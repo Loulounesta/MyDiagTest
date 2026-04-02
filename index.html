@@ -4581,19 +4581,6 @@ renderAccueil();
 const _savOrig=typeof save==='function'?save:null;
 function save(){if(_savOrig)_savOrig();localStorage.setItem('pppt_refs',JSON.stringify(refs));}
 
-// Patch goTab
-const _goTabOrig=typeof goTab==='function'?goTab:null;
-function goTab(name){
-  window._tabActif=name;
-  if(_goTabOrig)_goTabOrig(name);
-  if(name==='refends')renderRefView();
-  if(name==='plafonds')renderPlfView();
-  if(name==='planchers')renderPlaView();
-  if(name==='portes')renderPortesView();
-  if(name==='totaux')renderTotaux();
-  if(name==='copro')setTimeout(renderRecapAppts,50);
-}
-
 /* ── PLAFONDS ── */
 function toggleRampant(v){const pf=document.getElementById('plf-plat-fields'),rf=document.getElementById('plf-rampant-fields');if(pf)pf.style.display=v==='rampant'?'none':'block';if(rf)rf.style.display=v==='rampant'?'block':'none';}
 function toggleRampantEdit(v){const pf=document.getElementById('ed-plf-plat-fields'),rf=document.getElementById('ed-plf-rampant-fields');if(pf)pf.style.display=v==='rampant'?'none':'block';if(rf)rf.style.display=v==='rampant'?'block':'none';}
