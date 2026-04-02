@@ -363,7 +363,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
      VUE : ACCUEIL (GUIDE)
      ================================ -->
 
-<div id="vw-accueil" class="vw on">
+<div id="vw-accueil" class="vw on">   <div class="acc-copro-summary" id="acc-copro-summary"></div>
 
   <!-- ── Hero copro ── -->
   <div class="acc-hero" id="acc-hero">
@@ -1957,7 +1957,7 @@ function saveCopro(){
 function loadCopro(){
   if(!copro.nom) return;
   const s=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v||''; };
-  s('copro-nom',copro.nom); s('copro-adresse',copro.adresse); s('copro-annee',copro.annee); s('copro-batiments',copro.batiments); s('copro-ref',copro.ref);
+  s('copro-nom',copro.nom); s('copro-adresse',copro.adresse); s('copro-annee',copro.annee); s('copro-batiments',copro.batiments); s('copro-ref',copro.ref); s('copro-ref',copro.ref);
 }
 
 // ══════════════════════════════════════════════
@@ -4523,7 +4523,7 @@ function demanderVisite(){
 
 
 // ── Page Accueil — tableau de bord ──
-function renderAccueil(){
+function renderAccueil(){const copro=getCopro();   const summaryRows=['nom','adresse','ref','annee','chauf-collectif','ecs-collectif','vmc'].map(k=>{     const labels={nom:'Copropriété',adresse:'Adresse',ref:'Réf. dossier',annee:'Année',"chauf-collectif":'Chauf. collectif',"ecs-collectif":'ECS collective',vmc:'Ventilation'};     const v=copro[k]||copro['chauf-collectif']||'';     return '<div class="acc-summary-row"><span class="acc-summary-lbl">'+labels[k]+'</span><span class="acc-summary-val">'+(copro[k]||'—')+'</span></div>';   }).join('');   const el=document.getElementById('acc-copro-summary');   if(el) el.innerHTML=summaryRows;
   const nom = (copro&&copro.nom) ? copro.nom : null;
   const lots = (copro&&copro.lots) ? parseInt(copro.lots)||0 : 0;
   const dateV = (copro&&copro.dateVisite) ? copro.dateVisite : '';
