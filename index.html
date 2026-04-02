@@ -4061,64 +4061,6 @@ async function ouvrirDTGHtml(){
   toast('Fichier HTML généré ✓ — partagez-le par AirDrop ou Mail');
 }
 
-async function exportDTGHtml(){
-  if(!dtgPhotos.length){ toast('Aucune photo DTG à afficher'); return; }
-  const prog = document.getElementById('dtg-export-progress');
-  if(prog){ prog.style.display='block'; prog.textContent='Préparation du rapport…'; }
-
-  const sorted=[...dtgPhotos].sort((a,b)=>DTG_CATS.indexOf(a.cat)-DTG_CATS.indexOf(b.cat));
-  const converted=[];
-  for(let i=0;i<sorted.length;i++){
-    if(prog) prog.textContent='Conversion '+(i+1)+'/'+sorted.length+'…';
-    converted.push({...sorted[i], pngSrc: await toPNGDataUrl(sorted[i].src)});
-  }
-  const grp={};
-  converted.forEach(p=>{ if(!grp[p.cat]) grp[p.cat]=[]; grp[p.cat].push(p); });
-  const tagColors={'Défaut / Problème':'#A32D2D','Vétusté':'#854F0B','À remplacer':'#854F0B','Urgence':'#c0392b','Non-conformité':'#185FA5','Bon état':'#3B6D11'};
-  const ref=(copro&&copro.nom)?copro.nom.replace(/[^a-zA-Z0-9\u00C0-\u017E ]/g,'-').trim():'Copropriété';
-  const date=new Date().toLocaleDateString('fr-FR');
-  const sectionsHtml=DTG_CATS.filter(cat=>grp[cat]).map(cat=>{
-    const photos=grp[cat];
-    return '<div style="margin-bottom:28px">'
-      +'<h2 style="font-size:15px;font-weight:700;color:#185FA5;border-bottom:2px solid #185FA5;padding-bottom:6px;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">'+cat+' <span style="font-size:12px;font-weight:400;color:#888">('+photos.length+')</span></h2>'
-      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">'
-      +photos.map(p=>{
-        const tags=(p.tags&&p.tags.length)?p.tags.map(t=>'<span style="display:inline-block;padding:2px 8px;border-radius:10px;background:'+(tagColors[t]||'#666')+';color:#fff;font-size:10px;font-weight:700;margin:2px 2px 0 0">'+t+'</span>').join(''):'';
-        return '<div style="break-inside:avoid;border:1px solid #ddd;border-radius:8px;overflow:hidden">'
-          +'<img src="'+p.pngSrc+'" style="width:100%;display:block;max-height:280px;object-fit:cover">'
-          +'<div style="padding:8px 10px;background:#fff">'
-            +'<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:4px">'+p.titre+'</div>'
-            +(tags?'<div style="margin-bottom:4px">'+tags+'</div>':'')
-            +'<div style="font-size:10px;color:#999">'+p.date+'</div>'
-          +'</div></div>';
-      }).join('')
-      +'</div></div>';
-  }).join('');
-  const pageHtml='<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Photos DTG — '+ref+'</title>'
-    +'<style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;margin:0;padding:20px;background:#f5f5f5;color:#1a1a1a}'
-    +'.hd{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between}'
-    +'.hd h1{font-size:20px;margin:0 0 4px},.hd p{font-size:13px;margin:0;opacity:.8}'
-    +'@media print{body{background:#fff}.hd{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between}}'
-    +'</style></head><body>'
-    +'<div class="hd"><h1>Photos DTG — '+ref+'</h1><p>Généré le '+date+' · '+converted.length+' photos</p></div>'
-    +sectionsHtml
-    +'</body></html>';
-
-  // Créer un blob HTML et l'ouvrir / télécharger
-  const blob = new Blob([pageHtml], {type:'text/html;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-
-  // Sur iOS Safari, ouvrir dans un nouvel onglet fonctionne mieux que le téléchargement
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'DTG_'+(ref||'Copro').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'')+'_'+new Date().toLocaleDateString('fr-FR').replace(/\//g,'-')+'.html';
-  a.target = '_blank';
-  a.click();
-  URL.revokeObjectURL(url);
-
-  if(prog){ prog.textContent = converted.length+' photos exportées en PNG ✓'; setTimeout(()=>prog.style.display='none',3000); }
-  toast('Fichier HTML généré ✓ — partagez-le par AirDrop ou Mail');
-}
 
 
 // ══════════════════════════════════════════════
