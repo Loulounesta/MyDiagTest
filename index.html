@@ -896,9 +896,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
     <h2 style="font-size:.95rem;font-weight:700;color:var(--tx);padding:12px 14px 4px;margin:0">🚪 Appartements par niveau</h2>
     <div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 8px">
       <button class="tot-tab on" onclick="setTriNiveau('')">Tous</button>
-      <button class="tot-tab" onclick="setTriNiveau('rdc')">🏠 RDC</button>
-      <button class="tot-tab" onclick="setTriNiveau('intermediaire')">🏢 Intermédiaire</button>
-      <button class="tot-tab" onclick="setTriNiveau('dernier')">🏗️ Dernier</button>
+      <button class="tot-tab" onclick="setTriNiveau('RDC')">🏠 RDC</button>
+      <button class="tot-tab" onclick="setTriNiveau('Intermédiaire')">🏢 Intermédiaire</button>
+      <button class="tot-tab" onclick="setTriNiveau('Dernier étage')">🏗️ Dernier</button>
     </div>
     <div id="recap-appts-contenu" style="padding:0 12px 12px"></div>
   </section>
@@ -1668,7 +1668,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
         <select id="ed-apt-etage"><option value="">—</option><option>Sous-sol</option><option>RDC</option><option>R+1</option><option>R+2</option><option>R+3</option><option>R+4</option><option>R+5</option><option>R+6</option><option>R+7</option><option>R+8</option><option>R+9</option><option>R+10</option><option>R+11</option><option>R+12</option><option>R+13</option><option>R+14</option><option>R+15</option><option>R+16</option><option>R+17</option><option>R+18</option><option>R+19</option><option>R+20</option><option>R+21</option><option>R+22</option><option>R+23</option><option>R+24</option><option>R+25</option><option>Combles</option></select>
       </div>
       <div class="fr"><span class="fl">Niveau ANNALYSSIMO</span>
-        <select id="ed-apt-niveau"><option value="">—</option><option>RDC</option><option>Intermédiaire</option><option>Dernier étage</option></select>
+        <select id="ed-4696
+        "><option value="">—</option><option>RDC</option><option>Intermédiaire</option><option>Dernier étage</option></select>
       </div>
       <div class="fr"><span class="fl">Position</span>
         <select id="ed-apt-pos"><option value="">—</option><option>Gauche</option><option>Centre</option><option>Droite</option><option>Angle gauche</option><option>Angle droit</option></select>
@@ -1921,7 +1922,6 @@ if(name==='copro')     { renderCoproRecap(); setTimeout(renderRecapAppts,50); }
   if(name==='portes')    renderPortesView();
   if(name==='totaux')    renderTotaux();
   if(name==='refends')   renderRefView();
-        if(name==='aide')      renderAide();
   if(name==='export')    updateExportView();
 }
 
@@ -2348,7 +2348,8 @@ function editAppt(id){
   editId=id;
   document.getElementById('ed-apt-num').value     = a.num;
   document.getElementById('ed-apt-etage').value   = a.etage||'';
-  document.getElementById('ed-apt-niveau').value  = a.niveau||'';
+  document.getElementById('ed-4696
+  ').value  = a.niveau||'';
   document.getElementById('ed-apt-pos').value     = a.pos||'';
   document.getElementById('ed-apt-surf').value    = a.surf||'';
   document.getElementById('ed-apt-occupant').value= a.occupant||'';
@@ -4066,7 +4067,8 @@ async function ouvrirDTGHtml(){
 // ══════════════════════════════════════════════
 // Nomenclature chauffage — générateurs par énergie
 // ══════════════════════════════════════════════
-const CHAUF_GEN_MAP = {"Electrique":["Pompe à chaleur Air/Eau","Pompe à chaleur Eau/Eau","Pompe à chaleur Eau glycolé/Eau","Pompe à chaleur Géothermie","Pompe à chaleur Air/Air","Convecteur électrique NFC","Convecteur électrique NF**","Convecteur électrique NF***","Panneau rayonnant électrique NFC","Panneau rayonnant électrique NF**","Panneau rayonnant électrique NF***","Radiateur électrique NFC","Radiateur électrique NF**","Radiateur électrique NF***","Autres émetteurs à effet joule","Plancher rayonnant électrique","Plafond rayonnant électrique","Radiateur électrique à accumulation","Chaudière électrique","Convecteur bi-jonction","Installation collective unique multi bâtiment"],"Gaz naturel":["Radiateur gaz à ventouse","Radiateur gaz sur conduits de fumée","Générateur d'air chaud","Chaudière basse température","Chaudière standard","Chaudière classique","Chaudière condensation","Chaudière PAC hybride","Installation collective unique multi bâtiment"],"GPL":["Poêle GPL","Générateur d'air chaud","Chaudière basse température","Chaudière standard","Chaudière classique","Chaudière condensation","Chaudière PAC hybride","Installation collective unique multi bâtiment","Radiateur gaz à ventouse","Radiateur gaz sur conduits de fumée"],"Fioul":["Poêle fioul","Générateur d'air chaud","Chaudière basse température","Chaudière standard","Chaudière classique","Chaudière condensation","Chaudière PAC hybride","Installation collective unique multi bâtiment"],"Bois":["Cuisinière","Poêle à granulés","Chaudière bois","Chaudière à granulés","Poêle à bois bouilleur","Installation collective unique multi bâtiment","Foyer fermé","Poêle bûche","Insert","Poêle à bois bouilleur granulés"],"Charbon":["Chaudière atmosphérique charbon","Cuisinière","Foyer fermé","Poêle","Insert","Installation collective unique multi bâtiment"],"Réseau de chaleur":["Installation collective unique multi bâtiment"]};
+const CHAUF_GEN_MAP = {"Electrique":["4003
+Pompe à chaleur Air/Eau","Pompe à chaleur Eau/Eau","Pompe à chaleur Eau glycolé/Eau","Pompe à chaleur Géothermie","Pompe à chaleur Air/Air","Convecteur électrique NFC","Convecteur électrique NF**","Convecteur électrique NF***","Panneau rayonnant électrique NFC","Panneau rayonnant électrique NF**","Panneau rayonnant électrique NF***","Radiateur électrique NFC","Radiateur électrique NF**","Radiateur électrique NF***","Autres émetteurs à effet joule","Plancher rayonnant électrique","Plafond rayonnant électrique","Radiateur électrique à accumulation","Chaudière électrique","Convecteur bi-jonction","Installation collective unique multi bâtiment"],"Gaz naturel":["Radiateur gaz à ventouse","Radiateur gaz sur conduits de fumée","Générateur d'air chaud","Chaudière basse température","Chaudière standard","Chaudière classique","Chaudière condensation","Chaudière PAC hybride","Installation collective unique multi bâtiment"],"GPL":["Poêle GPL","Générateur d'air chaud","Chaudière basse température","Chaudière standard","Chaudière classique","Chaudière condensation","Chaudière PAC hybride","Installation collective unique multi bâtiment","Radiateur gaz à ventouse","Radiateur gaz sur conduits de fumée"],"Fioul":["Poêle fioul","Générateur d'air chaud","Chaudière basse température","Chaudière standard","Chaudière classique","Chaudière condensation","Chaudière PAC hybride","Installation collective unique multi bâtiment"],"Bois":["Cuisinière","Poêle à granulés","Chaudière bois","Chaudière à granulés","Poêle à bois bouilleur","Installation collective unique multi bâtiment","Foyer fermé","Poêle bûche","Insert","Poêle à bois bouilleur granulés"],"Charbon":["Chaudière atmosphérique charbon","Cuisinière","Foyer fermé","Poêle","Insert","Installation collective unique multi bâtiment"],"Réseau de chaleur":["Installation collective unique multi bâtiment"]};
 const INSTALL_TYPES_CHAUF = [];
 
 function fillGenSelect(selId, energie){
@@ -4576,11 +4578,11 @@ renderAccueil();
 /* ============================================================
    MYDIAG v2.1 — JS ADDITIONNEL
    ============================================================ */
-if(typeof refs==='undefined'){var refs=JSON.parse(localStorage.getItem('mydiag_refs')||'[]');}
+if(typeof refs==='undefined'){var refs=JSON.parse(localStorage.getItem('pppt_refs')||'[]');}
 
 // Patch save
 const _savOrig=typeof save==='function'?save:null;
-function save(){if(_savOrig)_savOrig();localStorage.setItem('mydiag_refs',JSON.stringify(refs));}
+function save(){if(_savOrig)_savOrig();localStorage.setItem('pppt_refs',JSON.stringify(refs));}
 
 // Patch goTab
 const _goTabOrig=typeof goTab==='function'?goTab:null;
@@ -4592,7 +4594,6 @@ function goTab(name){
   if(name==='planchers')renderPlaView();
   if(name==='portes')renderPortesView();
   if(name==='totaux')renderTotaux();
-  if(name==='aide')renderAide();
   if(name==='copro')setTimeout(renderRecapAppts,50);
 }
 
@@ -4640,7 +4641,7 @@ function editPla(id){const p=plas.find(x=>String(x.id)===String(id));if(!p)retur
 function savePla(){const p=plas.find(x=>String(x.id)===String(edPlaId));if(!p)return;const l=parseFloat(document.getElementById('ed-pla-l').value),li=parseFloat(document.getElementById('ed-pla-li').value);const surf=(!isNaN(l)&&!isNaN(li)&&l>0&&li>0)?Math.round(l*li*100)/100:null;Object.assign(p,{type:document.getElementById('ed-pla-type').value,donne:document.getElementById('ed-pla-donne').value,l:document.getElementById('ed-pla-l').value,li:document.getElementById('ed-pla-li').value,surf,isoType:document.getElementById('ed-pla-iso-type').value,isoEp:document.getElementById('ed-pla-iso-ep').value});save();closeModal('modal-pla');renderPlaView();if(typeof renderApptsList==='function')renderApptsList();toast(plaTitre(p)+' modifié ✓');}
 
 /* ── PORTES ── */
-const PORTE_TYPES={Bois:['Porte pleine bois','Porte bois vitrée','Porte bois isolée (double paroi)','Porte bois ancienne simple'],Métallique:['Porte métallique pleine','Porte métallique coupe-feu','Porte métallique vitrée','Porte métallique avec joint'],PVC:['Porte PVC pleine','Porte PVC vitrée','Porte PVC isolée']};
+const PORTE_TYPES_EXT={Bois:['Porte pleine bois','Porte bois vitrée','Porte bois isolée (double paroi)','Porte bois ancienne simple'],Métallique:['Porte métallique pleine','Porte métallique coupe-feu','Porte métallique vitrée','Porte métallique avec joint'],PVC:['Porte PVC pleine','Porte PVC vitrée','Porte PVC isolée']};
 function updatePorteTypes(matId='por-mat',typeId='por-type'){const mat=document.getElementById(matId)?.value;const sel=document.getElementById(typeId);if(!sel)return;const types=PORTE_TYPES[mat]||[];sel.innerHTML=types.length?`<option value=""></option>`+types.map(t=>`<option>${t}</option>`).join(''):`<option value="">— Choisir menuiserie d'abord —</option>`;}
 function resetPorte(){['por-mat','por-type','por-obs'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});['por-l','por-h','por-rep'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});['por-opt-isolee','por-opt-sas','por-opt-dv','por-opt-autre'].forEach(id=>{const e=document.getElementById(id);if(e)e.checked=false;});const s=document.getElementById('por-type');if(s)s.innerHTML="<option value=''>— Choisir menuiserie d'abord —</option>";}
 function nextPorteNum(){const ex=portes.filter(p=>p.aptId===curAppt).map(p=>parseInt(p.num)||0);return ex.length?Math.max(...ex)+1:1;}
@@ -4692,7 +4693,7 @@ let triNiveauActif='';
 function setTriNiveau(niv){triNiveauActif=niv;renderRecapAppts();}
 function renderRecapAppts(){
   const c=document.getElementById('recap-appts-contenu');if(!c)return;
-  const NIVEAUX=[{id:'rdc',icone:'🏠',label:'RDC'},{id:'intermediaire',icone:'🏢',label:'Intermédiaire'},{id:'dernier',icone:'🏗️',label:'Dernier étage'}];
+  const NIVEAUX=[{id:'RDC',icone:'🏠',label:'RDC'},{id:'Intermédiaire',icone:'🏢',label:'Intermédiaire'},{id:'Dernier étage',icone:'🏗️',label:'Dernier étage'}];
   const niv=triNiveauActif?NIVEAUX.filter(n=>n.id===triNiveauActif):NIVEAUX;
   if(!appts.length){c.innerHTML='<div class="empty">Aucun appartement saisi.</div>';return;}
   let html='';
