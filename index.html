@@ -3,198 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyDiag PRO v4.2 - FIX</title>
+    <title>MyDiag PRO v8.2</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        :root { --p: #2563eb; --bg: #f8fafc; --txt: #0f172a; --s: #10b981; --err: #ef4444; }
-        
-        /* FIX TACTILE IPHONE */
-        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; overflow-x: hidden; }
+        :root { 
+            --p: #2563eb; /* Bleu MyDiag */
+            --bg: #f8fafc; 
+            --txt: #0f172a; 
+            --s: #10b981; /* Vert Succès */
+            --err: #ef4444; 
+        }
 
-        /* Header Fixe sans superposition */
-        .header { background: #0f172a; color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        /* RESET ET FIX TACTILE IOS */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding-bottom: 100px; line-height: 1.5; }
+
+        /* HEADER FIXE AVEC LOGO */
+        .header { 
+            background: white; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 2000; 
+        }
         
-        /* Navigation Simple (plus de défilement complexe) */
-        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 50px; z-index: 1000; width: 100%; border-bottom: 3px solid var(--p); }
-        .tab-btn { flex: 1; padding: 15px 5px; border: none; background: none; font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+        /* NAVIGATION PAR ONGLETS */
+        .nav-tabs { 
+            display: flex; background: #1e293b; position: sticky; top: 54px; z-index: 1900; 
+            width: 100%; border-bottom: 3px solid var(--p); 
+        }
+        .tab-btn { 
+            flex: 1; padding: 16px 5px; border: none; background: none; 
+            font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; 
+        }
         .tab-btn.active { color: white; background: var(--p); }
 
-        .container { padding: 15px; max-width: 800px; margin: auto; position: relative; z-index: 1; }
-        .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        
-        /* Boutons larges pour iPhone */
-        input, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; -webkit-appearance: none; }
-        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; width: 100%; font-size: 1rem; display: block; text-align: center; text-decoration: none; }
-        .btn-p { background: var(--p); color: white; margin-bottom: 10px; }
-        .btn-s { background: var(--s); color: white; }
-
-        /* Tiroirs Appts */
-        .appt-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 10px; }
-        .appt-head { padding: 18px; display: flex; justify-content: space-between; font-weight: 800; cursor: pointer; background: #fff; border-radius: 12px; }
-        .appt-drawer { display: none; padding: 15px; border-top: 1px solid #eee; background: #fafafa; }
-        .appt-drawer.open { display: block; }
-
-        .quick-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .q-btn { padding: 15px 5px; border-radius: 10px; border: 1px solid #ccc; background: white; font-size: 0.7rem; font-weight: 800; text-align: center; }
-
-        .hidden { display: none !important; }
+        /* CONTENEUR ET VUES */
+        .container { padding: 15px; max-width: 800px; margin: auto; }
         .view { display: none; }
         .view.active { display: block; }
+        
+        .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        /* FORMULAIRES ET BOUTONS */
+        input, select { width: 100%; padding: 16px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; -webkit-appearance: none; background: #fff; }
+        .btn { 
+            padding: 18px; border-radius: 14px; border: none; font-weight: 800; 
+            width: 100%; font-size: 1rem; display: block; text-align: center; 
+            color: white; margin-bottom: 12px; text-decoration: none; cursor: pointer;
+        }
+        .btn-p { background: var(--p); }
+        .btn-s { background: var(--s); }
+
+        /* TIROIRS APPARTEMENTS */
+        .appt-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 10px; overflow: hidden; }
+        .appt-head { padding: 18px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; cursor: pointer; }
+        .appt-body { display: none; padding: 15px; border-top: 1px solid #eee; background: #fafafa; }
+        .appt-body.active { display: block; }
+
+        .quick-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .q-btn { 
+            padding: 15px 5px; border-radius: 10px; border: 1px solid #ccc; 
+            background: white; font-size: 0.7rem; font-weight: 800; text-align: center; 
+        }
+
+        /* CALCULATEUR CARREZ */
+        .carrez-row { display: grid; grid-template-columns: 1.5fr 65px 65px 65px 30px; gap: 5px; margin-bottom: 8px; align-items: center; }
+        .carrez-row input { padding: 10px 5px; font-size: 0.85rem; margin: 0; text-align: center; }
+        
+        h3 { margin-top: 0; color: var(--p); font-size: 1rem; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <span style="font-weight:900;">MYDIAG PRO v4.2</span>
-    <div id="sync" style="font-size:0.7rem; background:var(--s); padding:3px 8px; border-radius:10px;">🟢 SYNC</div>
+    <svg width="120" height="30" viewBox="0 0 250 60">
+        <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#2563eb"/><stop offset="100%" style="stop-color:#1e40af"/></linearGradient></defs>
+        <path d="M10 45 L10 20 L20 10 L30 20 L30 45 Z" fill="none" stroke="url(#g)" stroke-width="3"/>
+        <text x="50" y="42" font-family="sans-serif" font-size="38" font-weight="900" fill="#0f172a">My<tspan fill="url(#g)">Diag</tspan></text>
+    </svg>
+    <div id="sync-label" style="font-size:0.65rem; font-weight:bold; color:var(--s);">🟢 SYNC OK</div>
 </div>
 
 <nav class="nav-tabs">
-    <button class="tab-btn active" id="tab-accueil" onclick="goTab('accueil')">Accueil</button>
-    <button class="tab-btn" id="tab-appts" onclick="goTab('appts')">Appts</button>
-    <button class="tab-btn" id="tab-murs" onclick="goTab('murs')">Murs</button>
-    <button class="tab-btn" id="tab-fen" onclick="goTab('fen')">Fens</button>
-    <button class="tab-btn" id="tab-export" onclick="goTab('export')">Export</button>
+    <button class="tab-btn active" id="t-home" onclick="go('home')">Projet</button>
+    <button class="tab-btn" id="t-appts" onclick="go('appts')">Logements</button>
+    <button class="tab-btn" id="t-murs" onclick="go('murs')">Murs</button>
+    <button class="tab-btn" id="t-export" onclick="go('export')">Export</button>
 </nav>
 
 <div class="container">
-    <div id="vw-accueil" class="view active">
+    <div id="vw-home" class="view active">
         <div class="card">
-            <h3>🤖 Assistant Vision</h3>
-            <button class="btn btn-p" style="background:linear-gradient(to right, #6366f1, #a855f7)" onclick="alert('IA activée')">📸 Scan Plan</button>
+            <h3>🏢 INFORMATIONS GÉNÉRALES</h3>
+            <input type="text" id="cp-nom" placeholder="Nom de la copropriété" oninput="save()">
+            <input type="text" id="cp-ref" placeholder="Référence Dossier" oninput="save()">
+            <button class="btn btn-p" onclick="go('appts')">CRÉER LES LOGEMENTS ➡️</button>
         </div>
-        <div class="card">
-            <h3>🏢 Projet</h3>
-            <input type="text" id="cp-nom" placeholder="Nom de la résidence" oninput="save()">
-            <button class="btn btn-p" onclick="goTab('appts')">Démarrer Relevé</button>
-        </div>
+        <div class="card" id="home-stats" style="font-size:0.9rem; color:#64748b;">
+            </div>
     </div>
 
     <div id="vw-appts" class="view">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h2 style="margin:0">Logements</h2>
-            <button class="btn btn-p" style="width:auto; padding:10px 20px" onclick="addAppt()">+ Nouveau</button>
+            <button class="btn btn-p" style="width:auto; padding:10px 20px" onclick="addA()">+ NOUVEAU</button>
         </div>
-        <div id="list-appts"></div>
+        <div id="list-a"></div>
     </div>
 
     <div id="vw-murs" class="view">
         <div class="card">
-            <h3 id="mur-header">🧱 Murs (Sélectionnez un Appt)</h3>
-            <div id="mur-form" class="hidden">
+            <h3 id="m-label">🧱 CHOISISSEZ UN LOGEMENT</h3>
+            <div id="m-form" style="display:none">
                 <input type="number" id="m-l" placeholder="Largeur (m)" inputmode="decimal">
                 <input type="number" id="m-h" placeholder="Hauteur (m)" inputmode="decimal">
                 <select id="m-ori">
-                    <option value="Nord">Nord</option><option value="Sud">Sud</option>
-                    <option value="Est">Est</option><option value="Ouest">Ouest</option>
+                    <option value="Nord">Nord</option>
+                    <option value="Sud">Sud</option>
+                    <option value="Est">Est</option>
+                    <option value="Ouest">Ouest</option>
                 </select>
-                <button class="btn btn-p" onclick="saveMur()">Ajouter Mur</button>
+                <button class="btn btn-p" onclick="addM()">AJOUTER CE MUR</button>
             </div>
         </div>
-        <div id="list-murs"></div>
+        <div id="list-m"></div>
     </div>
 
     <div id="vw-export" class="view">
         <div class="card">
-            <h3>📤 Export ADN</h3>
-            <button class="btn btn-s" onclick="exportADN()">Générer Excel</button>
-            <button class="btn" style="margin-top:10px; background:#64748b; color:white" onclick="downloadBackup()">Sauvegarde JSON</button>
+            <h3>📤 RÉCUPÉRATION DES DONNÉES</h3>
+            <button class="btn btn-s" onclick="exp()">📊 EXPORT EXCEL ADN</button>
+            <button class="btn" style="background:#64748b; color:white" onclick="downloadBackup()">📥 SAUVEGARDE JSON</button>
+            <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+            <button class="btn" style="background:var(--err); color:white" onclick="reset()">🗑️ RESET TOTAL DE L'APPLI</button>
         </div>
     </div>
 </div>
 
 <script>
-let appts = [], murs = [], copro = {}, expanded = {}, curApt = null;
+    // --- ÉTAT GLOBAL ---
+    let appts = JSON.parse(localStorage.getItem('v8_appts') || '[]');
+    let murs = JSON.parse(localStorage.getItem('v8_murs') || '[]');
+    let carrez = JSON.parse(localStorage.getItem('v8_carrez') || '{}');
+    let curApt = null;
+    let expanded = {};
 
-// GESTIONNAIRE DE VUES (SIMPLE & ROBUSTE)
-function goTab(id) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    
-    document.getElementById('vw-' + id).classList.add('active');
-    document.getElementById('tab-' + id).classList.add('active');
-    
-    if(id === 'appts') renderAppts();
-    if(id === 'murs') renderMurs();
-}
+    // --- NAVIGATION ---
+    function go(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById('vw-' + id).classList.add('active');
+        document.getElementById('t-' + id).classList.add('active');
 
-// LOGIQUE DATA
-async function save() {
-    copro.nom = document.getElementById('cp-nom').value;
-    localStorage.setItem('diag_appts', JSON.stringify(appts));
-    localStorage.setItem('diag_murs', JSON.stringify(murs));
-    localStorage.setItem('diag_copro', JSON.stringify(copro));
-    document.getElementById('sync').innerText = "⏳...";
-    setTimeout(() => document.getElementById('sync').innerText = "🟢 SYNC", 500);
-}
+        if(id === 'appts') renderA();
+        if(id === 'murs') renderM();
+        if(id === 'home') renderStats();
+    }
 
-function addAppt() {
-    const n = prompt("N° Appartement :");
-    if(!n) return;
-    const id = Date.now().toString();
-    appts.push({ id, nom: n });
-    save(); renderAppts();
-}
+    // --- SAUVEGARDE ---
+    function save() {
+        localStorage.setItem('v8_appts', JSON.stringify(appts));
+        localStorage.setItem('v8_murs', JSON.stringify(murs));
+        localStorage.setItem('v8_carrez', JSON.stringify(carrez));
+        localStorage.setItem('v8_nom', document.getElementById('cp-nom').value);
+        localStorage.setItem('v8_ref', document.getElementById('cp-ref').value);
+        
+        const label = document.getElementById('sync-label');
+        label.innerText = "⏳ SAUVEGARDE...";
+        setTimeout(() => label.innerText = "🟢 SYNC OK", 400);
+    }
 
-function toggleApt(id) {
-    expanded[id] = !expanded[id];
-    renderAppts();
-}
-
-function selectApt(id, nom) {
-    curApt = id;
-    document.getElementById('mur-header').innerText = "🧱 Murs - " + nom;
-    document.getElementById('mur-form').classList.remove('hidden');
-    goTab('murs');
-}
-
-function renderAppts() {
-    const cont = document.getElementById('list-appts');
-    cont.innerHTML = appts.map(a => `
-        <div class="appt-card">
-            <div class="appt-head" onclick="toggleApt('${a.id}')">
-                <span>${a.nom}</span>
-                <span>${expanded[a.id] ? '▼' : '▶'}</span>
-            </div>
-            <div class="appt-drawer ${expanded[a.id] ? 'open' : ''}">
-                <div class="quick-grid">
-                    <button class="q-btn" onclick="selectApt('${a.id}','${a.nom}')">🧱 MURS</button>
-                    <button class="q-btn" onclick="curApt='${a.id}';goTab('fen')">🪟 FENS</button>
-                    <button class="q-btn" onclick="alert('IA Vision')">🔥 SYST</button>
-                </div>
-                <button class="btn" style="padding:8px; font-size:0.7rem; color:red" onclick="appts=appts.filter(x=>x.id!=='${a.id}');save();renderAppts()">Supprimer</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-function saveMur() {
-    const l = document.getElementById('m-l').value;
-    const h = document.getElementById('m-h').value;
-    murs.push({ aptId: curApt, surface: (l*h).toFixed(2), ori: document.getElementById('m-ori').value });
-    save(); renderMurs();
-}
-
-function renderMurs() {
-    const list = document.getElementById('list-murs');
-    list.innerHTML = murs.filter(m => m.aptId === curApt).map(m => `
-        <div class="card" style="display:flex; justify-content:space-between">
-            <strong>${m.ori}</strong> <span>${m.surface} m²</span>
-        </div>
-    `).join('');
-}
-
-window.onload = () => {
-    appts = JSON.parse(localStorage.getItem('diag_appts') || '[]');
-    murs = JSON.parse(localStorage.getItem('diag_murs') || '[]');
-    copro = JSON.parse(localStorage.getItem('diag_copro') || '{}');
-    document.getElementById('cp-nom').value = copro.nom || '';
-    goTab('accueil');
-};
-</script>
-</body>
-</html>
+    // --- LOGEMENTS ---
+    function addA() {
+        let n = prompt("Identification du lot (ex: E01 ou Appartement 12) :");
+        if(!n) return;
+        let id = "apt_" + Date.now();
+        appts.push({ id: id, nom: n });
+        carrez[id] = [];
+        save
