@@ -1,14 +1,14 @@
 <html lang="fr"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MyDiag [DÉMO]</title>
+<title>MyDiag DPE</title>
   <!-- PWA / iOS Safari -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="MyDiag">
+  <meta name="apple-mobile-web-app-title" content="MyDiag DPE">
     <meta name="theme-color" content="#2563EB">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIk9SRklUIFBQUFQgdjIuMCIsCiAgInNob3J0X25hbWUiOiAiT1JGSVQiLAogICJkZXNjcmlwdGlvbiI6ICJSZWxldsOpIHRlcnJhaW4gUFBQVCAvIERQRSBjb3Byb3ByacOpdMOpIOKAlCBFVEkiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjNDM1NDU5IiwKICAidGhlbWVfY29sb3IiOiAiIzQzNTQ1OSIsCiAgImljb25zIjogWwogICAgeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQXhPVElnTVRreUlqNEtJQ0E4Y21WamRDQjNhV1IwYUQwaU1Ua3lJaUJvWldsbmFIUTlJakU1TWlJZ2NuZzlJalF3SWlCbWFXeHNQU0lqTkRNMU5EVTVJaTgrQ2lBZ1BISmxZM1FnZUQwaU1UWWlJSGs5SWpnNElpQjNhV1IwYUQwaU9EQWlJR2hsYVdkb2REMGlPQ0lnWm1sc2JEMGlJMEUwUWpoQ1JTSXZQZ29nSUR4eVpXTjBJSGc5SWpFMklpQjVQU0l4TmlJZ2QybGtkR2c5SWpnaUlHaGxhV2RvZEQwaU1UWXdJaUJtYVd4c1BTSWpRVFJDT0VKRklpOCtDaUFnUEhSbGVIUWdlRDBpTXpRaUlIazlJakV5TlNJZ1ptOXVkQzFtWVcxcGJIazlJa0Z5YVdGc0xITmhibk10YzJWeWFXWWlJR1p2Ym5RdGMybDZaVDBpTnpJaUlHWnZiblF0ZDJWcFoyaDBQU0k1TURBaUlHWnBiR3c5SWlORU1qY3dNME1pUGs4OEwzUmxlSFErQ2lBZ1BIUmxlSFFnZUQwaU9UWWlJSGs5SWpFeU5TSWdabTl1ZEMxbVlXMXBiSGs5SWtGeWFXRnNMSE5oYm5NdGMyVnlhV1lpSUdadmJuUXRjMmw2WlQwaU16Z2lJR1p2Ym5RdGQyVnBaMmgwUFNJM01EQWlJR1pwYkd3OUlpTkZPRUkyT1VNaVBsSkdTVlE4TDNSbGVIUStDaUFnUEhSbGVIUWdlRDBpTXpRaUlIazlJakUxT0NJZ1ptOXVkQzFtWVcxcGJIazlJa0Z5YVdGc0xITmhibk10YzJWeWFXWWlJR1p2Ym5RdGMybDZaVDBpTWpnaUlHWnZiblF0ZDJWcFoyaDBQU0kyTURBaUlHWnBiR3c5SWlOQk5FSTRRa1VpUGxCUVVGUWdkakk4TDNSbGVIUStDand2YzNablBnPT0iLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwifSwKICAgIHsic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0F4T1RJZ01Ua3lJajRLSUNBOGNtVmpkQ0IzYVdSMGFEMGlNVGt5SWlCb1pXbG5hSFE5SWpFNU1pSWdjbmc5SWpRd0lpQm1hV3hzUFNJak5ETTFORFU1SWk4K0NpQWdQSEpsWTNRZ2VEMGlNVFlpSUhrOUlqZzRJaUIzYVdSMGFEMGlPREFpSUdobGFXZG9kRDBpT0NJZ1ptbHNiRDBpSTBFMFFqaENSU0l2UGdvZ0lEeHlaV04wSUhnOUlqRTJJaUI1UFNJeE5pSWdkMmxrZEdnOUlqZ2lJR2hsYVdkb2REMGlNVFl3SWlCbWFXeHNQU0lqUVRSQ09FSkZJaTgrQ2lBZ1BIUmxlSFFnZUQwaU16UWlJSGs5SWpFeU5TSWdabTl1ZEMxbVlXMXBiSGs5SWtGeWFXRnNMSE5oYm5NdGMyVnlhV1lpSUdadmJuUXRjMmw2WlQwaU56SWlJR1p2Ym5RdGQyVnBaMmgwUFNJNU1EQWlJR1pwYkd3OUlpTkVNamN3TTBNaVBrODhMM1JsZUhRK0NpQWdQSFJsZUhRZ2VEMGlPVFlpSUhrOUlqRXlOU0lnWm05dWRDMW1ZVzFwYkhrOUlrRnlhV0ZzTEhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlNemdpSUdadmJuUXRkMlZwWjJoMFBTSTNNREFpSUdacGJHdzlJaU5GT0VJMk9VTWlQbEpHU1ZROEwzUmxlSFErQ2lBZ1BIUmxlSFFnZUQwaU16UWlJSGs5SWpFMU9DSWdabTl1ZEMxbVlXMXBiSGs5SWtGeWFXRnNMSE5oYm5NdGMyVnlhV1lpSUdadmJuUXRjMmw2WlQwaU1qZ2lJR1p2Ym5RdGQyVnBaMmgwUFNJMk1EQWlJR1pwYkd3OUlpTkJORUk0UWtVaVBsQlFVRlFnZGpJOEwzUmxlSFErQ2p3dmMzWm5QZz09IiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIn0KICBdCn0=">
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIk15RGlhZyBEUEUiLCAic2hvcnRfbmFtZSI6ICJNeURpYWcgRFBFIiwgImRlc2NyaXB0aW9uIjogIlJlbGV2w6kgdGVycmFpbiBEUEUgLyBQUFBUIGNvcHJvcHJpw6l0w6kiLCAic3RhcnRfdXJsIjogIi4iLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwgImJhY2tncm91bmRfY29sb3IiOiAiIzFFM0E1RiIsICJ0aGVtZV9jb2xvciI6ICIjMjU2M0VCIiwgImljb25zIjogW3sic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0F4T1RJZ01Ua3lJajRLSUNBOGNtVmpkQ0IzYVdSMGFEMGlNVGt5SWlCb1pXbG5hSFE5SWpFNU1pSWdjbmc5SWpRd0lpQm1hV3hzUFNJak1VVXpRVFZHSWk4K0NpQWdQSEpsWTNRZ2VEMGlNakFpSUhrOUlqSXdJaUIzYVdSMGFEMGlNVFV5SWlCb1pXbG5hSFE5SWpFMU1pSWdjbmc5SWpJMElpQm1hV3hzUFNJak1qVTJNMFZDSWlCdmNHRmphWFI1UFNJd0xqRTFJaTgrQ2lBZ1BIUmxlSFFnZUQwaU9UWWlJSGs5SWpnd0lpQm1iMjUwTFdaaGJXbHNlVDBpUVhKcFlXd3NjMkZ1Y3kxelpYSnBaaUlnWm05dWRDMXphWHBsUFNJek5pSWdabTl1ZEMxM1pXbG5hSFE5SWprd01DSWdabWxzYkQwaUkwWkdSa1pHUmlJZ2RHVjRkQzFoYm1Ob2IzSTlJbTFwWkdSc1pTSStUWGxFYVdGblBDOTBaWGgwUGdvZ0lEeDBaWGgwSUhnOUlqazJJaUI1UFNJeE1UZ2lJR1p2Ym5RdFptRnRhV3g1UFNKQmNtbGhiQ3h6WVc1ekxYTmxjbWxtSWlCbWIyNTBMWE5wZW1VOUlqSTRJaUJtYjI1MExYZGxhV2RvZEQwaU56QXdJaUJtYVd4c1BTSWpPVE5ETlVaRUlpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJajVFVUVVOEwzUmxlSFErQ2lBZ1BISmxZM1FnZUQwaU16WWlJSGs5SWpFek1DSWdkMmxrZEdnOUlqRXlNQ0lnYUdWcFoyaDBQU0l6SWlCeWVEMGlNaUlnWm1sc2JEMGlJekkxTmpORlFpSXZQZ29nSUR4MFpYaDBJSGc5SWprMklpQjVQU0l4TlRnaUlHWnZiblF0Wm1GdGFXeDVQU0pCY21saGJDeHpZVzV6TFhObGNtbG1JaUJtYjI1MExYTnBlbVU5SWpFMElpQm1iMjUwTFhkbGFXZG9kRDBpTlRBd0lpQm1hV3hzUFNJalFrWkVRa1pGSWlCMFpYaDBMV0Z1WTJodmNqMGliV2xrWkd4bElqNVVaWEp5WVdsdVBDOTBaWGgwUGdvOEwzTjJaejQ9IiwgInNpemVzIjogIjE5MngxOTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIn0sIHsic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0F4T1RJZ01Ua3lJajRLSUNBOGNtVmpkQ0IzYVdSMGFEMGlNVGt5SWlCb1pXbG5hSFE5SWpFNU1pSWdjbmc5SWpRd0lpQm1hV3hzUFNJak1VVXpRVFZHSWk4K0NpQWdQSEpsWTNRZ2VEMGlNakFpSUhrOUlqSXdJaUIzYVdSMGFEMGlNVFV5SWlCb1pXbG5hSFE5SWpFMU1pSWdjbmc5SWpJMElpQm1hV3hzUFNJak1qVTJNMFZDSWlCdmNHRmphWFI1UFNJd0xqRTFJaTgrQ2lBZ1BIUmxlSFFnZUQwaU9UWWlJSGs5SWpnd0lpQm1iMjUwTFdaaGJXbHNlVDBpUVhKcFlXd3NjMkZ1Y3kxelpYSnBaaUlnWm05dWRDMXphWHBsUFNJek5pSWdabTl1ZEMxM1pXbG5hSFE5SWprd01DSWdabWxzYkQwaUkwWkdSa1pHUmlJZ2RHVjRkQzFoYm1Ob2IzSTlJbTFwWkdSc1pTSStUWGxFYVdGblBDOTBaWGgwUGdvZ0lEeDBaWGgwSUhnOUlqazJJaUI1UFNJeE1UZ2lJR1p2Ym5RdFptRnRhV3g1UFNKQmNtbGhiQ3h6WVc1ekxYTmxjbWxtSWlCbWIyNTBMWE5wZW1VOUlqSTRJaUJtYjI1MExYZGxhV2RvZEQwaU56QXdJaUJtYVd4c1BTSWpPVE5ETlVaRUlpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJajVFVUVVOEwzUmxlSFErQ2lBZ1BISmxZM1FnZUQwaU16WWlJSGs5SWpFek1DSWdkMmxrZEdnOUlqRXlNQ0lnYUdWcFoyaDBQU0l6SWlCeWVEMGlNaUlnWm1sc2JEMGlJekkxTmpORlFpSXZQZ29nSUR4MFpYaDBJSGc5SWprMklpQjVQU0l4TlRnaUlHWnZiblF0Wm1GdGFXeDVQU0pCY21saGJDeHpZVzV6TFhObGNtbG1JaUJtYjI1MExYTnBlbVU5SWpFMElpQm1iMjUwTFhkbGFXZG9kRDBpTlRBd0lpQm1hV3hzUFNJalFrWkVRa1pGSWlCMFpYaDBMV0Z1WTJodmNqMGliV2xrWkd4bElqNVVaWEp5WVdsdVBDOTBaWGgwUGdvOEwzTjJaejQ9IiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIn1dfQ==">
   <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQwIiBmaWxsPSIjNDM1NDU5Ii8+CiAgPHJlY3QgeD0iMTYiIHk9Ijg4IiB3aWR0aD0iODAiIGhlaWdodD0iOCIgZmlsbD0iI0E0QjhCRSIvPgogIDxyZWN0IHg9IjE2IiB5PSIxNiIgd2lkdGg9IjgiIGhlaWdodD0iMTYwIiBmaWxsPSIjQTRCOEJFIi8+CiAgPHRleHQgeD0iMzQiIHk9IjEyNSIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNzIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNEMjcwM0MiPk88L3RleHQ+CiAgPHRleHQgeD0iOTYiIHk9IjEyNSIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzgiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNFOEI2OUMiPlJGSVQ8L3RleHQ+CiAgPHRleHQgeD0iMzQiIHk9IjE1OCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjgiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNBNEI4QkUiPlBQUFQgdjI8L3RleHQ+Cjwvc3ZnPg==">
   <link rel="apple-touch-startup-image" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQwIiBmaWxsPSIjNDM1NDU5Ii8+CiAgPHJlY3QgeD0iMTYiIHk9Ijg4IiB3aWR0aD0iODAiIGhlaWdodD0iOCIgZmlsbD0iI0E0QjhCRSIvPgogIDxyZWN0IHg9IjE2IiB5PSIxNiIgd2lkdGg9IjgiIGhlaWdodD0iMTYwIiBmaWxsPSIjQTRCOEJFIi8+CiAgPHRleHQgeD0iMzQiIHk9IjEyNSIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNzIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNEMjcwM0MiPk88L3RleHQ+CiAgPHRleHQgeD0iOTYiIHk9IjEyNSIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzgiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNFOEI2OUMiPlJGSVQ8L3RleHQ+CiAgPHRleHQgeD0iMzQiIHk9IjE1OCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjgiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiNBNEI4QkUiPlBQUFQgdjI8L3RleHQ+Cjwvc3ZnPg==">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -333,7 +333,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
     
     <div style="border-left:1.5px solid rgba(164,184,190,.35);padding-left:12px">
       <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:-.2px;line-height:1.15">MyDiag</div>
-      <div style="font-size:10px;color:var(--clr-soft);font-weight:600;letter-spacing:.7px;text-transform:uppercase;line-height:1.2">v2.0 — Relevé terrain</div>
+      <div style="font-size:10px;color:var(--clr-soft);font-weight:600;letter-spacing:.7px;text-transform:uppercase;line-height:1.2">Relevé terrain</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
@@ -364,7 +364,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
 
   <!-- ── Hero copro ── -->
   <div class="acc-hero" id="acc-hero">
-    <div class="acc-hero-title">MyDiag <span style="color:var(--clr-soft)">v2.0</span></div>
+    <div class="acc-hero-title">MyDiag DPE</div>
     <div class="acc-hero-sub">Relevé terrain copropriété</div>
     <div id="acc-copro-name" class="acc-copro-name">—</div>
     <div id="acc-copro-meta" class="acc-copro-meta">Aucune copropriété saisie</div>
@@ -664,7 +664,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
   <div class="aide-faq-a">Oui. Une fois installée, l'appli fonctionne entièrement hors-ligne.</div></div>
 
   <div class="aide-footer">
-    <p><strong>MyDiag v2.0</strong><br>
+    <p><strong>MyDiag DPE</strong><br>
     Outil de relevé terrain PPPT / DPE copropriété</p>
   </div>
 
@@ -771,7 +771,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
     </div>
     <div class="fr"><span class="fl">Observations</span><input type="text" id="vmc-obs" placeholder="conduits obstrués…"></div>
   </div>
-  <div class="btn-row"><button class="btn btn-p" onclick="saveVMC()">Enregistrer la ventilation</button><div style="margin-top:8px"><label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border:.5px solid var(--bor);border-radius:var(--rs);cursor:pointer"><span style="font-size:20px">📷</span><span style="font-size:13px;font-weight:600;color:var(--acc)">Photo ventilation</span><input type="file" accept="image/*" capture="environment" multiple="" style="display:none" onchange="ajouterPhotoCollectif('vmc',this)"></label><div id="vmc-photo-thumbs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div></div></div>
+  <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border:.5px solid var(--bor);border-radius:var(--rs);cursor:pointer;margin:8px 0 4px;width:100%;box-sizing:border-box"><span style="font-size:20px">📷</span><span style="font-size:13px;font-weight:600;color:var(--acc)">Photo ventilation</span><input type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="ajouterPhotoCollectif('vmc',this)"></label><div id="vmc-photo-thumbs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;margin-bottom:8px"></div>
+<div class="btn-row"><button class="btn btn-p" onclick="saveVMC()">Enregistrer la ventilation</button></div></div>
   </div>
   </div>
 
@@ -814,16 +815,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
     <div class="fr"><span class="fl">Année</span><input type="number" id="col-chauf-annee" placeholder="ex: 2012" inputmode="numeric" min="1900" max="2099"></div>
     <div class="fr"><span class="fl">Puissance (kW)</span><input type="number" id="col-chauf-puissance" placeholder="ex: 180" inputmode="decimal" min="0" step="0.1"></div>
   </div>
-            <div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px 0;flex-wrap:wrap">
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--accent);color:#fff;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:600" title="Ajouter des photos du chauffage collectif">
-              📷 Photos chauffage
-              <input type="file" accept="image/*" padding:0}="" multiple="" style="display:none" onchange="addColPhotoInList('col-chauf',this)">
-            </label>
-            <div id="col-thumbs-col-chauf" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center"></div>
-          </div>
-  <div class="btn-row">
+  <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border:.5px solid var(--bor);border-radius:var(--rs);cursor:pointer;margin:8px 0 4px;width:100%;box-sizing:border-box"><span style="font-size:20px">📷</span><span style="font-size:13px;font-weight:600;color:var(--acc)">Photo chauffage collectif</span><input type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="ajouterPhotoCollectif('chauf_col',this)"></label><div id="chauf-col-photo-thumbs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;margin-bottom:8px"></div>
+<div class="btn-row">
     <button class="btn btn-s" style="flex:0 0 auto;padding:13px 16px" onclick="clearColChauf()">Effacer</button>
-    <button class="btn btn-ok" style="flex:1" onclick="appliquerColChauf()">Appliquer à tous les échantillons</button><div style="margin-top:8px"><label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border:.5px solid var(--bor);border-radius:var(--rs);cursor:pointer"><span style="font-size:20px">📷</span><span style="font-size:13px;font-weight:600;color:var(--acc)">Photo chauffage collectif</span><input type="file" accept="image/*" capture="environment" multiple="" style="display:none" onchange="ajouterPhotoCollectif('chauf_col',this)"></label><div id="chauf-col-photo-thumbs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div></div>
+    <button class="btn btn-ok" style="flex:1" onclick="appliquerColChauf()">Appliquer à tous les échantillons</button>
   </div>
   </div>
   </div>
@@ -865,16 +860,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
       </select>
     </div>
   </div>
-            <div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px 0;flex-wrap:wrap">
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--accent);color:#fff;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:600" title="Ajouter des photos de l'ECS collective">
-              📷 Photos ECS
-              <input type="file" accept="image/*" padding:0}="" multiple="" style="display:none" onchange="addColPhotoInList('col-ecs',this)">
-            </label>
-            <div id="col-thumbs-col-ecs" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center"></div>
-          </div>
-  <div class="btn-row">
+  <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border:.5px solid var(--bor);border-radius:var(--rs);cursor:pointer;margin:8px 0 4px;width:100%;box-sizing:border-box"><span style="font-size:20px">📷</span><span style="font-size:13px;font-weight:600;color:var(--acc)">Photo ECS collective</span><input type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="ajouterPhotoCollectif('ecs_col',this)"></label><div id="ecs-col-photo-thumbs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;margin-bottom:8px"></div>
+<div class="btn-row">
     <button class="btn btn-s" style="flex:0 0 auto;padding:13px 16px" onclick="clearColEcs()">Effacer</button>
-    <button class="btn btn-ok" style="flex:1" onclick="appliquerColEcs()">Appliquer à tous les échantillons</button><div style="margin-top:8px"><label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border:.5px solid var(--bor);border-radius:var(--rs);cursor:pointer"><span style="font-size:20px">📷</span><span style="font-size:13px;font-weight:600;color:var(--acc)">Photo ECS collective</span><input type="file" accept="image/*" capture="environment" multiple="" style="display:none" onchange="ajouterPhotoCollectif('ecs_col',this)"></label><div id="ecs-col-photo-thumbs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div></div><div style="margin-top:8px"><label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border:.5px solid var(--bor);border-radius:var(--rs);cursor:pointer"><span style="font-size:20px">📷</span><span style="font-size:13px;font-weight:600;color:var(--acc)">Photo ECS collective</span><input type="file" accept="image/*" capture="environment" multiple="" style="display:none" onchange="ajouterPhotoCollectif('ecs_col',this)"></label><div id="ecs-col-photo-thumbs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div></div>
+    <button class="btn btn-ok" style="flex:1" onclick="appliquerColEcs()">Appliquer à tous les échantillons</button>
   </div>
   </div>
   </div>
@@ -1607,7 +1596,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
     <button class="btn btn-d" style="margin-top:16px" onclick="resetTout()">Effacer toutes les données</button>
   </div>
   <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:.5px solid var(--bor)">
-    <div style="font-size:18px;font-weight:700;color:var(--clr-dark);font-size:18px;font-weight:700">MyDiag <span style="color:var(--clr-accent)">v2.0</span></div>
+    <div style="font-size:18px;font-weight:700;color:var(--clr-dark);font-size:18px;font-weight:700">MyDiag DPE</div>
     <div style="font-size:12px;color:var(--tx2);margin-top:4px">Outil de relevé terrain PPPT / DPE copropriété</div>
     <div style="font-size:12px;color:var(--tx2);margin-top:4px">Développé par </div>
     
@@ -1847,18 +1836,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;ba
   </div>
 
 <div class="vw" id="vw-aide">
-  <div class="sl">📖 Guide d'utilisation — MyDiag v2.1</div>
+  <div class="sl">📖 Guide d'utilisation — MyDiag DPE</div>
   <div class="tuto-list" id="tuto-list"></div>
 </div>
 </div>
 <div class="modal-bg" id="modal-plf"><div class="modal-box"><div class="modal-handle"></div><div class="modal-title">Modifier le plafond</div><div class="card"><div class="fr"><span class="fl">Type</span><select id="ed-plf-type" onchange="toggleRampantEdit(this.value)"><option value=""></option><option value="inconnu">Inconnu</option><option value="inconnuRempl">Inconnu avec ou sans remplissage</option><option value="boisSolives">Bois sous solives bois</option><option value="boisSurSolives">Bois sur solives bois</option><option value="bardeaux">Bardeaux et remplissage</option><option value="entresolivesBoiss">Entre solives bois avec ou sans remplissage</option><option value="boisMetal">Bois sur solives métallique</option><option value="boisSousMetal">Bois sous solives métallique</option><option value="solivestMetal">Entre solives métallique avec ou sans remplissage</option><option value="entrevous">Entrevous, terre-cuite, poutrelles béton</option><option value="dalle">Dalle béton</option><option value="rampant">Combles aménagés sous rampants</option><option value="chaume">Toit de chaume</option><option value="plaquesplatre">Plaques de plâtre</option><option value="bacAcier">Toiture en bac acier</option><option value="autre">Autre</option></select></div><div class="fr"><span class="fl">Donne sur</span><select id="ed-plf-donne"><option value=""></option><option>Terrasse</option><option>Combles aménagés</option><option>Combles perdus</option><option>Local chauffé</option><option>Local non chauffé</option><option>Local non chauffé et non accessible</option><option>Circulations communes</option><option>Extérieur</option><option>Bâtiment autre qu'habitation</option><option>Véranda non chauffée, loggia fermée</option><option>Local tertiaire à l'intérieur de l'immeuble</option></select></div><div id="ed-plf-plat-fields"><div class="fr"><span class="fl">L <span class="unit">m</span></span><div class="stepper"><button type="button" class="stepper-btn" onclick="stepperDec('ed-plf-l',0.05)">−</button><input type="number" id="ed-plf-l" inputmode="decimal" min="0" step="0.05"><span class="stepper-unit">m</span><button type="button" class="stepper-btn" onclick="stepperInc('ed-plf-l',0.05)">+</button></div></div><div class="fr"><span class="fl">l <span class="unit">m</span></span><div class="stepper"><button type="button" class="stepper-btn" onclick="stepperDec('ed-plf-li',0.05)">−</button><input type="number" id="ed-plf-li" inputmode="decimal" min="0" step="0.05"><span class="stepper-unit">m</span><button type="button" class="stepper-btn" onclick="stepperInc('ed-plf-li',0.05)">+</button></div></div></div><div id="ed-plf-rampant-fields" style="display:none"><div class="fr"><span class="fl">Orientation</span><select id="ed-plf-ori"><option value=""></option><option>Nord</option><option>Est</option><option>Sud</option><option>Ouest</option></select></div><div class="fr"><span class="fl">L rampant</span><input type="number" id="ed-plf-rl" inputmode="decimal" min="0" step="0.01"></div><div class="fr"><span class="fl">l rampant</span><input type="number" id="ed-plf-rli" inputmode="decimal" min="0" step="0.01"></div><div class="fr"><span class="fl">h bas</span><input type="number" id="ed-plf-rh" inputmode="decimal" min="0" step="0.01"></div><div class="fr"><span class="fl">H haut</span><input type="number" id="ed-plf-rH" inputmode="decimal" min="0" step="0.01"></div></div><div class="fr"><span class="fl">Isolation</span><select id="ed-plf-iso-type"><option value="Aucune"></option><option>ITE</option><option>ITI</option><option>Sous rampant</option><option>Soufflé</option></select></div><div class="fr"><span class="fl">ép. <span class="unit">cm</span></span><input type="number" id="ed-plf-iso-ep" inputmode="numeric" min="0"></div></div><div class="btn-row"><button class="btn btn-s" style="flex:0 0 80px" onclick="closeModal('modal-plf')">Annuler</button><button class="btn btn-p" style="flex:1" onclick="savePlf()">Enregistrer</button></div></div></div>
 <div class="modal-bg" id="modal-pla"><div class="modal-box"><div class="modal-handle"></div><div class="modal-title">Modifier le plancher</div><div class="card"><div class="fr"><span class="fl">Type</span><select id="ed-pla-type"><option value=""></option><option>Inconnu</option><option>Inconnu avec ou sans remplissage</option><option>Entre solives bois avec ou sans remplissage</option><option>Bardeaux et remplissage</option><option>Bois sur solives bois</option><option>Entre solives métallique avec ou sans remplissage</option><option>Bois sur solives métalliques</option><option>Voutains sur solives métallique</option><option>Entrevous, terre-cuite, poutrelles béton</option><option>Dalle béton</option><option>Voutains en brique ou moellons</option><option>Entrevous isolants</option><option>Autre</option></select></div><div class="fr"><span class="fl">Donne sur</span><select id="ed-pla-donne"><option value=""></option><option>Terre-plein</option><option>Vide sanitaire</option><option>Local non chauffé</option><option>Local non chauffé et non accessible</option><option>Bâtiment autre que d'habitation</option><option>Local chauffé</option><option>Extérieur</option><option>Circulations communes</option><option>Terre (paroi enterrée)</option><option>Sous-sol non chauffé</option><option>Local tertiaire à l'intérieur de l'immeuble</option></select></div><div class="fr"><span class="fl">L × l <span class="unit">m</span></span><div class="dg"><input type="number" id="ed-pla-l" inputmode="decimal" min="0" step="0.05"><span class="ds">×</span><input type="number" id="ed-pla-li" inputmode="decimal" min="0" step="0.05"></div></div><div class="fr"><span class="fl">Isolation</span><select id="ed-pla-iso-type"><option value="Aucune"></option><option>ITE</option><option>ITI</option><option>Sous dalle</option></select></div><div class="fr"><span class="fl">ép. <span class="unit">cm</span></span><input type="number" id="ed-pla-iso-ep" inputmode="numeric" min="0"></div></div><div class="btn-row"><button class="btn btn-s" style="flex:0 0 80px" onclick="closeModal('modal-pla')">Annuler</button><button class="btn btn-p" style="flex:1" onclick="savePla()">Enregistrer</button></div></div></div>
-<div class="modal-bg" id="modal-ref"><div class="modal-box"><div class="modal-handle"></div><div class="modal-title">Modifier le refend</div><div class="card"><div class="fr"><span class="fl">Orientation</span><select id="ed-ref-ori"><option value=""></option><option>Nord</option><option>Est</option><option>Sud</option><option>Ouest</option></select></div><div class="fr"><span class="fl">Longueur droite <span class="unit">m</span></span><div class="stepper"><button type="button" class="stepper-btn" onclick="stepperDec('ed-ref-ld',0.05)">−</button><input type="number" id="ed-ref-ld" inputmode="decimal" min="0" step="0.05"><span class="stepper-unit">m</span><button type="button" class="stepper-btn" onclick="stepperInc('ed-ref-ld',0.05)">+</button></div></div><div class="fr"><span class="fl">Longueur gauche <span class="unit">m</span></span><div class="stepper"><button type="button" class="stepper-btn" onclick="stepperDec('ed-ref-lg',0.05)">−</button><input type="number" id="ed-ref-lg" inputmode="decimal" min="0" step="0.05"><span class="stepper-unit">m</span><button type="button" class="stepper-btn" onclick="stepperInc('ed-ref-lg',0.05)">+</button></div></div></div><div class="btn-row"><button class="btn btn-s" style="flex:0 0 80px" onclick="closeModal('modal-ref')">Annuler</button><button class="btn btn-p" style="flex:1" onclick="saveRef()">Enregistrer</button>
+<div class="modal-bg" id="modal-ref"><div class="modal-box"><div class="modal-handle"></div><div class="modal-title">Modifier le refend</div><div class="card"><div class="fr"><span class="fl">Orientation</span><select id="ed-ref-ori"><option value=""></option><option>Nord</option><option>Est</option><option>Sud</option><option>Ouest</option></select></div><div class="fr"><span class="fl">Longueur droite <span class="unit">m</span></span><div class="stepper"><button type="button" class="stepper-btn" onclick="stepperDec('ed-ref-ld',0.05)">−</button><input type="number" id="ed-ref-ld" inputmode="decimal" min="0" step="0.05"><span class="stepper-unit">m</span><button type="button" class="stepper-btn" onclick="stepperInc('ed-ref-ld',0.05)">+</button></div></div><div class="fr"><span class="fl">Longueur gauche <span class="unit">m</span></span><div class="stepper"><button type="button" class="stepper-btn" onclick="stepperDec('ed-ref-lg',0.05)">−</button><input type="number" id="ed-ref-lg" inputmode="decimal" min="0" step="0.05"><span class="stepper-unit">m</span><button type="button" class="stepper-btn" onclick="stepperInc('ed-ref-lg',0.05)">+</button></div></div></div><div class="btn-row"><button class="btn btn-s" style="flex:0 0 80px" onclick="closeModal('modal-ref')">Annuler</button>
+    <button class="btn btn-p" style="flex:1" onclick="saveRef()">Enregistrer</button>
     </div>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ══════════════════════════════════════════════
 // État global
 // ══════════════════════════════════════════════
@@ -4619,11 +4609,11 @@ async function partagerProjet(){
   toast('Préparation du partage…');
   const ref=(copro&&copro.nom)?copro.nom.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,''):'Projet';
   const date=new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
-  const filename='ORFIT_'+ref+'_'+date+'.html';
+  const filename='MyDiag_'+ref+'_'+date+'.html';
   const blob=await _buildSaveBlob();
   const file=new File([blob],filename,{type:'text/html'});
   if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({title:'ORFIT — '+(copro.nom||'Projet'),files:[file]});toast('Partagé ✓');return;}catch(e){if(e.name!=='AbortError')console.warn(e);}
+    try{await navigator.share({title:'MyDiag DPE — '+(copro.nom||'Projet'),files:[file]});toast('Partagé ✓');return;}catch(e){if(e.name!=='AbortError')console.warn(e);}
   }
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url);
@@ -4638,7 +4628,7 @@ async function sauvegarderProjet(){
   const date=new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
   const blob=await _buildSaveBlob();
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='ORFIT_'+ref+'_'+date+'.html';a.click();
+  const a=document.createElement('a');a.href=url;a.download='MyDiag_'+ref+'_'+date+'.html';a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
   const lbl=document.getElementById('save-label'),btn=lbl?lbl.parentElement:null;
   if(btn){lbl.style.display='inline';btn.style.background='#3B6D11';setTimeout(()=>{lbl.style.display='none';btn.style.background='';},2500);}
@@ -4656,7 +4646,7 @@ renderAccueil();
 refreshMailVisite();
 document.addEventListener('DOMContentLoaded',refreshMailVisite);
 /* ============================================================
-   MYDIAG v2.1 — JS ADDITIONNEL
+   MYDIAG DPE — JS ADDITIONNEL
    ============================================================ */
 
 // Patch save
@@ -4734,6 +4724,8 @@ const TUTO_STEPS=[
 function renderAide(){const c=document.getElementById('tuto-list');if(!c)return;c.innerHTML=TUTO_STEPS.map((s,i)=>`<div class="tuto-item" id="tuto-${i}"><div class="tuto-head" onclick="toggleTuto(${i})"><span class="tuto-icon">${s.icon}</span><span class="tuto-titre">${s.titre}</span><span class="tuto-chevron" id="chev-${i}">▶</span></div><div class="tuto-body" id="tbody-${i}" style="display:none">${s.contenu}</div></div>`).join('');}
 function toggleTuto(i){const b=document.getElementById(`tbody-${i}`),ch=document.getElementById(`chev-${i}`);const open=b.style.display!=='none';b.style.display=open?'none':'block';ch.textContent=open?'▶':'▼';}
 function ouvrirTutoOnglet(nom){const map={accueil:0,copro:1,appts:2,murs:3,fen:4,plafonds:5,planchers:6,refends:7,totaux:8,export:9};goTab('aide');setTimeout(()=>{renderAide();const idx=map[nom];if(idx!==undefined){const b=document.getElementById(`tbody-${idx}`),ch=document.getElementById(`chev-${idx}`);if(b)b.style.display='block';if(ch)ch.textContent='▼';document.getElementById(`tuto-${idx}`)?.scrollIntoView({behavior:'smooth',block:'start'});}},120);}
+
+
 
 
 </script>
