@@ -3,51 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyDiag Assistant - ETI Edition</title>
+    <title>MyDiag Assistant - Classe 73 Edition</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        :root { --p: #1e40af; --bg: #f8fafc; --txt: #0f172a; --s: #059669; --w: #d97706; --err: #dc2626; }
+        :root { --p: #1e40af; --bg: #f8fafc; --txt: #0f172a; --s: #059669; --err: #dc2626; --accent: #fbbf24; }
         
-        /* OPTIMISATION IPHONE */
-        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; color: var(--txt); }
+        /* FIX IOS TACTILE */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; color: var(--txt); }
 
-        /* HEADER & NAV */
-        .header { background: white; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2000; }
-        .logo { font-weight: 900; font-size: 1.2rem; color: var(--p); }
-        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 52px; z-index: 1900; width: 100%; border-bottom: 3px solid var(--p); }
+        /* HEADER & NAVIGATION */
+        .header { background: white; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2000; }
+        .logo { font-weight: 900; font-size: 1.1rem; color: var(--p); display: flex; align-items: center; gap: 5px; }
+        .badge { background: #1e293b; color: var(--accent); font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: 800; }
+
+        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 50px; z-index: 1900; width: 100%; border-bottom: 4px solid var(--p); }
         .tab-btn { flex: 1; padding: 16px 5px; border: none; background: none; font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; cursor: pointer; }
-        .tab-btn.active { color: white; background: var(--p); border-bottom: 4px solid #fbbf24; }
+        .tab-btn.active { color: white; background: rgba(255,255,255,0.05); border-bottom: 3px solid var(--accent); }
 
         .container { padding: 15px; max-width: 800px; margin: auto; }
         .view { display: none; }
         .view.active { display: block; }
         
-        /* CARTES ET SAISIE */
+        /* CARTES */
         .card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        h3 { margin-top: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-left: 3px solid var(--p); padding-left: 10px; }
+        h3 { margin: 0 0 15px 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; border-left: 3px solid var(--p); padding-left: 10px; }
         
-        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; display: block; }
-        .btn { padding: 18px; border-radius: 14px; border: none; font-weight: 800; width: 100%; font-size: 1rem; cursor: pointer; text-align: center; color: white; display: block; text-decoration: none; margin-bottom: 10px; }
+        /* BOUTONS ET INPUTS */
+        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; display: block; outline: none; }
+        .btn { padding: 18px; border-radius: 14px; border: none; font-weight: 800; width: 100%; font-size: 1rem; cursor: pointer; text-align: center; color: white; display: block; text-decoration: none; transition: 0.1s; }
         .btn-p { background: var(--p); }
         .btn-s { background: var(--s); }
-        .btn-w { background: var(--w); }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
 
-        /* TIROIRS LOGEMENTS */
-        .bat-label { background: #e2e8f0; padding: 8px 12px; border-radius: 8px; font-weight: 900; font-size: 0.8rem; margin-top: 20px; color: #1e293b; }
-        .appt-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 10px; overflow: hidden; }
-        .appt-head { padding: 18px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; cursor: pointer; }
+        /* TIROIRS APPARTEMENTS */
+        .bat-header { background: #e2e8f0; padding: 8px 12px; border-radius: 8px; font-weight: 900; font-size: 0.8rem; margin: 15px 0 8px 0; color: #1e293b; }
+        .appt-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 10px; }
+        .appt-head { padding: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; cursor: pointer; }
         .appt-body { display: none; padding: 15px; border-top: 1px solid #f1f5f9; background: #fafafa; }
         .appt-body.active { display: block; }
 
-        /* CARREZ & ELEC */
-        .row-grid { display: grid; grid-template-columns: 1.5fr 60px 60px 60px 30px; gap: 5px; margin-bottom: 10px; }
-        .row-grid input { padding: 10px 5px; font-size: 0.85rem; margin: 0; text-align: center; }
+        /* GRILLES CARREZ & ELEC */
+        .grid-row { display: grid; grid-template-columns: 1.5fr 60px 60px 60px 30px; gap: 5px; margin-bottom: 8px; align-items: center; }
+        .grid-row input { padding: 8px 4px; font-size: 0.85rem; margin: 0; text-align: center; }
         
         .check-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .st-btn { padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; background: #fff; font-weight: 700; cursor: pointer; }
+        .st-btn { padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; background: #fff; font-weight: 800; cursor: pointer; }
         .st-btn.ok { background: var(--s); color: white; border-color: var(--s); }
         .st-btn.ko { background: var(--err); color: white; border-color: var(--err); }
     </style>
@@ -55,117 +58,127 @@
 <body>
 
 <div class="header">
-    <div class="logo">MyDiag <span style="font-weight:300; color:#64748b;">ETI Assistant</span></div>
-    <div id="sync" style="font-size:0.6rem; font-weight:bold; color:var(--s);">🟢 CLASSE 73 OK</div>
+    <div class="logo">MyDiag <span class="badge">E.T.I 73</span></div>
+    <div id="sync" style="font-size:0.65rem; font-weight:bold; color:var(--s);">🟢 SYNC OK</div>
 </div>
 
 <nav class="nav-tabs">
-    <button class="tab-btn active" id="t-home" onclick="go('home')">Dossier</button>
-    <button class="tab-btn" id="t-appts" onclick="go('appts')">Logements</button>
-    <button class="tab-btn" id="t-elec" onclick="go('elec')">Elec (Futur)</button>
-    <button class="tab-btn" id="t-expo" onclick="go('expo')">Export</button>
+    <button class="tab-btn active" id="btn-home" onclick="goTab('home')">Dossier</button>
+    <button class="tab-btn" id="btn-appts" onclick="goTab('appts')">Relevé</button>
+    <button class="tab-btn" id="btn-elec" onclick="goTab('elec')">Élec</button>
+    <button class="tab-btn" id="btn-expo" onclick="goTab('expo')">Export</button>
 </nav>
 
 <div class="container">
     <div id="vw-home" class="view active">
         <div class="card">
             <h3>📂 Configuration Copropriété</h3>
+            <label style="font-size: 0.7rem; font-weight: bold; margin-left: 5px;">NOM DU PROJET (EX: LOUIS)</label>
             <input type="text" id="cp-nom" placeholder="Nom de la résidence" oninput="save()">
-            <input type="number" id="cp-bat" value="1" placeholder="Nombre de bâtiments">
-            <button class="btn btn-p" onclick="build()">GÉNÉRER LA STRUCTURE ➡️</button>
+            <label style="font-size: 0.7rem; font-weight: bold; margin-left: 5px;">NOMBRE DE BÂTIMENTS</label>
+            <input type="number" id="cp-bat" value="1" min="1">
+            <button class="btn btn-p" onclick="initStructure()">CRÉER L'ARBORESCENCE ➡️</button>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#64748b;">Version spéciale pour David - 12 Avril</p>
+        <p style="text-align:center; font-size:0.8rem; color:#64748b;">Dédié à David - Édition Spéciale</p>
     </div>
 
     <div id="vw-appts" class="view">
-        <div id="list-a"></div>
+        <div id="list-appts"></div>
     </div>
 
     <div id="vw-elec" class="view">
         <div class="card">
-            <h3>⚡ Prototype Diagnostic Élec</h3>
-            <div id="list-e"></div>
+            <h3>⚡ Points de Contrôle Élec</h3>
+            <div id="list-elec"></div>
         </div>
     </div>
 
     <div id="vw-expo" class="view">
         <div class="card">
-            <h3>📤 Livraison Dossiers ETI</h3>
-            <button class="btn btn-s" onclick="xls()">📊 EXPORT EXCEL (ADN)</button>
-            <button class="btn btn-w" onclick="backup()">📥 SAUVEGARDE JSON</button>
-            <button class="btn" style="background:#64748b; margin-top:20px;" onclick="if(confirm('Reset?')){localStorage.clear();location.reload();}">🗑️ RESET APPLI</button>
+            <h3>📤 Finalisation & Envoi</h3>
+            <button class="btn btn-s" onclick="exportData()">📊 GÉNÉRER EXCEL ADN</button>
+            <button class="btn" style="background:#64748b; margin-top:20px; color:white;" onclick="resetApp()">🗑️ NOUVEAU PROJET (RESET)</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ÉTAT DES DONNÉES
-    let db = JSON.parse(localStorage.getItem('mydiag_v12_2') || '{"a":[],"m":[],"c":{},"co":{},"e":{}}');
-    let exp = {}, curApt = null;
+    // ÉTAT INITIAL RÉCUPÉRÉ
+    let data = JSON.parse(localStorage.getItem('mydiag_v12_3') || '{"appts":[], "carrez":{}, "elec":{}, "nom":""}');
+    let openApts = {};
 
     const pointsElec = [
-        {id:'agcp', l:'Appareil Général (AGCP)'},
-        {id:'terre', l:'Prise de terre / Equipot.'},
-        {id:'tableau', l:'Tableau (Protections)'},
-        {id:'sdb', l:'Volumes Salles de bain'},
-        {id:'conduct', l:'Conducteurs non protégés'}
+        {id:'p1', n:'Appareil de coupure (AGCP)'},
+        {id:'p2', n:'Protection différentielle'},
+        {id:'p3', n:'Liaison équipotentielle (Terre)'},
+        {id:'p4', n:'Volumes Salles d\'eau'},
+        {id:'p5', n:'Tableau : Protections surintensités'}
     ];
 
-    function go(id){
-        document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-        document.getElementById('vw-'+id).classList.add('active');
-        document.getElementById('t-'+id).classList.add('active');
-        if(id==='appts') renderA();
-        if(id==='elec') renderE();
+    function goTab(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('vw-' + id).classList.add('active');
+        document.getElementById('btn-' + id).classList.add('active');
+        if(id === 'appts') renderAppts();
+        if(id === 'elec') renderElec();
     }
 
-    function save(){
-        db.co.n = document.getElementById('cp-nom').value;
-        localStorage.setItem('mydiag_v12_2', JSON.stringify(db));
-        document.getElementById('sync').innerText = "⏳...";
-        setTimeout(()=> document.getElementById('sync').innerText = "🟢 CLASSE 73 OK", 400);
+    function save() {
+        data.nom = document.getElementById('cp-nom').value;
+        localStorage.setItem('mydiag_v12_3', JSON.stringify(data));
+        const sync = document.getElementById('sync');
+        sync.innerText = "⏳ ENREGISTREMENT...";
+        setTimeout(() => sync.innerText = "🟢 SYNC OK", 400);
     }
 
-    function build(){
-        const nb = parseInt(document.getElementById('cp-bat').value)||1;
-        db.a = [];
-        for(let b=1; b<=nb; b++){
-            for(let l=1; l<=2; l++){
+    function initStructure() {
+        const nb = parseInt(document.getElementById('cp-bat').value) || 1;
+        data.appts = [];
+        for(let b=1; b<=nb; b++) {
+            for(let l=1; l<=2; l++) {
                 let id = "b"+b+"l"+l;
-                db.a.push({id, b, n:`Bâtiment ${b} - Lot ${l}`});
-                if(!db.c[id]) db.c[id] = [];
+                data.appts.push({ id: id, bat: b, label: "Bâtiment " + b + " - Lot " + l });
+                if(!data.carrez[id]) data.carrez[id] = [];
             }
         }
-        save(); go('appts');
+        save();
+        goTab('appts');
     }
 
-    function renderA(){
-        const cont = document.getElementById('list-a'); let html = ""; let lb = null;
-        if(!db.a.length){ cont.innerHTML = "<p style='text-align:center;padding:20px'>Initialisez le projet en page Dossier.</p>"; return; }
-        
-        db.a.forEach(a => {
-            if(a.b !== lb){ lb = a.b; html += `<div class="bat-label">BÂTIMENT ${lb}</div>`; }
-            const surf = (db.c[a.id] || []).reduce((t,r)=>t+((r.L*r.l)-r.d),0).toFixed(2);
+    function renderAppts() {
+        const cont = document.getElementById('list-appts');
+        let html = ""; let lastBat = null;
+        if(!data.appts.length) { cont.innerHTML = "<p style='text-align:center; padding:20px;'>Configurez le projet d'abord.</p>"; return; }
+
+        data.appts.forEach(a => {
+            if(a.bat !== lastBat) {
+                lastBat = a.bat;
+                html += `<div class="bat-header">BÂTIMENT ${lastBat}</div>`;
+            }
+            const rooms = data.carrez[a.id] || [];
+            const surf = rooms.reduce((t, r) => t + ((r.L * r.l) - r.d), 0).toFixed(2);
+            const isOpen = openApts[a.id] ? 'active' : '';
+
             html += `
             <div class="appt-card">
-                <div class="appt-head" onclick="exp['${a.id}']=!exp['${a.id}'];renderA()">
-                    <span>${a.n} <small style="color:var(--p)">(${surf} m²)</small></span>
-                    <span>${exp[a.id]?'▼':'▶'}</span>
+                <div class="appt-head" onclick="toggleApt('${a.id}')">
+                    <span>${a.label} <small style="color:var(--p)">(${surf} m²)</small></span>
+                    <span>${openApts[a.id] ? '▼' : '▶'}</span>
                 </div>
-                <div class="appt-body ${exp[a.id]?'active':''}">
-                    <div style="background:#f0f9ff; padding:12px; border-radius:10px;">
-                        <div style="font-weight:bold; font-size:0.7rem; margin-bottom:8px;">CARREZ</div>
-                        ${(db.c[a.id]||[]).map((r,i)=>`
-                            <div class="row-grid">
+                <div class="appt-body ${isOpen}">
+                    <div style="background:#f0f9ff; padding:12px; border-radius:10px; border:1px solid #bae6fd;">
+                        <div style="font-weight:bold; font-size:0.75rem; color:#0369a1; margin-bottom:10px;">📐 CALCULATEUR CARREZ</div>
+                        ${rooms.map((r, i) => `
+                            <div class="grid-row">
                                 <input type="text" value="${r.n}" oninput="uC('${a.id}',${i},'n',this.value)">
                                 <input type="number" value="${r.L}" oninput="uC('${a.id}',${i},'L',this.value)" inputmode="decimal">
                                 <input type="number" value="${r.l}" oninput="uC('${a.id}',${i},'l',this.value)" inputmode="decimal">
                                 <input type="number" value="${r.d}" oninput="uC('${a.id}',${i},'d',this.value)" inputmode="decimal" style="background:#fee2e2">
-                                <button onclick="dC('${a.id}',${i})" style="border:none;background:none;color:red;font-weight:bold">✕</button>
+                                <button onclick="dC('${a.id}',${i})" style="border:none;background:none;color:red;font-weight:bold;font-size:1.2rem;">×</button>
                             </div>
                         `).join('')}
-                        <button class="btn" style="padding:8px; font-size:0.7rem; background:white; color:var(--p); border:1px solid var(--p);" onclick="aC('${a.id}')">+ AJOUTER PIÈCE</button>
+                        <button class="btn" style="padding:10px; font-size:0.8rem; background:white; color:var(--p); border:1px solid var(--p);" onclick="aC('${a.id}')">+ AJOUTER UNE PIÈCE</button>
                     </div>
                 </div>
             </div>`;
@@ -173,17 +186,18 @@
         cont.innerHTML = html;
     }
 
-    function aC(id){ db.c[id].push({n:'Pièce',L:0,l:0,d:0}); save(); renderA(); }
-    function uC(id,i,f,v){ db.c[id][i][f]=f==='n'?v:parseFloat(v)||0; save(); }
-    function dC(id,i){ db.c[id].splice(i,1); save(); renderA(); }
+    function toggleApt(id) { openApts[id] = !openApts[id]; renderAppts(); }
+    function aC(id) { data.carrez[id].push({n:'Pièce', L:0, l:0, d:0}); save(); renderAppts(); }
+    function uC(id, i, f, v) { data.carrez[id][i][f] = (f==='n') ? v : (parseFloat(v) || 0); save(); }
+    function dC(id, i) { data.carrez[id].splice(i, 1); save(); renderAppts(); }
 
-    function renderE(){
-        const cont = document.getElementById('list-e');
+    function renderElec() {
+        const cont = document.getElementById('list-elec');
         cont.innerHTML = pointsElec.map(p => {
-            const st = db.e[p.id] || '';
+            const st = data.elec[p.id] || '';
             return `
             <div class="check-item">
-                <span style="font-weight:700; font-size:0.9rem;">${p.l}</span>
+                <span style="font-weight:700; font-size:0.9rem; max-width:60%">${p.n}</span>
                 <div style="display:flex; gap:8px;">
                     <button class="st-btn ${st==='OK'?'ok':''}" onclick="setE('${p.id}','OK')">V</button>
                     <button class="st-btn ${st==='KO'?'ko':''}" onclick="setE('${p.id}','KO')">X</button>
@@ -191,28 +205,25 @@
             </div>`;
         }).join('');
     }
-    function setE(id, v){ db.e[id]=v; save(); renderE(); }
+    function setE(id, v) { data.elec[id] = v; save(); renderElec(); }
 
-    function xls(){
-        const data = db.a.map(a => {
-            const s = (db.c[a.id] || []).reduce((t,r)=>t+((r.L*r.l)-r.d),0).toFixed(2);
-            return {"Lot": a.n, "Surface": s};
+    function exportData() {
+        if(!data.appts.length) return alert("Aucune donnée.");
+        const exportList = data.appts.map(a => {
+            const s = (data.carrez[a.id] || []).reduce((t,r)=>t+((r.L*r.l)-r.d),0).toFixed(2);
+            return { "Lot": a.label, "Surface Carrez": s, "Diagnostic": "Complet" };
         });
-        const ws = XLSX.utils.json_to_sheet(data);
+        const ws = XLSX.utils.json_to_sheet(exportList);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "ADN");
-        XLSX.writeFile(wb, `ETI_DOSSIER_${db.co.n||'73'}.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Relevé_ETI");
+        XLSX.writeFile(wb, `MYDIAG_${data.nom || 'EXPORT'}.xlsx`);
     }
 
-    function backup(){
-        const b = new Blob([JSON.stringify(db)], {type:"application/json"});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(b);
-        a.download = `BACKUP_ETI_${Date.now()}.json`; a.click();
-    }
+    function resetApp() { if(confirm("Supprimer toutes les données ?")) { localStorage.clear(); location.reload(); } }
 
     window.onload = () => {
-        document.getElementById('cp-nom').value = db.co.n || '';
-        go('home');
+        document.getElementById('cp-nom').value = data.nom || '';
+        goTab('home');
     };
 </script>
 </body>
