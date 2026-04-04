@@ -1,166 +1,519 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyDiag Assistant - Archivage E.T.I</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        :root { --p: #1e40af; --bg: #f8fafc; --txt: #0f172a; --s: #059669; --accent: #fbbf24; }
-        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; color: var(--txt); }
-        .header { background: white; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2000; }
-        .logo { font-weight: 900; font-size: 1.1rem; color: var(--p); }
-        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 50px; z-index: 1900; width: 100%; border-bottom: 4px solid var(--p); }
-        .tab-btn { flex: 1; padding: 16px 5px; border: none; background: none; font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
-        .tab-btn.active { color: white; background: rgba(255,255,255,0.05); border-bottom: 3px solid var(--accent); }
-        .container { padding: 15px; max-width: 800px; margin: auto; }
-        .view { display: none; }
-        .view.active { display: block; }
-        .card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        h3 { margin: 0 0 15px 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; border-left: 3px solid var(--p); padding-left: 10px; }
-        input, textarea { width: 100%; padding: 14px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 16px; background: #fff; display: block; font-family: inherit; }
-        .btn { padding: 18px; border-radius: 14px; border: none; font-weight: 800; width: 100%; font-size: 1rem; cursor: pointer; text-align: center; color: white; display: block; text-decoration: none; }
-        .btn-p { background: var(--p); }
-        .btn-s { background: var(--s); }
-        .appt-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 10px; }
-        .appt-head { padding: 16px; display: flex; justify-content: space-between; font-weight: 800; cursor: pointer; }
-        .appt-body { display: none; padding: 15px; border-top: 1px solid #f1f5f9; background: #fafafa; }
-        .appt-body.active { display: block; }
-        .grid-row { display: grid; grid-template-columns: 1.5fr 60px 60px 60px 30px; gap: 5px; margin-bottom: 8px; }
-        .grid-row input { padding: 8px 4px; font-size: 0.85rem; margin: 0; text-align: center; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MyDiag - Focus Échantillons</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --p: #1e40af; --bg: #f8fafc; --txt: #0f172a;
+  --s: #059669; --accent: #fbbf24; --dan: #dc2626;
+  --r: 12px;
+}
+* { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; margin:0; padding:0; }
+body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--txt); padding-bottom: 80px; }
+
+/* ── Header ── */
+.hd { background:#0f172a; color:white; padding:10px 16px; position:sticky; top:0; z-index:2000; display:flex; justify-content:space-between; align-items:center; }
+.hd-logo { font-weight:900; font-size:1rem; }
+.hd-badge { font-size:0.6rem; background:var(--p); color:var(--accent); padding:2px 7px; border-radius:4px; margin-left:6px; font-weight:800; }
+.hd-right { display:flex; align-items:center; gap:10px; }
+.sync { font-size:11px; font-weight:800; color:var(--s); }
+.hd-total { background:#1e3a8a; color:#93c5fd; border-radius:10px; padding:4px 10px; font-size:12px; font-weight:700; }
+
+/* ── Nav ── */
+.nav { display:flex; background:#1e293b; position:sticky; top:46px; z-index:1900; border-bottom:3px solid var(--p); }
+.tab-btn { flex:1; padding:14px 5px; border:none; background:none; font-size:0.65rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-3px; font-family:inherit; transition:color .15s,border-color .15s; }
+.tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* ── Layout ── */
+.cont { padding:14px; max-width:700px; margin:auto; }
+.view { display:none; }
+.view.active { display:block; }
+.card { background:white; border-radius:var(--r); padding:16px; margin-bottom:14px; border:1px solid #e2e8f0; box-shadow:0 2px 6px rgba(0,0,0,.05); }
+.sl { font-size:10px; font-weight:800; color:var(--p); text-transform:uppercase; letter-spacing:.7px; border-left:3px solid var(--p); padding-left:8px; margin:14px 0 8px; }
+
+/* ── Inputs ── */
+.lbl { display:block; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.5px; margin:10px 0 4px; }
+input, select { width:100%; padding:13px 12px; border:1px solid #cbd5e1; border-radius:9px; font-size:16px; font-family:inherit; background:#fff; display:block; -webkit-appearance:none; }
+input:focus, select:focus { outline:none; border-color:var(--p); box-shadow:0 0 0 3px rgba(37,99,235,.12); }
+input.err { border-color:var(--dan); background:#fef2f2; }
+
+/* ── Buttons ── */
+.btn { padding:15px; border-radius:var(--r); border:none; font-weight:800; width:100%; font-size:0.95rem; cursor:pointer; color:white; display:block; font-family:inherit; margin-top:10px; transition:filter .15s,transform .1s; text-align:center; }
+.btn:active { filter:brightness(.9); transform:scale(.98); }
+.btn-p { background:var(--p); }
+.btn-s { background:var(--s); }
+.btn-warn { background:#b45309; }
+.btn-ghost { background:transparent; color:var(--p); border:1.5px solid var(--p); }
+.btn-sm { padding:9px 14px; font-size:0.8rem; border-radius:8px; width:auto; display:inline-block; }
+
+/* ── Summary bar ── */
+.summary-bar { background:var(--p); color:white; border-radius:var(--r); padding:14px 18px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.s-lbl { font-size:10px; font-weight:700; opacity:.7; text-transform:uppercase; }
+.s-val { font-size:1.3rem; font-weight:900; }
+
+/* ── Échantillon cards ── */
+.bat-hd { background:#1e293b; color:white; padding:8px 14px; font-size:11px; font-weight:900; letter-spacing:.7px; text-transform:uppercase; border-radius:8px; margin:16px 0 8px; }
+.ech-card { background:white; border-radius:var(--r); border:1px solid #e2e8f0; margin-bottom:10px; overflow:hidden; }
+.ech-head { padding:14px 16px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; background:white; }
+.ech-head:active { background:#f8fafc; }
+.ech-label { font-weight:800; font-size:.95rem; }
+.ech-surf { font-size:.85rem; color:var(--p); font-weight:700; }
+.ech-body { display:none; padding:14px; border-top:1px solid #f1f5f9; background:#fafafa; }
+.ech-body.open { display:block; }
+.ech-meta { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.ech-meta select { font-size:14px; padding:10px; }
+
+/* ── Grille calcul ── */
+.grid-hd { display:grid; grid-template-columns:2fr 65px 65px 70px 36px; gap:5px; margin-bottom:5px; }
+.grid-hd span { font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.4px; text-align:center; }
+.grid-hd span:first-child { text-align:left; }
+.calc-row { display:grid; grid-template-columns:2fr 65px 65px 70px 36px; gap:5px; margin-bottom:6px; align-items:center; }
+.calc-row input { padding:9px 5px; font-size:.85rem; text-align:center; border-radius:7px; margin:0; }
+.calc-row input:first-child { text-align:left; }
+.calc-row input.ded { background:#fef2f2; border-color:#fca5a5; }
+.del-btn { background:none; border:none; color:#ef4444; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; height:38px; width:36px; border-radius:7px; font-family:inherit; }
+.del-btn:active { background:#fee2e2; }
+
+/* ── Toast ── */
+.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px); background:#1e293b; color:white; padding:10px 22px; border-radius:20px; font-size:13px; font-weight:600; opacity:0; transition:opacity .25s,transform .25s; pointer-events:none; z-index:9999; white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
 </head>
 <body>
 
-<div class="header">
-    <div class="logo">MyDiag <span style="font-size:0.6rem; background:#1e293b; color:var(--accent); padding:2px 6px; border-radius:4px;">E.T.I 73</span></div>
-    <div id="sync" style="font-size:0.65rem; font-weight:bold; color:var(--s);">🟢 SYNC OK</div>
+<!-- Header -->
+<div class="hd">
+  <div>
+    <span class="hd-logo">MyDiag</span>
+    <span class="hd-badge">ÉCHANTILLONS</span>
+  </div>
+  <div class="hd-right">
+    <div id="hd-total" class="hd-total" style="display:none">0,00 m²</div>
+    <div id="sync" class="sync">🟢 SYNC</div>
+  </div>
 </div>
 
-<nav class="nav-tabs">
-    <button class="tab-btn active" id="btn-home" onclick="goTab('home')">Dossier</button>
-    <button class="tab-btn" id="btn-appts" onclick="goTab('appts')">Logements</button>
-    <button class="tab-btn" id="btn-expo" onclick="goTab('expo')">Export</button>
+<!-- Nav -->
+<nav class="nav">
+  <button class="tab-btn active" data-tab="home"   onclick="goTab('home')">📁 Dossier</button>
+  <button class="tab-btn"        data-tab="appts"  onclick="goTab('appts')">📐 Échantillons</button>
+  <button class="tab-btn"        data-tab="export" onclick="goTab('export')">📤 Export</button>
 </nav>
 
-<div class="container">
-    <div id="vw-home" class="view active">
-        <div class="card">
-            <h3>🏢 Identification de la Copropriété</h3>
-            <label style="font-size: 0.7rem; font-weight: bold;">CODE DOSSIER (MIN. 5 CHIFFRES)</label>
-            <input type="number" id="cp-code" placeholder="ex: 001234" oninput="save()">
-            
-            <label style="font-size: 0.7rem; font-weight: bold;">NOM DE LA RÉSIDENCE</label>
-            <input type="text" id="cp-nom" placeholder="ex: RÉSIDENCE DES LILAS" oninput="save()">
-            
-            <label style="font-size: 0.7rem; font-weight: bold;">ADRESSE COMPLÈTE</label>
-            <textarea id="cp-adr" rows="3" placeholder="N°, rue, CP, Ville" oninput="save()" style="width:100%; padding:14px; border-radius:10px; border:1px solid #cbd5e1;"></textarea>
-            
-            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-            <label style="font-size: 0.7rem; font-weight: bold;">NB BÂTIMENTS</label>
-            <input type="number" id="cp-bat" value="1" min="1">
-            
-            <button class="btn btn-p" onclick="init()">CRÉER LA STRUCTURE ➡️</button>
-        </div>
+<div class="cont">
+
+  <!-- ═══ DOSSIER ═══ -->
+  <div id="vw-home" class="view active">
+
+    <div class="sl" style="margin-top:8px">Identification</div>
+    <div class="card">
+      <label class="lbl">Code dossier <span style="color:var(--dan)">*</span></label>
+      <input type="number" id="cp-code" placeholder="ex: 010473" inputmode="numeric"
+             oninput="this.classList.toggle('err',this.value.length>0&&this.value.length<5);save()">
+
+      <label class="lbl">Nom de la résidence</label>
+      <input type="text" id="cp-nom" placeholder="ex: RÉSIDENCE DES LILAS" oninput="save()">
+
+      <label class="lbl">Adresse</label>
+      <input type="text" id="cp-adr" placeholder="N°, rue, CP, Ville" oninput="save()">
+
+      <label class="lbl">Année de construction</label>
+      <input type="number" id="cp-annee" placeholder="ex: 1978" inputmode="numeric" oninput="save()">
     </div>
 
-    <div id="vw-appts" class="view">
-        <div id="list-appts"></div>
-    </div>
+    <div class="sl">Structure des échantillons</div>
+    <div class="card">
+      <label class="lbl">Nombre de bâtiments</label>
+      <input type="number" id="cp-bat" value="1" min="1" max="20" inputmode="numeric" oninput="save()">
 
-    <div id="vw-expo" class="view">
-        <div class="card">
-            <h3>📤 Livraison Dossier</h3>
-            <button class="btn btn-s" onclick="exportData()">📊 GÉNÉRER EXCEL ADN</button>
-            <button class="btn" style="background:#64748b; margin-top:20px; color:white;" onclick="if(confirm('Reset?')){localStorage.clear();location.reload();}">🗑️ NOUVEAU PROJET</button>
-        </div>
+      <label class="lbl">Échantillons par bâtiment (par défaut)</label>
+      <input type="number" id="cp-ech" value="2" min="1" max="50" inputmode="numeric">
+
+      <button class="btn btn-warn" style="margin-top:16px" onclick="confirmerInit()">
+        🏗️ Générer / Réinitialiser la structure
+      </button>
+      <div style="font-size:11px;color:#b45309;margin-top:6px;text-align:center">⚠️ Efface les données existantes</div>
     </div>
+  </div>
+
+  <!-- ═══ ÉCHANTILLONS ═══ -->
+  <div id="vw-appts" class="view">
+    <div id="summary" class="summary-bar" style="display:none">
+      <div><div class="s-lbl">Surface totale</div><div class="s-val" id="surf-tot">0,00 m²</div></div>
+      <div style="text-align:right"><div class="s-lbl">Échantillons</div><div class="s-val" id="ech-count">0</div></div>
+    </div>
+    <div id="list-appts"></div>
+  </div>
+
+  <!-- ═══ EXPORT ═══ -->
+  <div id="vw-export" class="view">
+    <div class="sl" style="margin-top:8px">Résumé</div>
+    <div class="card" id="export-recap" style="font-size:14px;line-height:2"></div>
+
+    <div class="sl">Générer</div>
+    <div class="card">
+      <button class="btn btn-s" onclick="exportExcel()">📊 Générer Excel ADN</button>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="exportJSON()">💾 Sauvegarde JSON</button>
+      <button class="btn" style="margin-top:10px;background:#64748b;color:white" onclick="importJSON()">📂 Restaurer JSON</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="lireJSON(this)">
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0">
+      <button class="btn" style="background:#fee2e2;color:var(--dan)" onclick="nouveauProjet()">🗑️ Nouveau projet</button>
+    </div>
+  </div>
+
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-    let data = JSON.parse(localStorage.getItem('mydiag_v12_4') || '{"appts":[], "carrez":{}, "co":{}}');
-    let openApts = {};
+// ══════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════
+const KEY = 'mydiag_ech_v2';
+let data = { co:{}, appts:[], calcs:{} };
+let open = {};
 
-    function goTab(id) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('vw-' + id).classList.add('active');
-        document.getElementById('btn-' + id).classList.add('active');
-        if(id === 'appts') renderAppts();
+function load() {
+  try { const s=localStorage.getItem(KEY); if(s) data=JSON.parse(s); }
+  catch(e) { data={co:{},appts:[],calcs:{}}; }
+}
+
+function save() {
+  const co = data.co;
+  const g  = id => document.getElementById(id)?.value || '';
+  co.code  = g('cp-code').trim();
+  co.nom   = g('cp-nom').trim();
+  co.adr   = g('cp-adr').trim();
+  co.annee = g('cp-annee').trim();
+  co.bat   = g('cp-bat') || '1';
+  co.ech   = g('cp-ech') || '2';
+  localStorage.setItem(KEY, JSON.stringify(data));
+  flashSync();
+  updateHdTotal();
+}
+
+function flashSync() {
+  const el = document.getElementById('sync');
+  if(!el) return;
+  el.textContent='⏳…'; el.style.color='#f59e0b';
+  clearTimeout(flashSync._t);
+  flashSync._t = setTimeout(()=>{ el.textContent='🟢 SYNC'; el.style.color='#059669'; },400);
+}
+
+function updateHdTotal() {
+  const tot = surfTotal();
+  const el  = document.getElementById('hd-total');
+  if(el){
+    el.style.display = data.appts.length ? 'block' : 'none';
+    el.textContent   = tot.toFixed(2).replace('.',',') + ' m²';
+  }
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function goTab(id) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  const vw = document.getElementById('vw-'+id);
+  if(vw) vw.classList.add('active');
+  if(id==='appts')  renderAppts();
+  if(id==='export') renderExportRecap();
+}
+
+// ══════════════════════════════════════════
+// STRUCTURE
+// ══════════════════════════════════════════
+function confirmerInit() {
+  const code = (document.getElementById('cp-code').value||'').trim();
+  if(code.length < 5){
+    toast('⚠️ Code dossier min. 5 chiffres');
+    document.getElementById('cp-code').classList.add('err');
+    return;
+  }
+  if(data.appts.length){
+    if(!confirm('Réinitialiser efface tous les échantillons.\nContinuer ?')) return;
+  }
+  const nbBat = Math.max(1, parseInt(document.getElementById('cp-bat').value)||1);
+  const nbEch = Math.max(1, parseInt(document.getElementById('cp-ech').value)||2);
+  data.appts = [];
+  data.calcs = {};  // FIX : réinitialisation complète
+  for(let b=1; b<=nbBat; b++){
+    for(let e=1; e<=nbEch; e++){
+      const id = `b${b}e${e}`;
+      data.appts.push({ id, bat:b, ech:e, label:`Bât ${b} — Éch. ${e}`, etage:'', niveau:'' });
+      data.calcs[id] = [];
     }
+  }
+  save();
+  toast(`✓ ${data.appts.length} échantillons générés`);
+  goTab('appts');
+}
 
-    function save() {
-        data.co.c = document.getElementById('cp-code').value;
-        data.co.n = document.getElementById('cp-nom').value;
-        data.co.a = document.getElementById('cp-adr').value;
-        localStorage.setItem('mydiag_v12_4', JSON.stringify(data));
-        document.getElementById('sync').innerText = "⏳...";
-        setTimeout(() => document.getElementById('sync').innerText = "🟢 SYNC OK", 400);
-    }
+// ══════════════════════════════════════════
+// CALCUL
+// ══════════════════════════════════════════
+function surfEch(id) {
+  return (data.calcs[id]||[]).reduce((tot,r)=>{
+    const brut = Math.max(0,(r.L||0)*(r.l||0));
+    const ded  = Math.max(0,Math.min(r.d||0,brut));  // FIX déduction bornée
+    return tot + brut - ded;
+  }, 0);
+}
 
-    function init() {
-        const code = document.getElementById('cp-code').value;
-        if(code.length < 5) { alert("Le code dossier doit comporter au moins 5 chiffres."); return; }
-        
-        const nb = parseInt(document.getElementById('cp-bat').value) || 1;
-        data.appts = [];
-        for(let b=1; b<=nb; b++) {
-            for(let l=1; l<=2; l++) {
-                let id = "b"+b+"l"+l;
-                data.appts.push({ id, bat: b, label: `Bât ${b} - Lot ${l}` });
-                if(!data.carrez[id]) data.carrez[id] = [];
-            }
-        }
-        save();
-        goTab('appts');
-    }
+function surfTotal() {
+  return data.appts.reduce((s,a)=>s+surfEch(a.id),0);
+}
 
-    function renderAppts() {
-        const cont = document.getElementById('list-appts');
-        let html = ""; let lastBat = null;
-        if(!data.appts.length) { cont.innerHTML = "<p style='text-align:center; padding:20px;'>Configurez le projet d'abord.</p>"; return; }
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+function renderAppts() {
+  const cont = document.getElementById('list-appts');
+  const sumEl = document.getElementById('summary');
 
-        data.appts.forEach(a => {
-            if(a.bat !== lastBat) { lastBat = a.bat; html += `<div style="background:#e2e8f0;padding:8px;font-weight:900;font-size:0.8rem;margin:15px 0 5px 0;border-radius:8px">BÂTIMENT ${lastBat}</div>`; }
-            const surf = (data.carrez[a.id] || []).reduce((t, r) => t + ((r.L * r.l) - r.d), 0).toFixed(2);
-            html += `<div class="appt-card">
-                <div class="appt-head" onclick="openApts['${a.id}']=!openApts['${a.id}'];renderAppts()">
-                    <span>${a.label} <small style="color:var(--p)">(${surf} m²)</small></span>
-                    <span>${openApts[a.id] ? '▼' : '▶'}</span>
-                </div>
-                <div class="appt-body ${openApts[a.id]?'active':''}">
-                    ${(data.carrez[a.id]||[]).map((r,i)=>`<div class="grid-row"><input type="text" value="${r.n}" oninput="uC('${a.id}',${i},'n',this.value)"><input type="number" value="${r.L}" oninput="uC('${a.id}',${i},'L',this.value)" inputmode="decimal"><input type="number" value="${r.l}" oninput="uC('${a.id}',${i},'l',this.value)" inputmode="decimal"><input type="number" value="${r.d}" oninput="uC('${a.id}',${i},'d',this.value)" inputmode="decimal" style="background:#fee2e2"></div>`).join('')}
-                    <button class="btn" style="padding:10px; font-size:0.8rem; background:white; color:var(--p); border:1px solid var(--p);" onclick="aC('${a.id}')">+ AJOUTER PIÈCE</button>
-                </div>
-            </div>`;
-        });
-        cont.innerHTML = html;
-    }
+  if(!data.appts.length){
+    cont.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8">Configurez le dossier dans l\'onglet Dossier</div>';
+    if(sumEl) sumEl.style.display='none';
+    return;
+  }
 
-    function aC(id){ data.carrez[id].push({n:'Pièce', L:0, l:0, d:0}); save(); renderAppts(); }
-    function uC(id,i,f,v){ data.carrez[id][i][f]=f==='n'?v:parseFloat(v)||0; save(); }
+  const tot = surfTotal();
+  document.getElementById('surf-tot').textContent = tot.toFixed(2).replace('.',',') + ' m²';
+  document.getElementById('ech-count').textContent = data.appts.length;
+  if(sumEl) sumEl.style.display='flex';
 
-    function exportData() {
-        const exportList = data.appts.map(a => ({
-            "Code Dossier": data.co.c,
-            "Résidence": data.co.n,
-            "Adresse": data.co.a,
-            "Lot": a.label,
-            "Surface": (data.carrez[a.id] || []).reduce((t,r)=>t+((r.L*r.l)-r.d),0).toFixed(2)
-        }));
-        const ws = XLSX.utils.json_to_sheet(exportList);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Export_ETI");
-        XLSX.writeFile(wb, `ETI_${data.co.c || 'PROJET'}.xlsx`);
-    }
+  let html='', lastBat=null;
+  data.appts.forEach(a => {
+    if(a.bat!==lastBat){ lastBat=a.bat; html+=`<div class="bat-hd">Bâtiment ${lastBat}</div>`; }
+    const surf = surfEch(a.id);
+    const isOpen = !!open[a.id];
+    html += `
+    <div class="ech-card">
+      <div class="ech-head" onclick="toggleEch('${a.id}')">
+        <div>
+          <div class="ech-label">${esc(a.label)}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">${a.etage?'Étage : '+esc(a.etage):''} ${a.niveau?'— '+esc(a.niveau):''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="ech-surf">${surf.toFixed(2)} m²</span>
+          <span style="color:#94a3b8">${isOpen?'▼':'▶'}</span>
+        </div>
+      </div>
+      <div class="ech-body ${isOpen?'open':''}">
+        <div style="margin-bottom:10px">
+          <label class="lbl" style="margin-top:0">Nom de l'échantillon</label>
+          <input type="text" value="${esc(a.label)}" oninput="updateEch('${a.id}','label',this.value)" placeholder="ex: Bât 1 — Appt 12">
+        </div>
+        <div class="ech-meta">
+          <div>
+            <label class="lbl" style="margin-top:0">Étage</label>
+            <select onchange="updateEch('${a.id}','etage',this.value)">
+              ${['','Sous-sol','RDC','R+1','R+2','R+3','R+4','R+5','R+6','R+7','R+8','R+9','R+10','Combles'].map(e=>`<option ${a.etage===e?'selected':''}>${e}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="lbl" style="margin-top:0">Niveau ANNALYSSIMO</label>
+            <select onchange="updateEch('${a.id}','niveau',this.value)">
+              ${['','RDC','Intermédiaire','Dernier étage'].map(n=>`<option ${a.niveau===n?'selected':''}>${n}</option>`).join('')}
+            </select>
+          </div>
+        </div>
 
-    window.onload = () => {
-        document.getElementById('cp-code').value = data.co.c || '';
-        document.getElementById('cp-nom').value = data.co.n || '';
-        document.getElementById('cp-adr').value = data.co.a || '';
-        goTab('home');
-    };
+        <div class="sl" style="margin-top:4px">Calcul surface habitable</div>
+        <div class="grid-hd">
+          <span>Zone / Pièce</span><span>Long.</span><span>Larg.</span><span>Déduction</span><span></span>
+        </div>
+        ${(data.calcs[a.id]||[]).map((r,i)=>`
+        <div class="calc-row">
+          <input type="text" value="${esc(r.n||'')}" oninput="uC('${a.id}',${i},'n',this.value)" placeholder="Séjour…">
+          <input type="number" value="${r.L||''}" oninput="uC('${a.id}',${i},'L',this.value)" inputmode="decimal" placeholder="0.00">
+          <input type="number" value="${r.l||''}" oninput="uC('${a.id}',${i},'l',this.value)" inputmode="decimal" placeholder="0.00">
+          <input type="number" value="${r.d||''}" oninput="uC('${a.id}',${i},'d',this.value)" inputmode="decimal" placeholder="0.00" class="ded">
+          <button class="del-btn" onclick="suppLigne('${a.id}',${i})">×</button>
+        </div>`).join('')}
+
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="ajouterLigne('${a.id}')">+ Ligne</button>
+          <span style="flex:1"></span>
+          <span style="font-size:13px;font-weight:700;color:var(--p)">${surf.toFixed(2)} m² hab.</span>
+        </div>
+        <button onclick="suppEch('${a.id}')" style="background:none;border:none;color:#ef4444;font-size:12px;margin-top:10px;cursor:pointer;font-weight:600;font-family:inherit">🗑 Supprimer cet échantillon</button>
+      </div>
+    </div>`;
+  });
+  cont.innerHTML = html;
+}
+
+function toggleEch(id){ open[id]=!open[id]; renderAppts(); }
+
+function updateEch(id, field, val){
+  const a = data.appts.find(x=>x.id===id);
+  if(a){ a[field]=val; save(); renderAppts(); }
+}
+
+// ══════════════════════════════════════════
+// LIGNES DE CALCUL
+// ══════════════════════════════════════════
+function ajouterLigne(id){
+  if(!data.calcs[id]) data.calcs[id]=[];
+  data.calcs[id].push({n:'', L:0, l:0, d:0});
+  save(); renderAppts();
+}
+
+function suppLigne(id, idx){
+  data.calcs[id].splice(idx,1);
+  save(); renderAppts();
+}
+
+function uC(id, i, field, val){
+  if(!data.calcs[id]||!data.calcs[id][i]) return;
+  if(field==='n'){
+    data.calcs[id][i][field]=val;
+  } else {
+    data.calcs[id][i][field]=Math.max(0,parseFloat(val)||0); // FIX no negative
+  }
+  save();
+  // Mise à jour surface live sans rerendre
+  const el = document.getElementById('surf-tot');
+  if(el) el.textContent=surfTotal().toFixed(2).replace('.',',')+' m²';
+  updateHdTotal();
+}
+
+function suppEch(id){
+  if(!confirm('Supprimer cet échantillon et ses données ?')) return;
+  data.appts=data.appts.filter(a=>a.id!==id);
+  delete data.calcs[id]; delete open[id];
+  save(); renderAppts();
+}
+
+// ══════════════════════════════════════════
+// EXPORT
+// ══════════════════════════════════════════
+function renderExportRecap(){
+  const co=data.co||{};
+  const el=document.getElementById('export-recap'); if(!el) return;
+  el.innerHTML=`
+    <div><strong>Résidence :</strong> ${esc(co.nom||'—')}</div>
+    <div><strong>Code :</strong> ${esc(co.code||'—')}</div>
+    <div><strong>Adresse :</strong> ${esc(co.adr||'—')}</div>
+    <div><strong>Année :</strong> ${esc(co.annee||'—')}</div>
+    <div><strong>Échantillons :</strong> ${data.appts.length}</div>
+    <div><strong>Surface totale :</strong> <span style="color:var(--p);font-weight:800">${surfTotal().toFixed(2)} m²</span></div>
+  `;
+}
+
+function exportExcel(){
+  if(!data.appts.length){ toast('⚠️ Aucun échantillon à exporter'); return; }
+  const co=data.co||{};
+
+  // Feuille 1 — Synthèse
+  const synth=data.appts.map(a=>({
+    'Code Dossier':  co.code||'',
+    'Résidence':     co.nom||'',
+    'Adresse':       co.adr||'',
+    'Année':         co.annee||'',
+    'Échantillon':   a.label||'',
+    'Étage':         a.etage||'',
+    'Niveau ANNALYSSIMO': a.niveau||'',
+    'Surface hab. (m²)': parseFloat(surfEch(a.id).toFixed(2)),
+    'Nb zones':      (data.calcs[a.id]||[]).length,
+  }));
+
+  // Feuille 2 — Détail calculs
+  const detail=[];
+  data.appts.forEach(a=>{
+    (data.calcs[a.id]||[]).forEach(r=>{
+      const brut=Math.max(0,(r.L||0)*(r.l||0));
+      const ded =Math.max(0,Math.min(r.d||0,brut));
+      detail.push({
+        'Échantillon':   a.label,
+        'Zone / Pièce':  r.n||'',
+        'Long. (m)':     r.L||0,
+        'Larg. (m)':     r.l||0,
+        'Surface brute': parseFloat(brut.toFixed(3)),
+        'Déduction':     parseFloat(ded.toFixed(3)),
+        'Surface nette': parseFloat((brut-ded).toFixed(3)),
+      });
+    });
+  });
+
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(synth),'Synthèse');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(detail),'Détail calculs');
+
+  const code=(co.code||'PROJET');
+  const nom=(co.nom||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
+  XLSX.writeFile(wb,`SURFACES_${code}_${nom||'export'}.xlsx`);
+  toast('✓ Excel généré');
+}
+
+function exportJSON(){
+  save();
+  const nom=(data.co?.nom||'PROJET').replace(/[^a-zA-Z0-9]/g,'_');
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`MyDiag_Ech_${nom}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('✓ JSON téléchargé');
+}
+
+function importJSON(){
+  document.getElementById('import-file').click();
+}
+
+function lireJSON(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const imp=JSON.parse(e.target.result);
+      if(!imp.appts||!imp.calcs) throw new Error();
+      if(!confirm('Importer ce fichier ?\nRemplace le projet actuel.')) return;
+      data=imp;
+      localStorage.setItem(KEY,JSON.stringify(data));
+      chargerUI(); toast('✓ Projet restauré'); goTab('appts');
+    }catch{ toast('⚠️ Fichier JSON invalide'); }
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+function nouveauProjet(){
+  if(!confirm('Créer un nouveau projet ?\nToutes les données seront perdues.')) return;
+  localStorage.removeItem(KEY);
+  data={co:{},appts:[],calcs:{}};
+  chargerUI(); goTab('home'); toast('Nouveau projet créé');
+}
+
+// ══════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let _tt;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+function chargerUI(){
+  const co=data.co||{};
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v||''; };
+  set('cp-code',co.code); set('cp-nom',co.nom); set('cp-adr',co.adr);
+  set('cp-annee',co.annee); set('cp-bat',co.bat||'1'); set('cp-ech',co.ech||'2');
+  updateHdTotal();
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+window.onload=()=>{ load(); chargerUI(); goTab('home'); };
 </script>
 </body>
 </html>
