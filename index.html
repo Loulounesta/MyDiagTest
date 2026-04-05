@@ -9,25 +9,25 @@
             --bg: #F1F5F9; --sur: #FFFFFF; --bor: rgba(30,41,59,.15);
             --tx: #0F172A; --tx2: #334155;
             --acc: #2563EB; --acc-l: #DBEAFE;
-            --ok: #16A34A; --dan: #DC2626;
+            --ok: #16A34A; --ok-l: #DCFCE7;
+            --dan: #DC2626; --dan-l: #FEE2E2;
+            --warn: #D97706; --warn-l: #FEF3C7;
             --r: 14px; --rs: 8px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--tx); padding-bottom: 100px; }
 
-        /* HEADER */
+        /* HEADER & TABS */
         .hd { background: #0F172A; border-bottom: 2px solid var(--acc); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 20; }
         .hd-title { font-size: 16px; font-weight: 700; color: #fff; }
         .hd-sub { font-size: 10px; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px; }
         .btn-save { background: var(--acc); color: #fff; border: none; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
 
-        /* TABS HORIZONTAL SCROLL */
         .tabs { background: #0F172A; display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; position: sticky; top: 55px; z-index: 19; }
         .tabs::-webkit-scrollbar { display: none; }
         .tab { flex: 0 0 auto; padding: 12px 16px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.65); border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; }
         .tab.on { color: #fff; border-bottom-color: var(--acc); font-weight: 700; background: rgba(255,255,255,0.05); }
         
-        /* VIEWS */
         .vw { display: none; padding: 16px; max-width: 800px; margin: 0 auto; }
         .vw.on { display: block; }
 
@@ -44,16 +44,42 @@
         .btn-row { display: flex; gap: 8px; margin-top: 8px; }
         .btn { flex: 1; padding: 14px; border-radius: var(--r); border: none; font-size: 15px; font-weight: 700; cursor: pointer; text-align: center; }
         .btn-p { background: var(--acc); color: #fff; }
-
+        .btn-s { background: #CBD5E1; color: #0F172A; }
+        .btn-xs { padding: 8px; font-size: 12px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; }
+        
         /* ACCUEIL HERO */
         .acc-hero { background: #0F172A; border-radius: 16px; padding: 20px; margin-bottom: 16px; color: #fff; }
         .acc-hero-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
         .acc-copro-name { font-size: 18px; font-weight: 700; color: var(--acc-l); margin-top: 10px; }
         
-        /* ACCORDEONS */
+        /* ACCORDEONS COPRO */
         .coll-acc-hd { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: var(--sur); border-radius: var(--r); border: 1px solid var(--bor); margin-top: 10px; cursor: pointer; font-weight: 700; font-size: 14px; }
         .coll-acc-body { display: none; margin-top: 8px; }
         .coll-acc-body.open { display: block; }
+
+        /* CARTES APPARTEMENTS */
+        .appt-card { background: #fff; border-radius: var(--r); border: 1px solid var(--bor); overflow: hidden; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(30,41,59,.08); }
+        .appt-header { display: flex; align-items: center; padding: 14px 16px; cursor: pointer; background: #F8FAFC; border-bottom: 1px solid var(--bor); }
+        .appt-num { font-size: 16px; font-weight: 700; color: #0F172A; flex: 1; }
+        .appt-meta { font-size: 12px; color: var(--tx2); margin-top: 2px; }
+        .appt-chevron { font-size: 12px; color: var(--tx2); transition: transform 0.2s; margin-left: 10px; }
+        .appt-chevron.open { transform: rotate(180deg); }
+        .appt-body { display: none; padding: 12px; border-top: 1px solid var(--bor); }
+        .appt-body.open { display: block; }
+        
+        /* BADGES ET RACCOURCIS */
+        .st { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 8px; border: 1px solid var(--bor); display: inline-block; margin-right: 4px; margin-bottom: 4px; }
+        .st-ok { background: var(--ok-l); color: var(--ok); border-color: #C0DD97; }
+        .st-warn { background: var(--warn-l); color: var(--warn); border-color: #FAC775; }
+        .st-neu { background: var(--bg); color: var(--tx2); }
+        .st-cur { background: var(--acc-l); color: var(--acc); border-color: #B5D4F4; }
+
+        .quick-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin: 10px 0; }
+        .qbtn { padding: 10px 4px; border-radius: var(--rs); border: 1px solid var(--bor); background: var(--bg); color: var(--acc); font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; }
+        
+        .sub-item { background: var(--bg); border-radius: var(--rs); border: 1px solid var(--bor); padding: 10px; margin-bottom: 8px; }
+        .sub-head { font-size: 13px; font-weight: 700; color: var(--tx); margin-bottom: 6px; }
+        .tag { font-size: 11px; padding: 3px 8px; border-radius: 10px; background: var(--sur); color: var(--tx2); border: 1px solid var(--bor); display: inline-block; margin: 2px 2px 0 0; }
     </style>
 </head>
 <body>
@@ -103,82 +129,86 @@
         <div class="fr"><span class="fl">Réf. dossier</span><input type="text" id="copro-ref" placeholder="N° dossier" inputmode="numeric" oninput="saveCoproData()"></div>
     </div>
 
-    <div class="coll-acc-hd" onclick="toggleAcc('vmc-acc', this)">
-        <span>🌀 Ventilation collective</span> <span>▶</span>
-    </div>
+    <div class="coll-acc-hd" onclick="toggleAcc('vmc-acc', this)"><span>🌀 Ventilation collective</span> <span>▶</span></div>
     <div class="coll-acc-body" id="vmc-acc">
         <div class="card">
             <div class="fr"><span class="fl">Type</span>
                 <select id="vmc-type" onchange="saveCoproData()">
                     <option value="">—</option>
-                    <optgroup label="VMC simple flux Hygro">
-                        <option>VMC simple flux Hygro</option>
-                        <option>VMC Basse pression Hygro A</option>
-                        <option>VMC Basse pression Hygro B</option>
-                        <option>VMC SF Hygro A après 2012</option>
-                    </optgroup>
-                    <optgroup label="VMC simple flux">
-                        <option>Ventilation mécanique sur conduit existant</option>
-                        <option>VMC Basse pression Auto-réglable</option>
-                    </optgroup>
-                    <optgroup label="Ventilation naturelle">
-                        <option>Ventilation naturelle par conduit</option>
-                        <option>Ventilation par ouverture de fenêtres</option>
-                    </optgroup>
+                    <optgroup label="VMC simple flux Hygro"><option>VMC simple flux Hygro</option><option>VMC Basse pression Hygro A</option><option>VMC Basse pression Hygro B</option></optgroup>
+                    <optgroup label="VMC simple flux"><option>Ventilation mécanique sur conduit existant</option><option>VMC Basse pression Auto-réglable</option></optgroup>
+                    <optgroup label="Ventilation naturelle"><option>Ventilation naturelle par conduit</option><option>Ventilation par ouverture de fenêtres</option></optgroup>
                     <option>Autre</option>
                 </select>
             </div>
             <div class="fr"><span class="fl">Période</span>
-                <select id="vmc-periode" onchange="saveCoproData()">
-                    <option value="">—</option>
-                    <option>Avant 1982</option><option>1982 – 2000</option>
-                    <option>2001 – 2012</option><option>Après 2012</option>
-                </select>
-            </div>
-            <div class="fr"><span class="fl">État</span>
-                <select id="vmc-etat" onchange="saveCoproData()">
-                    <option value="">—</option>
-                    <option>Bon état</option><option>État moyen</option>
-                    <option>Défaillant</option><option>Absent</option>
-                </select>
+                <select id="vmc-periode" onchange="saveCoproData()"><option value="">—</option><option>Avant 1982</option><option>1982 – 2000</option><option>2001 – 2012</option><option>Après 2012</option></select>
             </div>
         </div>
     </div>
 
-    <div class="coll-acc-hd" onclick="toggleAcc('chauf-acc', this)">
-        <span>🔥 Chauffage collectif</span> <span>▶</span>
-    </div>
+    <div class="coll-acc-hd" onclick="toggleAcc('chauf-acc', this)"><span>🔥 Chauffage collectif</span> <span>▶</span></div>
     <div class="coll-acc-body" id="chauf-acc">
         <div class="card">
-            <div class="fr"><span class="fl">Énergie</span>
-                <select id="col-chauf-energie" onchange="saveCoproData()">
-                    <option value="">—</option>
-                    <option>Electrique</option><option>Gaz naturel</option><option>Fioul</option><option>Réseau de chaleur</option>
-                </select>
-            </div>
+            <div class="fr"><span class="fl">Énergie</span><select id="col-chauf-energie" onchange="saveCoproData()"><option value="">—</option><option>Electrique</option><option>Gaz naturel</option><option>Fioul</option><option>Réseau de chaleur</option></select></div>
             <div class="fr"><span class="fl">Générateur</span><input type="text" id="col-chauf-gen" placeholder="ex: Chaudière Condensation" oninput="saveCoproData()"></div>
             <div class="fr"><span class="fl">Année</span><input type="number" id="col-chauf-annee" placeholder="ex: 2012" oninput="saveCoproData()"></div>
         </div>
     </div>
 
-    <div class="coll-acc-hd" onclick="toggleAcc('ecs-acc', this)">
-        <span>🚿 ECS collective</span> <span>▶</span>
-    </div>
+    <div class="coll-acc-hd" onclick="toggleAcc('ecs-acc', this)"><span>🚿 ECS collective</span> <span>▶</span></div>
     <div class="coll-acc-body" id="ecs-acc">
         <div class="card">
-            <div class="fr"><span class="fl">Énergie</span>
-                <select id="col-ecs-energie" onchange="saveCoproData()">
-                    <option value="">—</option>
-                    <option>Electrique</option><option>Gaz naturel</option><option>Fioul</option><option>Solaire</option>
-                </select>
-            </div>
+            <div class="fr"><span class="fl">Énergie</span><select id="col-ecs-energie" onchange="saveCoproData()"><option value="">—</option><option>Electrique</option><option>Gaz naturel</option><option>Fioul</option><option>Solaire</option></select></div>
             <div class="fr"><span class="fl">Générateur</span><input type="text" id="col-ecs-gen" placeholder="ex: Ballon accumulation" oninput="saveCoproData()"></div>
             <div class="fr"><span class="fl">Volume (L)</span><input type="number" id="col-ecs-vol" placeholder="ex: 1000" oninput="saveCoproData()"></div>
         </div>
     </div>
+
+    <div style="margin-top: 25px;">
+        <button class="btn btn-p" onclick="goTab('appts'); showNouvelAppt();">🚪 + Ajouter un appartement</button>
+    </div>
 </div>
 
-<div id="vw-appts" class="vw"><div class="card" style="text-align:center; padding:30px;">[Étape 2] Liste des Appartements viendra ici</div></div>
+<div id="vw-appts" class="vw">
+    
+    <div id="new-apt-form" style="display: none; margin-bottom: 20px;">
+        <div class="sl">Nouvel appartement</div>
+        <div class="card">
+            <div class="fr"><span class="fl">N° échantillon</span>
+                <input type="text" id="apt-num" placeholder="ex: E01" style="text-align: right; color: var(--acc); font-weight: 700;">
+            </div>
+            <div class="fr"><span class="fl">Bâtiment n°</span>
+                <select id="apt-bat"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            </div>
+            <div class="fr"><span class="fl">Étage</span>
+                <select id="apt-etage"><option value="">—</option><option>Sous-sol</option><option>RDC</option><option>R+1</option><option>R+2</option><option>R+3</option><option>R+4</option><option>Combles</option></select>
+            </div>
+            <div class="fr"><span class="fl">Niveau ADN</span>
+                <select id="apt-niveau"><option value="">—</option><option>RDC</option><option>Intermédiaire</option><option>Dernier étage</option></select>
+            </div>
+            <div class="fr"><span class="fl">Position</span>
+                <select id="apt-pos"><option value="">—</option><option>Gauche</option><option>Centre</option><option>Droite</option><option>Angle</option></select>
+            </div>
+            <div class="fr"><span class="fl">Surface hab. (m²)</span><input type="number" id="apt-surf" placeholder="ex: 68" inputmode="decimal"></div>
+            <div class="fr"><span class="fl">HSP (m)</span><input type="number" id="apt-hsp" placeholder="ex: 2.50" inputmode="decimal"></div>
+            <div class="fr"><span class="fl">Occupant</span><input type="text" id="apt-occupant" placeholder="Nom"></div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-s" onclick="hideNouvelAppt()">Annuler</button>
+            <button class="btn btn-p" onclick="creerAppt()">Enregistrer</button>
+        </div>
+        <hr style="border:0; border-top:1px solid var(--bor); margin:20px 0;">
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span class="sl" style="margin:0;" id="appts-count-lbl">0 appartement</span>
+        <button class="btn btn-p" style="width:auto; padding:8px 16px; font-size:13px;" onclick="showNouvelAppt()">+ Nouveau</button>
+    </div>
+
+    <div id="appts-liste"></div>
+</div>
+
 <div id="vw-murs" class="vw"><div class="card" style="text-align:center; padding:30px;">[Étape 3] Murs</div></div>
 <div id="vw-fen" class="vw"><div class="card" style="text-align:center; padding:30px;">[Étape 3] Fenêtres</div></div>
 <div id="vw-plafonds" class="vw"><div class="card" style="text-align:center; padding:30px;">[Étape 3] Plafonds</div></div>
@@ -190,28 +220,15 @@
 <div id="vw-export" class="vw"><div class="card" style="text-align:center; padding:30px;">[Étape 4] Export</div></div>
 
 <script>
-    // 1. GESTION DES ONGLETS
-    function goTab(tabId) {
-        // Cacher toutes les vues
-        document.querySelectorAll('.vw').forEach(v => v.classList.remove('on'));
-        // Désélectionner tous les boutons du menu
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-        
-        // Activer la vue et le bouton correspondants
-        document.getElementById('vw-' + tabId).classList.add('on');
-        event.currentTarget.classList.add('on');
-    }
+    // 1. ETAT DE L'APPLICATION
+    let db = JSON.parse(localStorage.getItem('mydiag_v16') || '{"copro":{}, "vmc":{}, "chaufCol":{}, "ecsCol":{}, "appts":[], "chaufs":[], "ecss":[]}');
+    let expandedAppts = {};
+    let curAppt = null;
 
-    // 2. GESTION DES ACCORDEONS
-    function toggleAcc(id, headerEl) {
-        const body = document.getElementById(id);
-        const chevron = headerEl.querySelector('span:last-child');
-        body.classList.toggle('open');
-        chevron.textContent = body.classList.contains('open') ? '▼' : '▶';
+    function sauvegarderLocal() {
+        localStorage.setItem('mydiag_v16', JSON.stringify(db));
+        alert("Projet sauvegardé !");
     }
-
-    // 3. GESTION DES DONNEES (LocalStorage)
-    let db = JSON.parse(localStorage.getItem('mydiag_v16_copro') || '{"copro":{}, "vmc":{}, "chaufCol":{}, "ecsCol":{}}');
 
     function saveCoproData() {
         db.copro = {
@@ -221,33 +238,260 @@
             batiments: document.getElementById('copro-batiments').value,
             ref: document.getElementById('copro-ref').value
         };
-        db.vmc = {
-            type: document.getElementById('vmc-type').value,
-            periode: document.getElementById('vmc-periode').value,
-            etat: document.getElementById('vmc-etat').value
-        };
-        db.chaufCol = {
-            energie: document.getElementById('col-chauf-energie').value,
-            gen: document.getElementById('col-chauf-gen').value,
-            annee: document.getElementById('col-chauf-annee').value
-        };
-        db.ecsCol = {
-            energie: document.getElementById('col-ecs-energie').value,
-            gen: document.getElementById('col-ecs-gen').value,
-            vol: document.getElementById('col-ecs-vol').value
-        };
-
-        // Mettre à jour l'accueil en direct
+        db.vmc = { type: document.getElementById('vmc-type').value, periode: document.getElementById('vmc-periode').value };
+        db.chaufCol = { energie: document.getElementById('col-chauf-energie').value, gen: document.getElementById('col-chauf-gen').value, annee: document.getElementById('col-chauf-annee').value };
+        db.ecsCol = { energie: document.getElementById('col-ecs-energie').value, gen: document.getElementById('col-ecs-gen').value, vol: document.getElementById('col-ecs-vol').value };
+        
         document.getElementById('acc-copro-name').textContent = db.copro.nom || "Aucune copropriété saisie";
+        localStorage.setItem('mydiag_v16', JSON.stringify(db));
     }
 
-    function sauvegarderLocal() {
-        localStorage.setItem('mydiag_v16_copro', JSON.stringify(db));
-        alert("Données générales sauvegardées !");
+    // 2. NAVIGATION ET UI
+    function goTab(tabId) {
+        document.querySelectorAll('.vw').forEach(v => v.classList.remove('on'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+        document.getElementById('vw-' + tabId).classList.add('on');
+        event.currentTarget.classList.add('on');
+        if(tabId === 'appts') renderApptsList();
     }
 
-    // 4. CHARGEMENT INITIAL
+    function toggleAcc(id, headerEl) {
+        const body = document.getElementById(id);
+        const chevron = headerEl.querySelector('span:last-child');
+        body.classList.toggle('open');
+        chevron.textContent = body.classList.contains('open') ? '▼' : '▶';
+    }
+
+    // 3. GESTION DES APPARTEMENTS
+    function showNouvelAppt() {
+        document.getElementById('new-apt-form').style.display = 'block';
+        document.getElementById('apt-num').focus();
+    }
+    function hideNouvelAppt() {
+        document.getElementById('new-apt-form').style.display = 'none';
+    }
+
+    function creerAppt() {
+        const num = document.getElementById('apt-num').value.trim();
+        if(!num) { alert("Le numéro d'échantillon est obligatoire."); return; }
+
+        const apt = {
+            id: String(Date.now()),
+            num: num,
+            bat: document.getElementById('apt-bat').value,
+            etage: document.getElementById('apt-etage').value,
+            niveau: document.getElementById('apt-niveau').value,
+            pos: document.getElementById('apt-pos').value,
+            surf: document.getElementById('apt-surf').value,
+            hsp: document.getElementById('apt-hsp').value,
+            occupant: document.getElementById('apt-occupant').value
+        };
+
+        db.appts.push(apt);
+        expandedAppts[apt.id] = true; // Ouvrir le tiroir par défaut
+        curAppt = apt.id;
+        
+        localStorage.setItem('mydiag_v16', JSON.stringify(db));
+        
+        // Vider le formulaire
+        document.getElementById('apt-num').value = '';
+        document.getElementById('apt-occupant').value = '';
+        
+        hideNouvelAppt();
+        renderApptsList();
+    }
+
+    function toggleAppt(id) {
+        expandedAppts[id] = !expandedAppts[id];
+        renderApptsList();
+    }
+
+    function suppAppt(id) {
+        if(confirm("Supprimer définitivement cet appartement ?")) {
+            db.appts = db.appts.filter(a => a.id !== id);
+            db.chaufs = db.chaufs.filter(c => c.aptId !== id);
+            db.ecss = db.ecss.filter(e => e.aptId !== id);
+            localStorage.setItem('mydiag_v16', JSON.stringify(db));
+            renderApptsList();
+        }
+    }
+
+    function dupAppt(id) {
+        const src = db.appts.find(a => a.id === id);
+        if(!src) return;
+        const newNum = prompt("Numéro de la copie :", src.num + " (copie)");
+        if(!newNum) return;
+        
+        const newId = String(Date.now());
+        const newApt = { ...src, id: newId, num: newNum };
+        db.appts.push(newApt);
+        expandedAppts[newId] = true;
+        localStorage.setItem('mydiag_v16', JSON.stringify(db));
+        renderApptsList();
+    }
+
+    // 4. CHAUFFAGE & ECS INDIVIDUELS
+    function ajouterChauf(aptId) {
+        const e = document.getElementById('ifc-energie-' + aptId).value;
+        const g = document.getElementById('ifc-gen-' + aptId).value;
+        if(!e && !g) { alert("Indiquez au moins l'énergie ou le générateur"); return; }
+        
+        db.chaufs.push({
+            id: String(Date.now()), aptId: aptId,
+            energie: e, gen: g,
+            emetteur: document.getElementById('ifc-emetteur-' + aptId).value,
+            distrib: document.getElementById('ifc-distrib-' + aptId).value,
+            annee: document.getElementById('ifc-annee-' + aptId).value
+        });
+        localStorage.setItem('mydiag_v16', JSON.stringify(db));
+        renderApptsList();
+    }
+
+    function suppChauf(id) {
+        db.chaufs = db.chaufs.filter(c => c.id !== id);
+        localStorage.setItem('mydiag_v16', JSON.stringify(db));
+        renderApptsList();
+    }
+
+    function ajouterEcs(aptId) {
+        const t = document.getElementById('ife-type-' + aptId).value;
+        const e = document.getElementById('ife-energie-' + aptId).value;
+        if(!t && !e) { alert("Indiquez au moins le type ou l'énergie"); return; }
+        
+        db.ecss.push({
+            id: String(Date.now()), aptId: aptId,
+            type: t, energie: e,
+            vol: document.getElementById('ife-vol-' + aptId).value,
+            annee: document.getElementById('ife-annee-' + aptId).value
+        });
+        localStorage.setItem('mydiag_v16', JSON.stringify(db));
+        renderApptsList();
+    }
+
+    function suppEcs(id) {
+        db.ecss = db.ecss.filter(e => e.id !== id);
+        localStorage.setItem('mydiag_v16', JSON.stringify(db));
+        renderApptsList();
+    }
+
+    // 5. RENDU DE LA LISTE
+    function renderApptsList() {
+        const cont = document.getElementById('appts-liste');
+        document.getElementById('appts-count-lbl').textContent = db.appts.length + " appartement(s)";
+        
+        if(db.appts.length === 0) {
+            cont.innerHTML = '<div style="text-align:center; padding:30px; color:#64748b;">Aucun appartement. Utilisez le bouton + Nouveau.</div>';
+            return;
+        }
+
+        let html = '';
+        db.appts.forEach(a => {
+            const isExp = expandedAppts[a.id];
+            const meta = [a.etage, a.niveau, a.surf ? a.surf+' m²' : '', a.occupant ? '👤 '+a.occupant : ''].filter(Boolean).join(' · ');
+            
+            const myChaufs = db.chaufs.filter(c => c.aptId === a.id);
+            const myEcss = db.ecss.filter(e => e.aptId === a.id);
+            
+            const stChauf = myChaufs.length ? `<span class="st st-ok">${myChaufs.length} chauf.</span>` : `<span class="st st-warn">⚠ chauf.</span>`;
+            const stEcs = myEcss.length ? `<span class="st st-ok">${myEcss.length} ECS</span>` : `<span class="st st-warn">⚠ ECS</span>`;
+            const isCur = curAppt === a.id ? '<span class="st st-cur">Actif</span>' : '';
+
+            let bodyHtml = '';
+            if(isExp) {
+                // CHAUFFAGES SAISIS
+                let chaufListeHtml = myChaufs.map(c => `
+                    <div class="sub-item">
+                        <div class="sub-head">${c.energie || '—'} · ${c.gen || '—'}</div>
+                        <div>
+                            ${c.emetteur ? `<span class="tag">${c.emetteur}</span>` : ''}
+                            ${c.distrib ? `<span class="tag">${c.distrib}</span>` : ''}
+                            ${c.annee ? `<span class="tag">An ${c.annee}</span>` : ''}
+                        </div>
+                        <button class="btn-xs" style="color:var(--dan); border:1px solid #F7C1C1; background:var(--dan-l); margin-top:5px;" onclick="suppChauf('${c.id}')">Supprimer</button>
+                    </div>
+                `).join('');
+
+                // FORMULAIRE AJOUT CHAUFFAGE
+                let chaufFormHtml = `
+                    <div class="card" style="margin-top:8px; border-color:#B5D4F4;">
+                        <div class="fr"><span class="fl">Énergie</span><select id="ifc-energie-${a.id}"><option value="">—</option><option>Gaz naturel</option><option>Électricité</option><option>Fioul</option><option>PAC air/eau</option><option>Réseau chaleur</option></select></div>
+                        <div class="fr"><span class="fl">Générateur</span><select id="ifc-gen-${a.id}"><option value="">—</option><option>Chaudière condensation</option><option>Chaudière standard</option><option>PAC</option><option>Convecteur électrique</option><option>Radiateur électrique à inertie</option></select></div>
+                        <div class="fr"><span class="fl">Émetteur</span><select id="ifc-emetteur-${a.id}"><option value="">—</option><option>Radiateurs eau chaude</option><option>Plancher chauffant</option><option>Convecteurs électriques</option></select></div>
+                        <div class="fr"><span class="fl">Distrib.</span><select id="ifc-distrib-${a.id}"><option value="">—</option><option>Individuelle</option><option>Collective</option></select></div>
+                        <div class="fr"><span class="fl">Année</span><input type="number" id="ifc-annee-${a.id}" placeholder="ex: 2015"></div>
+                        <button class="btn btn-p" style="margin:10px 14px; width:calc(100% - 28px); padding:10px; font-size:13px;" onclick="ajouterChauf('${a.id}')">+ Ajouter chauffage</button>
+                    </div>
+                `;
+
+                // ECS SAISIES
+                let ecsListeHtml = myEcss.map(e => `
+                    <div class="sub-item">
+                        <div class="sub-head">${e.type || '—'} · ${e.energie || '—'}</div>
+                        <div>
+                            ${e.vol ? `<span class="tag">${e.vol} L</span>` : ''}
+                            ${e.annee ? `<span class="tag">An ${e.annee}</span>` : ''}
+                        </div>
+                        <button class="btn-xs" style="color:var(--dan); border:1px solid #F7C1C1; background:var(--dan-l); margin-top:5px;" onclick="suppEcs('${e.id}')">Supprimer</button>
+                    </div>
+                `).join('');
+
+                // FORMULAIRE AJOUT ECS
+                let ecsFormHtml = `
+                    <div class="card" style="margin-top:8px; border-color:#B5D4F4;">
+                        <div class="fr"><span class="fl">Type</span><select id="ife-type-${a.id}"><option value="">—</option><option>Ballon électrique</option><option>Chauffe-eau gaz instantané</option><option>Chauffe-eau thermodynamique</option><option>Production par chaudière</option></select></div>
+                        <div class="fr"><span class="fl">Énergie</span><select id="ife-energie-${a.id}"><option value="">—</option><option>Électricité</option><option>Gaz naturel</option></select></div>
+                        <div class="fr"><span class="fl">Volume (L)</span><input type="number" id="ife-vol-${a.id}" placeholder="ex: 150"></div>
+                        <div class="fr"><span class="fl">Année</span><input type="number" id="ife-annee-${a.id}" placeholder="ex: 2018"></div>
+                        <button class="btn btn-p" style="margin:10px 14px; width:calc(100% - 28px); padding:10px; font-size:13px;" onclick="ajouterEcs('${a.id}')">+ Ajouter ECS</button>
+                    </div>
+                `;
+
+                bodyHtml = `
+                <div class="appt-body open">
+                    <div class="quick-btns">
+                        <button class="qbtn" onclick="curAppt='${a.id}'; goTab('murs')">+ Mur</button>
+                        <button class="qbtn" onclick="curAppt='${a.id}'; goTab('fen')">+ Fenêtre</button>
+                        <button class="qbtn" onclick="curAppt='${a.id}'; goTab('planchers')">+ Plancher</button>
+                        <button class="qbtn" onclick="curAppt='${a.id}'; goTab('plafonds')">+ Plafond</button>
+                        <button class="qbtn" onclick="curAppt='${a.id}'; goTab('portes')">+ Porte</button>
+                        <button class="qbtn" style="color:var(--ok); border-color:#C0DD97;" onclick="dupAppt('${a.id}')">Dupliquer</button>
+                    </div>
+                    
+                    <div class="sl">Chauffage(s) Individuel(s)</div>
+                    ${chaufListeHtml}
+                    ${chaufFormHtml}
+
+                    <div class="sl" style="margin-top:20px;">ECS Individuelle(s)</div>
+                    ${ecsListeHtml}
+                    ${ecsFormHtml}
+
+                    <div style="margin-top:20px; text-align:right;">
+                        <button class="btn-xs" style="color:var(--dan); background:var(--dan-l); border:1px solid #F7C1C1;" onclick="suppAppt('${a.id}')">🗑️ Supprimer l'appartement complet</button>
+                    </div>
+                </div>`;
+            }
+
+            html += `
+            <div class="appt-card">
+                <div class="appt-header" onclick="toggleAppt('${a.id}')">
+                    <div style="flex:1;">
+                        <div class="appt-num">${a.bat ? `<span style="font-size:10px; background:#e2e8f0; padding:2px 6px; border-radius:4px; margin-right:5px;">Bât.${a.bat}</span>` : ''} ${a.num} ${isCur}</div>
+                        <div class="appt-meta">${meta}</div>
+                        <div style="margin-top:6px;">${stChauf} ${stEcs}</div>
+                    </div>
+                    <span class="appt-chevron ${isExp ? 'open' : ''}">▼</span>
+                </div>
+                ${bodyHtml}
+            </div>`;
+        });
+
+        cont.innerHTML = html;
+    }
+
+    // CHARGEMENT INITIAL (Suite de l'étape 1)
+    const oldOnload = window.onload;
     window.onload = () => {
+        if(oldOnload) oldOnload();
         if(db.copro.nom) {
             document.getElementById('copro-nom').value = db.copro.nom;
             document.getElementById('acc-copro-name').textContent = db.copro.nom;
@@ -256,21 +500,9 @@
             document.getElementById('copro-batiments').value = db.copro.batiments || '';
             document.getElementById('copro-ref').value = db.copro.ref || '';
         }
-        if(db.vmc.type) {
-            document.getElementById('vmc-type').value = db.vmc.type;
-            document.getElementById('vmc-periode').value = db.vmc.periode || '';
-            document.getElementById('vmc-etat').value = db.vmc.etat || '';
-        }
-        if(db.chaufCol.energie) {
-            document.getElementById('col-chauf-energie').value = db.chaufCol.energie;
-            document.getElementById('col-chauf-gen').value = db.chaufCol.gen || '';
-            document.getElementById('col-chauf-annee').value = db.chaufCol.annee || '';
-        }
-        if(db.ecsCol.energie) {
-            document.getElementById('col-ecs-energie').value = db.ecsCol.energie;
-            document.getElementById('col-ecs-gen').value = db.ecsCol.gen || '';
-            document.getElementById('col-ecs-vol').value = db.ecsCol.vol || '';
-        }
+        if(db.vmc.type) { document.getElementById('vmc-type').value = db.vmc.type; document.getElementById('vmc-periode').value = db.vmc.periode || ''; }
+        if(db.chaufCol.energie) { document.getElementById('col-chauf-energie').value = db.chaufCol.energie; document.getElementById('col-chauf-gen').value = db.chaufCol.gen || ''; document.getElementById('col-chauf-annee').value = db.chaufCol.annee || ''; }
+        if(db.ecsCol.energie) { document.getElementById('col-ecs-energie').value = db.ecsCol.energie; document.getElementById('col-ecs-gen').value = db.ecsCol.gen || ''; document.getElementById('col-ecs-vol').value = db.ecsCol.vol || ''; }
     };
 </script>
 </body>
