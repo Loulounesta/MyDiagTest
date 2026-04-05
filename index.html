@@ -169,15 +169,13 @@
             <path d="M256 120 L96 280 H144 V400 H256 V120 Z" fill="#38BDF8" opacity="0.8"/>
             <circle cx="256" cy="300" r="40" fill="#16A34A"/>
         </svg>
-        MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.3 (ADN)</span>
+        MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.4</span>
     </div>
     <button class="btn-save" onclick="sauvegarderLocal()">Sauvegarder</button>
 </div>
 
 <div class="tabs" id="tab-bar">
     <div class="tab on" onclick="goTab('accueil')">🏠 Accueil</div>
-    <div class="tab" onclick="goTab('bim')">🏗️ Synthèse BIM</div>
-    <div class="tab" onclick="goTab('totaux')">🧮 Totaux</div>
     <div class="tab" onclick="goTab('copro')">🏢 Copro</div>
     <div class="tab" onclick="goTab('appts')">🚪 Appts</div>
     <div class="tab" onclick="goTab('murs')">🧱 Murs</div>
@@ -185,6 +183,8 @@
     <div class="tab" onclick="goTab('portes')">🚪 Portes</div>
     <div class="tab" onclick="goTab('plafonds')">🔝 Plafonds</div>
     <div class="tab" onclick="goTab('planchers')">🔽 Planchers</div>
+    <div class="tab" onclick="goTab('bim')">🏗️ Synthèse BIM</div>
+    <div class="tab" onclick="goTab('totaux')">🧮 Totaux</div>
     <div class="tab" onclick="goTab('export')">📤 Export</div>
 </div>
 
@@ -212,32 +212,7 @@
             </div>
         </div>
     </div>
-    <button class="btn btn-p" onclick="goTab('bim')">Voir la modélisation 3D</button>
-</div>
-
-<div id="vw-bim" class="vw">
-    <div class="card" style="padding:24px; background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%); color:white; text-align:center; border:none; box-shadow: 0 10px 30px rgba(15,23,42,0.15);">
-        <div style="font-size:22px; font-weight:900; margin-bottom:12px; letter-spacing:-0.5px;">Modélisation & Extrapolation</div>
-        <div style="font-size:14px; color:#94A3B8; font-weight:500; line-height:1.5;">Aperçu de l'empilement des échantillons (Tetris) et extrapolation à l'échelle du bâtiment.</div>
-    </div>
-    <div id="bim-container"></div>
-</div>
-
-<div id="vw-totaux" class="vw">
-    <div class="sl">Récapitulatif des saisies</div>
-    <div class="card">
-        <div class="fr" style="border:none; padding:16px;">
-            <span class="fl" style="font-size:15px;">Catégorie</span>
-            <select id="totaux-category" onchange="totauxSortCol=''; renderTotauxTable()">
-                <option value="murs">Murs</option>
-                <option value="fens">Fenêtres</option>
-                <option value="portes">Portes</option>
-                <option value="plfs">Plafonds</option>
-                <option value="plas">Planchers</option>
-            </select>
-        </div>
-    </div>
-    <div id="totaux-table-container" class="tbl-container"></div>
+    <button class="btn btn-p" onclick="goTab('copro')">Commencer la saisie ➡️</button>
 </div>
 
 <div id="vw-copro" class="vw">
@@ -642,6 +617,31 @@
     <div id="list-plas" style="margin-top:20px;"></div>
 </div>
 
+<div id="vw-bim" class="vw">
+    <div class="card" style="padding:24px; background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%); color:white; text-align:center; border:none; box-shadow: 0 10px 30px rgba(15,23,42,0.15);">
+        <div style="font-size:22px; font-weight:900; margin-bottom:12px; letter-spacing:-0.5px;">Modélisation & Extrapolation</div>
+        <div style="font-size:14px; color:#94A3B8; font-weight:500; line-height:1.5;">Aperçu de l'empilement des échantillons (Tetris) et extrapolation à l'échelle du bâtiment.</div>
+    </div>
+    <div id="bim-container"></div>
+</div>
+
+<div id="vw-totaux" class="vw">
+    <div class="sl">Récapitulatif des saisies</div>
+    <div class="card">
+        <div class="fr" style="border:none; padding:16px;">
+            <span class="fl" style="font-size:15px;">Catégorie</span>
+            <select id="totaux-category" onchange="totauxSortCol=''; renderTotauxTable()">
+                <option value="murs">Murs</option>
+                <option value="fens">Fenêtres</option>
+                <option value="portes">Portes</option>
+                <option value="plfs">Plafonds</option>
+                <option value="plas">Planchers</option>
+            </select>
+        </div>
+    </div>
+    <div id="totaux-table-container" class="tbl-container"></div>
+</div>
+
 <div id="vw-export" class="vw">
     <div class="card" style="padding:24px; text-align:center;">
         <div style="font-size:20px; font-weight:900; margin-bottom:16px; color:var(--tx);">Phase finale du diagnostic</div>
@@ -722,7 +722,7 @@
     let totauxSortAsc = true;
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v8_3', db); } 
+        try { await localforage.setItem('mydiag_v8_4', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -2222,7 +2222,7 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v8_3');
+            const savedData = await localforage.getItem('mydiag_v8_4');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
