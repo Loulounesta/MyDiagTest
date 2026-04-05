@@ -9,8 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MyDiag">
     
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%230F172A'/%3E%3Cpath d='M256 120 L96 280 H144 V400 H368 V280 H416 Z' fill='%232563EB'/%3E%3Cpath d='M256 120 L96 280 H144 V400 H256 V120 Z' fill='%2338BDF8' opacity='0.8'/%3E%3Ccircle cx='256' cy='300' r='40' fill='%2316A34A'/%3E%3C/svg%3E">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%230F172A'/%3E%3Cpath d='M256 120 L96 280 H144 V400 H368 V280 H416 Z' fill='%232563EB'/%3E%3Cpath d='M256 120 L96 280 H144 V400 H256 V120 Z' fill='%2338BDF8' opacity='0.8'/%3E%3Ccircle cx='256' cy='300' r='40' fill='%2316A34A'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="apple-touch-icon.png">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -169,7 +169,7 @@
             <path d="M256 120 L96 280 H144 V400 H256 V120 Z" fill="#38BDF8" opacity="0.8"/>
             <circle cx="256" cy="300" r="40" fill="#16A34A"/>
         </svg>
-        MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.2 (Mobile Fix)</span>
+        MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.3 (ADN)</span>
     </div>
     <button class="btn-save" onclick="sauvegarderLocal()">Sauvegarder</button>
 </div>
@@ -680,7 +680,7 @@
         DONNE_SUR_MURS: ["Extérieur", "Local non chauffé (autre que véranda)", "Local non chauffé et non accessible", "Circulations communes", "Local chauffé", "Bâtiment ou espace autre qu'habitation", "Comble", "Terre (paroi enterrée)", "Sous-sol non chauffé"],
         FEN_TYPE: ["Fenêtres battantes", "Fenêtres coulissantes", "Portes-fenêtres coulissantes", "Portes-fenêtres battantes sans soubassement", "Portes-fenêtres battantes avec soubassement", "Fenêtres sans ouverture possible", "Portes-fenêtres sans ouverture possible", "Fenêtre de toit (Velux)", "Hublot"],
         FEN_VITRAGE: ["Simple vitrage vertical", "Double vitrage vertical", "Survitrage vertical", "Triple vitrage vertical", "Brique de verre pleine", "Brique de verre creuse", "Polycarbonate"],
-        FEN_MATIERE: ["Menuiserie PVC", "Menuiserie Bois", "Menuiserie métallique à rupture de pont thermique", "Menuiserie métallique sans rupture de pont thermique", "Menuiserie Bois / Métal"],
+        FEN_MATIERE: ["Menuiserie PVC", "Menuiserie bois", "Menuiserie métallique avec rupture de pont thermique", "Menuiserie métallique sans rupture de pont thermique", "Menuiserie bois/métal"],
         FEN_FERMETURE: ["Jalousie accordéon", "Fermeture sans ajours, volets roulants Alu", "Volet roulant PVC ou bois (épaisseur tablier ≤ 12mm)", "Persienne coulissante", "Volet roulant PVC ou bois (épaisseur tablier > 12mm)"],
         PLAFONDS: ["Dalle béton", "Bois sous solives bois", "Bois sur solives bois", "Entre solives bois", "Bois sur solives métallique", "Bois sous solives métallique", "Entrevous, terre-cuite, poutrelles béton", "Combles aménagés sous rampants", "Plaques de plâtre", "Inconnu"],
         DONNE_SUR_PLAFOND: ["Terrasse", "Combles aménagés", "Combles perdus", "Local chauffé", "Local non chauffé", "Circulations communes", "Extérieur"],
@@ -722,7 +722,7 @@
     let totauxSortAsc = true;
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v8_2', db); } 
+        try { await localforage.setItem('mydiag_v8_3', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -815,7 +815,10 @@
             if(cat === 'murs') html += `<td>${d.ori||''}</td><td>${(d.mat||'').substring(0,15)}...</td><td>${d.l||''}</td><td>${d.h||''}</td>`;
             else if (cat === 'fens') {
                 let dimStr = d.type === 'Hublot' ? `Ø${d.diam}cm` : `${d.l}x${d.h}cm`;
-                html += `<td>${d.ori||''}</td><td>${(d.type||'').substring(0,10)}..</td><td>${(d.mat||'').substring(0,10)}..</td><td>${dimStr}</td><td>${d.nb||'1'}</td>`;
+                let shortFenMat = (d.mat||'').replace("Menuiserie ", "");
+                if(shortFenMat === "métallique avec rupture de pont thermique") shortFenMat = "Métal (avec RPT)";
+                if(shortFenMat === "métallique sans rupture de pont thermique") shortFenMat = "Métal (sans RPT)";
+                html += `<td>${d.ori||''}</td><td>${(d.type||'').substring(0,10)}..</td><td>${shortFenMat.substring(0,12)}..</td><td>${dimStr}</td><td>${d.nb||'1'}</td>`;
             }
             else if (cat === 'portes') html += `<td>${(d.type||'').substring(0,15)}..</td><td>${d.mat||''}</td><td>${d.l||''}</td><td>${d.h||''}</td>`;
             else html += `<td>${(d.type||'').substring(0,15)}..</td><td>${(d.donne||'').substring(0,15)}..</td><td>${d.l||''}</td><td>${d.larg||''}</td>`;
@@ -899,7 +902,7 @@
             let surfMoyEtage = totSurf / sortedFloors.length;
             let surfEstimee = surfMoyEtage * nbEtagesDeclares;
             
-            html += `<div style="font-size:12px; color:var(--tx2); margin-top:12px;">Extrapolation estimée Bâtiment (Basée sur ${nbEtagesDeclares} niveaux)</div>`;
+            html += `<div style="font-size:12px; color:var(--tx2); margin-top:10px;">Extrapolation estimée Bâtiment (Basée sur ${nbEtagesDeclares} niveaux)</div>`;
             html += `<div style="font-size:20px; font-weight:900; color:#D97706;">~ ${surfEstimee.toFixed(0)} m²</div>`;
             
             html += `</div></div>`;
@@ -1002,7 +1005,7 @@
         if(type === 'mur' || type === 'pig') drawCroquis();
     }
 
-    // --- 3. MOTEUR UPLOAD & COMPRESSION PHOTOS ---
+    // --- 3. MOTEUR UPLOAD & COMPRESSION PHOTOS (PNG FIX) ---
     function triggerUpload(type, id = null) {
         currentUploadTarget = { type, id };
         document.getElementById('global-uploader').click();
@@ -2022,7 +2025,11 @@
                 } else {
                     dimText = `Dim: ${x.l||'?'}x${x.h||'?'}cm | Lame: ${x.ep||'?'}mm | Qté: ${x.nb||1} (Motifs: ${x.motifs||1})`;
                 }
-                titleText = `${x.nom ? x.nom + ' - ' : ''}${x.mat}`;
+                let shortFenMat = (x.mat || '').replace("Menuiserie ", "");
+                if(shortFenMat === "métallique avec rupture de pont thermique") shortFenMat = "Métal (avec RPT)";
+                if(shortFenMat === "métallique sans rupture de pont thermique") shortFenMat = "Métal (sans RPT)";
+                shortFenMat = shortFenMat.charAt(0).toUpperCase() + shortFenMat.slice(1);
+                titleText = `${x.nom ? x.nom + ' - ' : ''}${shortFenMat}`;
             } else if (type === 'plfs' || type === 'plas') {
                 if (x.s) dimText = `Surf: ${x.s}m²`; else dimText = `Dim: ${x.l||'?'} x ${x.larg||'?'}m`;
                 if(x.iso && x.iso !== 'Non') dimText += ` | Iso: ${x.iso}${x.isoEp ? ' '+x.isoEp+'cm' : ''}`;
@@ -2215,7 +2222,7 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v8_2');
+            const savedData = await localforage.getItem('mydiag_v8_3');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
