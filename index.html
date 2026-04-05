@@ -127,7 +127,7 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v7.5</span></div>
+    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v7.6 (Loi Carrez)</span></div>
     <button class="btn-save" onclick="sauvegarderLocal()">💾 Sauvegarder</button>
 </div>
 
@@ -414,6 +414,11 @@
                     <div><div style="font-size:13px; font-weight:700;">Plafond Plat (L×l_plat)</div><div style="font-size:16px; font-weight:800; color:#0F172A;" id="res-plat">--</div></div>
                     <button class="btn-xs" style="background:#E2E8F0; color:#0F172A; padding:8px 12px; flex:0 0 auto;" onclick="addCalc('plat')">+ Ajouter Plaf. plat</button>
                 </div>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bor); padding-top:10px; margin-top:10px;">
+                    <div><div style="font-size:13px; font-weight:700;">Surf. Habitable (&gt;1.80m)</div><div style="font-size:16px; font-weight:800; color:#8B5CF6;" id="res-shab">--</div></div>
+                    <button class="btn-xs" style="background:#EDE9FE; color:#8B5CF6; padding:8px 12px; flex:0 0 auto;" onclick="window.applyHabSurface()">+ Appliquer au Lot</button>
+                </div>
             </div>
         </div>
     </div>
@@ -672,7 +677,7 @@
     let totauxSortAsc = true;
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v7_5', db); } 
+        try { await localforage.setItem('mydiag_v7_6', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -858,19 +863,7 @@
         cont.innerHTML = html;
     }
 
-    // --- TOGGLE FEN TYPE (VELUX / HUBLOT) ---
-    window.toggleFenType = function() {
-        let t = document.getElementById('f-type').value;
-        if(t === 'Hublot') {
-            document.getElementById('f-dim-lh').style.display = 'none';
-            document.getElementById('f-dim-diam').style.display = 'block';
-        } else {
-            document.getElementById('f-dim-lh').style.display = 'block';
-            document.getElementById('f-dim-diam').style.display = 'none';
-        }
-    };
-
-    // --- CALCULATEUR GEOMETRIQUE ---
+    // --- CALCULATEUR GEOMETRIQUE AVEC SURFACE HABITABLE ---
     function runCalc() {
         let L = parseFloat(document.getElementById('calc-L').value);
         let l = parseFloat(document.getElementById('calc-l').value);
@@ -888,15 +881,47 @@
         let sRamp = L * hyp;
         let sPlat = L * l_plat;
 
-        lastCalc = { sMur: sMur.toFixed(2), sPig: sPig.toFixed(2), sRamp: sRamp.toFixed(2), sPlat: sPlat.toFixed(2) };
+        // CALCUL DE LA SURFACE HABITABLE (> 1.80m)
+        let sHabitable = 0;
+        if (H < 1.80) {
+            sHabitable = 0;
+        } else if (h >= 1.80) {
+            sHabitable = L * l;
+        } else {
+            // Thalès pour trouver la distance horizontale où h = 1.80
+            let x_180 = (1.80 - h) * (baseRampant / (H - h));
+            let l_hab = l - (2 * x_180);
+            sHabitable = L * l_hab;
+        }
+
+        lastCalc = { 
+            sMur: sMur.toFixed(2), 
+            sPig: sPig.toFixed(2), 
+            sRamp: sRamp.toFixed(2), 
+            sPlat: sPlat.toFixed(2),
+            sHab: sHabitable.toFixed(2)
+        };
 
         document.getElementById('res-mur').textContent = lastCalc.sMur + ' m²';
         document.getElementById('res-pig').textContent = lastCalc.sPig + ' m²';
         document.getElementById('res-ramp').textContent = lastCalc.sRamp + ' m²';
         document.getElementById('res-plat').textContent = lastCalc.sPlat + ' m²';
+        document.getElementById('res-shab').textContent = lastCalc.sHab + ' m²';
+        
         document.getElementById('row-calc-plat').style.display = l_plat > 0 ? 'flex' : 'none';
         resDiv.style.display = 'block';
     }
+
+    window.applyHabSurface = function() {
+        if(!curAppt) return alert("Sélectionnez un appartement !");
+        if(!lastCalc.sHab) return;
+        updateApptField(curAppt, 'surf', lastCalc.sHab);
+        
+        let surfInput = document.querySelector(`#vw-appts input[value="${lastCalc.sHab}"]`);
+        if(surfInput) surfInput.value = lastCalc.sHab;
+        
+        toast("Surface habitable (" + lastCalc.sHab + " m²) appliquée au lot !");
+    };
 
     function addCalc(type) {
         if(!curAppt) return alert("Sélectionnez un appartement !");
@@ -2132,7 +2157,7 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v7_5');
+            const savedData = await localforage.getItem('mydiag_v7_6');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
