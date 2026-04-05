@@ -13,6 +13,9 @@
     <link rel="icon" type="image/png" href="icon.png">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
     <style>
         :root {
             --bg: #F1F5F9; --sur: #FFFFFF; --bor: rgba(30,41,59,.15);
@@ -126,7 +129,7 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v7.0</span></div>
+    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v7.1 Excel & Zip</span></div>
     <button class="btn-save" onclick="sauvegarderLocal()">💾 Sauvegarder</button>
 </div>
 
@@ -306,7 +309,6 @@
             <select id="m-doub">
                 <option value="Absent">Absent</option>
                 <option value="Inconnu">Inconnu</option>
-                <option value="Connu : Plâtre, bois, brique...">Connu : Plâtre, bois, brique...</option>
                 <option value="Connu avec lame d'air de moins de 15 mm">Connu avec lame d'air de moins de 15 mm</option>
                 <option value="Connu avec lame d'air de 15 mm ou plus">Connu avec lame d'air de 15 mm ou plus</option>
             </select>
@@ -539,13 +541,21 @@
     <div class="card" style="padding:20px; text-align:center;">
         <div style="font-size:18px; font-weight:800; margin-bottom:15px; color:var(--acc);">Phase finale du diagnostic</div>
         <div style="font-size:13px; color:var(--tx2); margin-bottom:20px; line-height:1.5;">
-            L'exportation rassemble la totalité des échantillons, des systèmes, des extrapolations et des photos pour le transfert vers le logiciel certifié.
+            Exportez vos relevés au format adapté pour préparer le transfert vers votre logiciel de certification (ex: LICIEL, Analysimmo...).
         </div>
         
-        <button class="btn btn-p" onclick="exportData()" style="font-size:16px; padding:18px;">📥 TÉLÉCHARGER LE JSON</button>
-        <div style="font-size:11px; color:#94A3B8; margin-top:10px;">Fichier complet prêt pour traitement.</div>
+        <button class="btn btn-p" onclick="exportExcel()" style="font-size:16px; padding:14px; background:#16A34A; margin-bottom:10px;">📊 EXPORTER EXCEL</button>
+        <div style="font-size:11px; color:#94A3B8; margin-bottom:20px;">Génère un fichier .xlsx avec un onglet par catégorie.</div>
+
+        <button class="btn btn-p" onclick="exportZip()" style="font-size:16px; padding:14px; background:#D97706; margin-bottom:10px;">📸 EXPORTER PHOTOS (ZIP)</button>
+        <div style="font-size:11px; color:#94A3B8; margin-bottom:30px;">Extrait toutes les photos et documents dans une archive compressée.</div>
         
-        <button class="btn" style="background:var(--dan); color:white; margin-top:40px;" onclick="if(confirm('Attention, action irréversible. Tout effacer ?')) {localforage.clear(); location.reload();}">🗑️ RESET TOTAL DU PROJET</button>
+        <hr style="border:0; border-top:1px dashed var(--bor); margin:20px 0;">
+
+        <button class="btn btn-p" onclick="exportData()" style="font-size:14px; padding:12px; background:#475569;">📥 SAUVEGARDE JSON</button>
+        <div style="font-size:11px; color:#94A3B8; margin-top:10px;">Backup brut de la base de données.</div>
+        
+        <button class="btn" style="background:var(--dan-l); color:var(--dan); margin-top:40px;" onclick="if(confirm('Attention, action irréversible. Tout effacer ?')) {localforage.clear(); location.reload();}">🗑️ RESET TOTAL DU PROJET</button>
     </div>
 </div>
 
@@ -605,7 +615,7 @@
     let lastCalc = {};
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v7_0', db); } 
+        try { await localforage.setItem('mydiag_v7_1', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -903,7 +913,6 @@
         toast('Mur de fermeture (' + l + 'm) généré.');
     };
     
-    // Traducteur pour affichage court sur le croquis
     function getShortMat(mat) {
         if(!mat) return "";
         if(mat.includes("Pierre")) return "Pierre";
@@ -1752,24 +1761,166 @@
         }).join('');
     }
 
-    // --- 10. EXPORT ET RESET ---
+    // --- 10. EXPORTS (JSON, EXCEL, ZIP) ---
     function exportData() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-        const a = document.createElement('a'); a.setAttribute("href", dataStr); a.setAttribute("download", "MyDiag_Project_" + Date.now() + ".json"); document.body.appendChild(a); a.click(); a.remove();
+        const a = document.createElement('a'); a.setAttribute("href", dataStr); a.setAttribute("download", "MyDiag_Backup_" + Date.now() + ".json"); document.body.appendChild(a); a.click(); a.remove();
     }
     
-    async function resetTotal() {
-        if(confirm('Attention, cela effacera définitivement tout le projet actuel et ses photos de la mémoire du téléphone. Continuer ?')) {
-            try { await localforage.clear(); location.reload(); } 
-            catch(e) { alert("Erreur lors de la suppression."); }
+    function exportExcel() {
+        if (typeof XLSX === 'undefined') return alert("La bibliothèque XLSX n'est pas chargée.");
+        toast("Génération du fichier Excel...");
+        
+        let wb = XLSX.utils.book_new();
+        const getAptNum = (id) => { let a = db.appts.find(x=>x.id===id); return a ? a.num : "Inconnu"; };
+
+        // 1. Copropriété
+        let coproData = [{
+            "Référence": db.copro.ref || "", "Nom": db.copro.nom || "", "Adresse": db.copro.adresse || "",
+            "Année": db.copro.annee || "", "Bâtiments": db.copro.batiments || "", "Étages": db.copro.etages || "",
+            "VMC Type": db.vmc.type || "", "VMC Période": db.vmc.periode || "",
+            "Chauff Col. Energie": db.chaufCol.energie || "", "Chauff Col. Générateur": db.chaufCol.gen || "",
+            "Chauff Col. Emetteur": db.chaufCol.emetteur || "", "Chauff Col. Année": db.chaufCol.annee || "", "Chauff Col. Puissance": db.chaufCol.puissance || "",
+            "ECS Col. Energie": db.ecsCol.energie || "", "ECS Col. Type": db.ecsCol.type || "",
+            "ECS Col. Année": db.ecsCol.annee || "", "ECS Col. Volume": db.ecsCol.vol || ""
+        }];
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(coproData), "Copropriété");
+
+        // 2. Appts
+        let apptsData = db.appts.map(a => ({
+            "Lot": a.num, "Bâtiment": a.bat || "", "Type": a.type === 2 ? "Duplex" : a.type === 3 ? "Triplex" : "Plain-pied",
+            "Étage": a.etage || "", "Niveau ADN": a.niveau || "", "Surface (m²)": a.surf || "", "HSP (m)": a.hsp || ""
+        }));
+        if(apptsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(apptsData), "Appartements");
+
+        // 3. Murs
+        let mursData = db.murs.map(m => ({
+            "Lot": getAptNum(m.aid), "Niveau (Duplex)": m.nivInt || 0, "Orientation": m.ori || "Auto",
+            "Donne sur": m.donne || "", "Matériau": m.mat || "", "Longueur (m)": m.l || "",
+            "Hauteur (m)": m.h || "", "Épaisseur (cm)": m.ep || "", "Doublage": m.doub || "",
+            "Isolant": m.iso || "", "Ép. Isolant (cm)": m.isoEp || ""
+        }));
+        if(mursData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mursData), "Murs");
+
+        // 4. Fenêtres
+        let fensData = db.fens.map(f => ({
+            "Lot": getAptNum(f.aid), "Niveau": f.nivInt || 0, "Repère": f.nom || "", "Orientation": f.ori || "",
+            "Type": f.type || "", "Matériau": f.mat || "", "Vitrage": f.vit || "",
+            "Ép. Lame (mm)": f.ep || "", "Fermeture": f.fer || "", "Largeur (cm)": f.l || "", "Hauteur (cm)": f.h || "",
+            "Quantité": f.nb || 1, "Motifs": f.motifs || 1
+        }));
+        if(fensData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fensData), "Fenêtres");
+
+        // 5. Portes
+        let portesData = db.portes.map(p => ({
+            "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type": p.type || "", "Matériau": p.mat || "",
+            "Donne sur": p.donne || "", "Isolation": p.iso || "", "Sas": p.sas || "",
+            "Largeur (m)": p.l || "", "Hauteur (m)": p.h || ""
+        }));
+        if(portesData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(portesData), "Portes");
+
+        // 6. Plafonds
+        let plfsData = db.plfs.map(p => ({
+            "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type ADN": p.type || "", "Donne sur": p.donne || "",
+            "Longueur (m)": p.l || "", "Largeur (m)": p.larg || "", "Surface (m²)": p.s || "",
+            "Isolant": p.iso || "", "Ép. Isolant (cm)": p.isoEp || ""
+        }));
+        if(plfsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plfsData), "Plafonds");
+
+        // 7. Planchers
+        let plasData = db.plas.map(p => ({
+            "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type ADN": p.type || "", "Donne sur": p.donne || "",
+            "Longueur (m)": p.l || "", "Largeur (m)": p.larg || "", "Surface (m²)": p.s || "",
+            "Isolant": p.iso || "", "Ép. Isolant (cm)": p.isoEp || ""
+        }));
+        if(plasData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plasData), "Planchers");
+
+        // 8. Chauffages
+        let chaufsData = db.chaufs.map(c => ({
+            "Lot": getAptNum(c.aptId), "Énergie": c.energie || "", "Générateur": c.gen || "",
+            "Émetteur": c.emetteur || "", "Année": c.annee || "", "Puissance (kW)": c.puissance || ""
+        }));
+        if(chaufsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(chaufsData), "Chauffages");
+
+        // 9. ECS
+        let ecsData = db.ecss.map(e => ({
+            "Lot": getAptNum(e.aptId), "Énergie": e.energie || "", "Type/Générateur": e.type || "",
+            "Année": e.annee || "", "Volume (L)": e.vol || ""
+        }));
+        if(ecsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ecsData), "ECS");
+
+        let d = new Date();
+        let fName = `Export_MyDiag_${db.copro.ref||'Projet'}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.xlsx`;
+        XLSX.writeFile(wb, fName);
+    }
+    
+    async function exportZip() {
+        if (typeof JSZip === 'undefined') return alert("La bibliothèque JSZip n'est pas chargée.");
+        toast("Préparation du ZIP en cours...");
+        let zip = new JSZip();
+        let hasPhotos = false;
+        
+        if (db.docs && db.docs.length > 0) {
+            let docFolder = zip.folder("Documents_Copro");
+            db.docs.forEach((d, i) => {
+                if (d.data && d.data.includes('base64,')) {
+                    let b64 = d.data.split(',')[1];
+                    let ext = d.type === 'img' ? '.jpg' : '.pdf';
+                    docFolder.file(d.name || `doc_${i}${ext}`, b64, {base64: true});
+                    hasPhotos = true;
+                }
+            });
         }
+        
+        let coproFolder = zip.folder("Systemes_Collectifs");
+        if (db.chaufCol && db.chaufCol.photo && db.chaufCol.photo.includes('base64,')) {
+            coproFolder.file("Plaque_Chauffage_Collectif.jpg", db.chaufCol.photo.split(',')[1], {base64: true});
+            hasPhotos = true;
+        }
+        if (db.ecsCol && db.ecsCol.photo && db.ecsCol.photo.includes('base64,')) {
+            coproFolder.file("Plaque_ECS_Collective.jpg", db.ecsCol.photo.split(',')[1], {base64: true});
+            hasPhotos = true;
+        }
+
+        let indFolder = zip.folder("Systemes_Individuels");
+        db.chaufs.forEach((c, i) => {
+            if (c.photo && c.photo.includes('base64,')) {
+                let apt = db.appts.find(a => a.id === c.aptId);
+                let aNum = apt ? apt.num : "Inconnu";
+                indFolder.file(`Chauffage_${aNum}_${i+1}.jpg`, c.photo.split(',')[1], {base64: true});
+                hasPhotos = true;
+            }
+        });
+        db.ecss.forEach((e, i) => {
+            if (e.photo && e.photo.includes('base64,')) {
+                let apt = db.appts.find(a => a.id === e.aptId);
+                let aNum = apt ? apt.num : "Inconnu";
+                indFolder.file(`ECS_${aNum}_${i+1}.jpg`, e.photo.split(',')[1], {base64: true});
+                hasPhotos = true;
+            }
+        });
+
+        if (!hasPhotos) {
+            toast("Aucune photo à exporter.");
+            return;
+        }
+
+        let content = await zip.generateAsync({type:"blob"});
+        let a = document.createElement("a");
+        a.href = URL.createObjectURL(content);
+        let d = new Date();
+        a.download = `Photos_MyDiag_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast("ZIP téléchargé !");
     }
 
     // --- 11. INIT ASYNCHRONE ---
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v7_0');
+            const savedData = await localforage.getItem('mydiag_v7_1');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
