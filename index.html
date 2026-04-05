@@ -123,7 +123,7 @@
             <path d="M256 120 L96 280 H144 V400 H256 V120 Z" fill="#38BDF8" opacity="0.8"/>
             <circle cx="256" cy="300" r="40" fill="#16A34A"/>
         </svg>
-        MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.7</span>
+        MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.8</span>
     </div>
     <div style="display:flex; align-items:center; gap:12px;">
         <div id="voyant-save" style="width:12px; height:12px; border-radius:50%; background-color:#475569; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);"></div>
@@ -259,6 +259,12 @@
             <button class="btn-p" style="background:var(--tx2);" onclick="hideNouvelAppt()">Annuler</button>
             <button class="btn-p" onclick="creerAppt()">Créer le lot</button>
         </div>
+        <hr style="border:0; border-top:1px solid var(--bor); margin:24px 0;">
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <span class="sl" style="margin:0; font-size:13px;" id="appts-count-lbl">0 appartement</span>
+        <button class="btn-xs" style="background:var(--acc); color:#fff; padding:10px 16px; border-radius:20px;" onclick="showNouvelAppt()">+ Nouveau lot</button>
     </div>
     <div id="appts-liste"></div>
 </div>
@@ -303,9 +309,16 @@
 <div id="vw-totaux" class="vw"><div id="totaux-table-container" class="tbl-container"></div></div>
 <div id="vw-export" class="vw">
     <div class="card" style="padding:24px; text-align:center;">
+        <div style="font-size:20px; font-weight:900; margin-bottom:16px; color:var(--tx);">Phase finale du diagnostic</div>
+        <div style="font-size:14px; color:var(--tx2); margin-bottom:24px; line-height:1.6;">
+            Exportez vos relevés au format adapté pour préparer le transfert vers votre logiciel de certification.
+        </div>
+        
         <button class="btn-p" onclick="exportExcel()" style="background:var(--ok);">📊 EXPORTER EXCEL</button>
         <button class="btn-p" onclick="exportZip()" style="background:var(--warn); margin-top:12px;">📸 EXPORTER PHOTOS (ZIP)</button>
         <button class="btn-p" onclick="exportData()" style="background:#475569; margin-top:24px;">📥 BACKUP JSON</button>
+        
+        <button class="btn" style="background:var(--dan-l); color:var(--dan); margin-top:40px; border:1px solid #FECACA;" onclick="resetProjet()">🗑️ RESET TOTAL DU PROJET</button>
     </div>
 </div>
 
@@ -329,7 +342,7 @@
 
     async function sauvegarderLocal() { 
         try { 
-            await localforage.setItem('mydiag_v8_7', db); 
+            await localforage.setItem('mydiag_v8_8', db); 
             let v = document.getElementById('voyant-save');
             if(v) { v.classList.remove('saved-blink'); void v.offsetWidth; v.classList.add('saved-blink'); }
         } catch (err) {}
@@ -343,7 +356,7 @@
         if(db.copro.adresse) {
             addrEl.style.display = 'flex';
             addrEl.querySelector('span').textContent = db.copro.adresse;
-            // Lien vers Google Maps (encodage propre de l'adresse)
+            // Lien Universel Google Maps
             addrEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(db.copro.adresse)}`;
         } else {
             addrEl.style.display = 'none';
@@ -363,7 +376,7 @@
             adresse: document.getElementById('copro-adresse').value, annee: document.getElementById('copro-annee').value, 
             batiments: document.getElementById('copro-batiments').value, etages: document.getElementById('copro-etages').value
         };
-        updateDashboard(); // Met à jour le lien Google Maps immédiatement
+        updateDashboard(); 
         sauvegarderLocal();
     }
 
@@ -376,6 +389,21 @@
         if(tabId === 'accueil') updateDashboard();
         if(tabId === 'bim') renderBIM();
         if(tabId === 'totaux') renderTotauxTable();
+    }
+
+    // --- FONCTION RESET SÉCURISÉE ---
+    function resetProjet() {
+        if(confirm("Voulez-vous télécharger une sauvegarde de sécurité (Backup JSON) avant d'effacer le projet ?\n\nCliquez sur OK pour sauvegarder, ou Annuler pour ignorer.")) {
+            exportData();
+        }
+        
+        setTimeout(() => {
+            if(confirm("⚠️ ATTENTION : Cette action va effacer TOUTES les données de l'application sur cet appareil.\n\nÊtes-vous absolument sûr de vouloir tout supprimer ?")) {
+                localforage.clear().then(() => {
+                    location.reload();
+                });
+            }
+        }, 500); // Petit délai pour laisser le téléchargement se lancer si l'utilisateur a dit oui
     }
 
     // --- UPLOAD PHOTOS ---
@@ -442,7 +470,7 @@
 
     // Initialisation
     window.onload = async () => {
-        const data = await localforage.getItem('mydiag_v8_7');
+        const data = await localforage.getItem('mydiag_v8_8');
         if(data) db = data;
         renderDocs();
         updateDashboard();
