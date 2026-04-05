@@ -88,7 +88,7 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v4.5 Validation Plan</span></div>
+    <div class="hd-title">MyDiag <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v4.6 Biblio Fenêtres</span></div>
     <button class="btn-save" onclick="sauvegarderLocal()">💾 Sauvegarder</button>
 </div>
 
@@ -228,6 +228,16 @@
 
 <div id="vw-fen" class="vw">
     <div id="fen-apt-banner" class="active-apt-banner">Aucun appartement sélectionné</div>
+    
+    <div class="card" style="border-color:#0369a1; background:#f0f9ff; margin-bottom:15px;">
+        <div class="fr" style="border-bottom:none;">
+            <span class="fl" style="color:#0369a1;">Bibliothèque</span>
+            <select id="f-bibli" onchange="chargerModeleFen(this.value)" style="color:#0369a1;">
+                <option value="">-- Nouvelle Fenêtre --</option>
+            </select>
+        </div>
+    </div>
+
     <div class="card">
         <div class="fr"><span class="fl">Orientation</span><select id="f-ori"><option>Nord</option><option>Sud</option><option>Est</option><option>Ouest</option><option>Horizontal</option></select></div>
         <div class="fr"><span class="fl">Type</span><select id="f-type"></select></div>
@@ -329,14 +339,14 @@
     };
 
     // --- 2. BASE DE DONNÉES GLOBALE (MOTEUR INDEXEDDB) ---
-    let db = {copro:{}, docs:[], vmc:{}, chaufCol:{}, ecsCol:{}, appts:[], chaufs:[], ecss:[], murs:[], fens:[], portes:[], plfs:[], plas:[]};
+    let db = {copro:{}, docs:[], vmc:{}, chaufCol:{}, ecsCol:{}, appts:[], chaufs:[], ecss:[], murs:[], fens:[], modelesFens:[], portes:[], plfs:[], plas:[]};
     let expAppts = {};
     let curAppt = null;
     let editParoiId = null;
     let currentUploadTarget = null;
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v4_5', db); } 
+        try { await localforage.setItem('mydiag_v4_6', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -413,7 +423,7 @@
         if(db.ecsCol.photo) { ecsImg.src = db.ecsCol.photo; ecsImg.style.display = 'block'; } else { ecsImg.style.display = 'none'; }
     }
 
-    // --- 4. MOTEUR DE DESSIN 2D & LOGIQUE DE FERMETURE ---
+    // --- 4. MOTEUR DE DESSIN 2D (BIM) ---
     function isSchemaClosed(aptId) {
         const mursApt = db.murs.filter(m => m.aid === aptId);
         if (mursApt.length < 3) return false;
@@ -421,14 +431,15 @@
         let curX = 0, curY = 0;
         mursApt.forEach(m => {
             let l = parseFloat(m.l) || 0;
-            if (m.ori === 'Nord') curY -= l;
-            else if (m.ori === 'Est') curX += l;
-            else if (m.ori === 'Sud') curY += l;
-            else if (m.ori === 'Ouest') curX -= l;
+            // Horaire : N(+X), E(+Y), S(-X), O(-Y)
+            if (m.ori === 'Nord') curX += l;
+            else if (m.ori === 'Est') curY += l;
+            else if (m.ori === 'Sud') curX -= l;
+            else if (m.ori === 'Ouest') curY -= l;
         });
         
         let err = Math.sqrt(curX*curX + curY*curY);
-        return err <= 0.15; // Tolérance de fermeture de 15cm
+        return err <= 0.15;
     }
 
     function drawCroquis() {
@@ -455,10 +466,11 @@
 
         mursApt.forEach(m => {
             let l = parseFloat(m.l) || 0;
-            if (m.ori === 'Nord') curY -= l;
-            else if (m.ori === 'Est') curX += l;
-            else if (m.ori === 'Sud') curY += l;
-            else if (m.ori === 'Ouest') curX -= l;
+            // Repère Cartographique avec dessin horaire
+            if (m.ori === 'Nord') curX += l;
+            else if (m.ori === 'Est') curY += l;
+            else if (m.ori === 'Sud') curX -= l;
+            else if (m.ori === 'Ouest') curY -= l;
             points.push({ x: curX, y: curY });
         });
 
@@ -530,13 +542,42 @@
         msg.innerHTML = txt;
     }
 
-    // --- 5. PEUPLEMENT DES SELECTS ---
+    // --- 5. PEUPLEMENT DES SELECTS & BIBLIOTHEQUES ---
     function peuplerSelects() {
         const fill = (id, arr) => { const el = document.getElementById(id); if(el) el.innerHTML = arr.map(v => `<option value="${v}">${v}</option>`).join(''); };
         fill('m-mat', ADN.MURS); fill('m-donne', ADN.DONNE_SUR_MURS);
         fill('f-type', ADN.FEN_TYPE); fill('f-mat', ADN.FEN_MATIERE); fill('f-vit', ADN.FEN_VITRAGE); fill('f-fer', ADN.FEN_FERMETURE);
         fill('p-type', ADN.PLAFONDS); fill('p-donne', ADN.DONNE_SUR_PLAFOND);
         fill('s-type', ADN.PLANCHERS); fill('s-donne', ADN.DONNE_SUR_PLANCHER);
+    }
+
+    function renderBibliFens() {
+        const sel = document.getElementById('f-bibli');
+        if(!sel) return;
+        let html = '<option value="">-- Nouvelle Fenêtre --</option>';
+        if(db.modelesFens) {
+            db.modelesFens.forEach(m => {
+                html += `<option value="${m.id}">${m.nom} (${m.l}x${m.h} - ${m.mat})</option>`;
+            });
+        }
+        sel.innerHTML = html;
+    }
+
+    function chargerModeleFen(modId) {
+        if(!modId) {
+            ['f-type','f-mat','f-vit','f-ep','f-fer','f-l','f-h'].forEach(id => document.getElementById(id).value = '');
+            return;
+        }
+        const m = db.modelesFens.find(x => x.id === modId);
+        if(m) {
+            document.getElementById('f-type').value = m.type;
+            document.getElementById('f-mat').value = m.mat;
+            document.getElementById('f-vit').value = m.vit;
+            document.getElementById('f-ep').value = m.ep || '';
+            document.getElementById('f-fer').value = m.fer;
+            document.getElementById('f-l').value = m.l;
+            document.getElementById('f-h').value = m.h;
+        }
     }
 
     function getEtageOptionsHtml(selected = "") {
@@ -584,6 +625,7 @@
             verifierAptActif(tabId); 
             renderElementsList(tabId);
             if(tabId === 'murs') drawCroquis();
+            if(tabId === 'fen') renderBibliFens();
         }
     }
     function toggleAcc(id, el) {
@@ -888,7 +930,14 @@
         let el = editParoiId ? db[type].find(x => x.id === editParoiId) : { id: Date.now(), aid: curAppt };
         
         if(type === 'murs') { el.ori = document.getElementById('m-ori').value; el.donne = document.getElementById('m-donne').value; el.mat = document.getElementById('m-mat').value; el.l = document.getElementById('m-l').value; el.h = document.getElementById('m-h').value; el.iso = document.getElementById('m-iso').value; }
-        else if (type === 'fens') { el.ori = document.getElementById('f-ori').value; el.type = document.getElementById('f-type').value; el.mat = document.getElementById('f-mat').value; el.vit = document.getElementById('f-vit').value; el.ep = document.getElementById('f-ep').value; el.fer = document.getElementById('f-fer').value; el.l = document.getElementById('f-l').value; el.h = document.getElementById('f-h').value; el.nb = document.getElementById('f-nb').value; el.motifs = document.getElementById('f-motifs').value; }
+        else if (type === 'fens') { 
+            let ftype = document.getElementById('f-type').value; let fmat = document.getElementById('f-mat').value; let fvit = document.getElementById('f-vit').value; let fep = document.getElementById('f-ep').value; let ffer = document.getElementById('f-fer').value; let fl = document.getElementById('f-l').value; let fh = document.getElementById('f-h').value;
+            // Gestion Bibliothèque
+            let existingMod = db.modelesFens.find(m => m.type === ftype && m.mat === fmat && m.vit === fvit && m.ep === fep && m.fer === ffer && m.l === fl && m.h === fh);
+            if(!existingMod) { existingMod = { id: 'mod_' + Date.now(), nom: 'Fenêtre ' + (db.modelesFens.length + 1), type:ftype, mat:fmat, vit:fvit, ep:fep, fer:ffer, l:fl, h:fh }; db.modelesFens.push(existingMod); renderBibliFens(); }
+            
+            el.nom = existingMod.nom; el.ori = document.getElementById('f-ori').value; el.type = ftype; el.mat = fmat; el.vit = fvit; el.ep = fep; el.fer = ffer; el.l = fl; el.h = fh; el.nb = document.getElementById('f-nb').value; el.motifs = document.getElementById('f-motifs').value; 
+        }
         else if (type === 'portes') { el.type = document.getElementById('po-type').value; el.donne = document.getElementById('po-donne').value; el.l = document.getElementById('po-l').value; el.h = document.getElementById('po-h').value; }
         else if (type === 'plfs') { el.type = document.getElementById('p-type').value; el.donne = document.getElementById('p-donne').value; el.l = document.getElementById('p-l').value; el.larg = document.getElementById('p-larg').value; el.s = document.getElementById('p-s').value;}
         else if (type === 'plas') { el.type = document.getElementById('s-type').value; el.donne = document.getElementById('s-donne').value; el.l = document.getElementById('s-l').value; el.larg = document.getElementById('s-larg').value; el.s = document.getElementById('s-s').value;}
@@ -902,7 +951,7 @@
         renderElementsList(type);
         
         if(type === 'murs') { document.getElementById('m-l').value = ''; drawCroquis(); } 
-        else if (type === 'fens') { document.getElementById('f-l').value = ''; document.getElementById('f-h').value = ''; document.getElementById('f-ep').value = ''; document.getElementById('f-nb').value = '1'; document.getElementById('f-motifs').value = '1'; }
+        else if (type === 'fens') { document.getElementById('f-bibli').value = ''; document.getElementById('f-l').value = ''; document.getElementById('f-h').value = ''; document.getElementById('f-ep').value = ''; document.getElementById('f-nb').value = '1'; document.getElementById('f-motifs').value = '1'; }
         else { document.querySelectorAll(`#vw-${type} input[type="number"]`).forEach(i => i.value = ''); }
     }
 
@@ -911,7 +960,7 @@
         const p = db[type].find(x => x.id === id);
         
         if(type === 'murs') { document.getElementById('m-ori').value = p.ori; document.getElementById('m-donne').value = p.donne; document.getElementById('m-mat').value = p.mat; document.getElementById('m-l').value = p.l; document.getElementById('m-h').value = p.h; document.getElementById('m-iso').value = p.iso; document.getElementById('btn-save-murs').textContent = "Modifier ce mur"; }
-        else if (type === 'fens') { document.getElementById('f-ori').value = p.ori || 'Nord'; document.getElementById('f-type').value = p.type; document.getElementById('f-mat').value = p.mat; document.getElementById('f-vit').value = p.vit; document.getElementById('f-ep').value = p.ep || ''; document.getElementById('f-fer').value = p.fer; document.getElementById('f-l').value = p.l; document.getElementById('f-h').value = p.h; document.getElementById('f-nb').value = p.nb || '1'; document.getElementById('f-motifs').value = p.motifs || '1'; document.getElementById('btn-save-fens').textContent = "Modifier cette fenêtre"; }
+        else if (type === 'fens') { document.getElementById('f-bibli').value = ''; document.getElementById('f-ori').value = p.ori || 'Nord'; document.getElementById('f-type').value = p.type; document.getElementById('f-mat').value = p.mat; document.getElementById('f-vit').value = p.vit; document.getElementById('f-ep').value = p.ep || ''; document.getElementById('f-fer').value = p.fer; document.getElementById('f-l').value = p.l; document.getElementById('f-h').value = p.h; document.getElementById('f-nb').value = p.nb || '1'; document.getElementById('f-motifs').value = p.motifs || '1'; document.getElementById('btn-save-fens').textContent = "Modifier cette fenêtre"; }
         else if (type === 'portes') { document.getElementById('po-type').value = p.type; document.getElementById('po-donne').value = p.donne; document.getElementById('po-l').value = p.l; document.getElementById('po-h').value = p.h; document.getElementById('btn-save-portes').textContent = "Modifier cette porte"; }
         else if (type === 'plfs') { document.getElementById('p-type').value = p.type; document.getElementById('p-donne').value = p.donne; document.getElementById('p-l').value = p.l || ''; document.getElementById('p-larg').value = p.larg || ''; document.getElementById('p-s').value = p.s || ''; document.getElementById('btn-save-plfs').textContent = "Modifier ce plafond"; }
         else if (type === 'plas') { document.getElementById('s-type').value = p.type; document.getElementById('s-donne').value = p.donne; document.getElementById('s-l').value = p.l || ''; document.getElementById('s-larg').value = p.larg || ''; document.getElementById('s-s').value = p.s || ''; document.getElementById('btn-save-plas').textContent = "Modifier ce plancher"; }
@@ -932,19 +981,18 @@
 
         cont.innerHTML = data.filter(x => x.aid === curAppt).map(x => {
             let dimText = "";
+            let titleText = x.mat || x.type;
             if (type === 'fens') {
                 dimText = `Dim: ${x.l||'?'}x${x.h||'?'}cm | Lame: ${x.ep||'?'}mm | Qté: ${x.nb||1} (Motifs: ${x.motifs||1})`;
+                titleText = `${x.nom ? x.nom + ' - ' : ''}${x.mat}`;
             } else if (type === 'plfs' || type === 'plas') {
-                if (x.s) dimText = `Surf: ${x.s}m²`;
-                else dimText = `Dim: ${x.l||'?'} x ${x.larg||'?'}m`;
-            } else {
-                dimText = `Dim: ${x.l||'?'} x ${x.h||'?'}m`;
-            }
+                if (x.s) dimText = `Surf: ${x.s}m²`; else dimText = `Dim: ${x.l||'?'} x ${x.larg||'?'}m`;
+            } else { dimText = `Dim: ${x.l||'?'} x ${x.h||'?'}m`; }
             const badgeText = type === 'fens' ? (x.ori || 'N/A') : (type === 'portes' ? 'Porte' : (x.ori || 'Surf.'));
 
             return `
             <div class="item-row">
-                <div class="item-details"><span class="badge">${badgeText}</span> <b>${x.mat || x.type}</b> <br><span style="color:var(--tx2); font-size:11px;">${dimText}</span></div>
+                <div class="item-details"><span class="badge">${badgeText}</span> <b>${titleText}</b> <br><span style="color:var(--tx2); font-size:11px;">${dimText}</span></div>
                 <div><button class="btn-xs" style="color:var(--acc); margin-right:5px;" onclick="editerParoi('${type}', ${x.id})">✏️</button><button class="btn-xs" style="background:var(--dan-l); color:var(--dan);" onclick="suppElement('${type}', ${x.id})">X</button></div>
             </div>
             `;
@@ -968,11 +1016,10 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v4_5');
+            const savedData = await localforage.getItem('mydiag_v4_6');
             if (savedData) { 
                 db = savedData; 
-                if(!db.docs) db.docs = []; 
-                if(!db.portes) db.portes = []; 
+                if(!db.docs) db.docs = []; if(!db.portes) db.portes = []; if(!db.modelesFens) db.modelesFens = [];
             }
             
             ['copro-ref','copro-nom','copro-adresse','copro-annee','copro-batiments','copro-etages'].forEach(id => { const k = id.replace('copro-',''); if(db.copro[k]) document.getElementById(id).value = db.copro[k]; });
