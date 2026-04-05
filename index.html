@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyDiag - DPE / Audit Terrain</title>
+    <title>MyDiag - DPE</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MyDiag - DPE">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230F172A'/%3E%3Cpath d='M256 120 L100 270 H150 V400 H362 V270 H412 Z' fill='%232563EB'/%3E%3Cpath d='M256 190 C200 190 180 240 180 280 C180 330 220 360 256 360 C292 360 332 330 332 280 C332 240 312 190 256 190 Z' fill='%2316A34A'/%3E%3Cpath d='M256 360 L256 260' stroke='%23FFF' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230F172A'/%3E%3Cpath d='M256 120 L100 270 H150 V400 H362 V270 H412 Z' fill='%232563EB'/%3E%3Cpath d='M256 190 C200 190 180 240 180 280 C180 330 220 360 256 360 C292 360 332 330 332 280 C332 240 312 190 256 190 Z' fill='%2316A34A'/%3E%3Cpath d='M256 360 L256 260' stroke='%23FFF' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <style>
         :root {
@@ -88,7 +95,7 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v4.10 Doublage</span></div>
+    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v5.0</span></div>
     <button class="btn-save" onclick="sauvegarderLocal()">💾 Sauvegarder</button>
 </div>
 
@@ -119,7 +126,7 @@
         <div class="fr"><span class="fl">Nom Copro</span><input type="text" id="copro-nom" placeholder="ex: Les Lilas" oninput="saveCoproData()"></div>
         <div class="fr"><span class="fl">Adresse</span><input type="text" id="copro-adresse" placeholder="Adresse" oninput="saveCoproData()"></div>
         <div class="fr"><span class="fl">Année constr.</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-annee" placeholder="ex: 1975" oninput="saveCoproData()"></div>
-        <div class="fr"><span class="fl">Nb bâtiments</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-batiments" placeholder="ex: 3" oninput="saveCoproData()"></div>
+        <div class="fr"><span class="fl">Nb bâtiments</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-batiments" placeholder="ex: 3" oninput="saveCoproData(); updateBatimentOptions('apt-bat');"></div>
         <div class="fr"><span class="fl">Nb d'étages</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-etages" placeholder="ex: 4" oninput="saveCoproData(); updateEtageOptions('apt-etage');"></div>
     </div>
 
@@ -355,7 +362,7 @@
     let currentUploadTarget = null;
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v4_10', db); } 
+        try { await localforage.setItem('mydiag_v5_0', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -476,10 +483,10 @@
         mursApt.forEach(m => {
             let l = parseFloat(m.l) || 0;
             // Repère Cartographique avec dessin horaire
-            if (m.ori === 'Nord') curY -= l;
-            else if (m.ori === 'Est') curX += l;
-            else if (m.ori === 'Sud') curY += l;
-            else if (m.ori === 'Ouest') curX -= l;
+            if (m.ori === 'Nord') curX += l;
+            else if (m.ori === 'Est') curY += l;
+            else if (m.ori === 'Sud') curX -= l;
+            else if (m.ori === 'Ouest') curY -= l;
             points.push({ x: curX, y: curY });
         });
 
@@ -589,6 +596,20 @@
         }
     }
 
+    function getBatimentOptionsHtml(selected = "") {
+        const nb = parseInt(document.getElementById('copro-batiments').value) || 1;
+        let html = '<option value="">—</option>';
+        for(let i=1; i<=nb; i++) {
+            html += `<option value="${i}" ${selected == i ? 'selected' : ''}>${i}</option>`;
+        }
+        return html;
+    }
+    function updateBatimentOptions(selectId, selectedValue = "") {
+        const select = document.getElementById(selectId);
+        if(!select) return; 
+        select.innerHTML = getBatimentOptionsHtml(selectedValue);
+    }
+
     function getEtageOptionsHtml(selected = "") {
         const n = parseInt(document.getElementById('copro-etages').value) || 0;
         let html = '<option value="">—</option><option value="Sous-sol">Sous-sol</option><option value="RDC">RDC</option>';
@@ -694,6 +715,7 @@
     function showNouvelAppt() { 
         document.getElementById('apt-num').innerHTML = getAptNumOptionsHtml();
         updateEtageOptions('apt-etage');
+        updateBatimentOptions('apt-bat');
         document.getElementById('new-apt-form').style.display = 'block'; 
     }
     function hideNouvelAppt() { document.getElementById('new-apt-form').style.display = 'none'; }
@@ -849,6 +871,7 @@
                 body = `<div class="appt-body open">
                     <div class="card" style="margin-bottom:10px; border-color:#CBD5E1;">
                         <div class="fr"><span class="fl">Identifiant</span><select onchange="updateApptField('${a.id}', 'num', this.value)">${getAptNumOptionsHtml(a.num)}</select></div>
+                        <div class="fr"><span class="fl">Bâtiment n°</span><select onchange="updateApptField('${a.id}', 'bat', this.value)">${getBatimentOptionsHtml(a.bat)}</select></div>
                         <div class="fr"><span class="fl">Surface (m²)</span><input type="number" inputmode="decimal" step="any" value="${a.surf||''}" onchange="updateApptField('${a.id}', 'surf', this.value)"></div>
                         <div class="fr"><span class="fl">HSP (m)</span><input type="number" inputmode="decimal" step="any" value="${a.hsp||''}" onchange="updateApptField('${a.id}', 'hsp', this.value)"></div>
                         <div class="fr"><span class="fl">Étage</span>
@@ -1043,7 +1066,7 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v4_10');
+            const savedData = await localforage.getItem('mydiag_v5_0');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
