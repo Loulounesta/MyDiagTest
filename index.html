@@ -7,10 +7,10 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MyDiag - DPE">
+    <meta name="apple-mobile-web-app-title" content="MyDiag">
     
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%230F172A'/%3E%3Cpath d='M256 120 L96 280 H144 V400 H368 V280 H416 Z' fill='%232563EB'/%3E%3Cpath d='M256 120 L96 280 H144 V400 H256 V120 Z' fill='%2338BDF8' opacity='0.8'/%3E%3Ccircle cx='256' cy='300' r='40' fill='%2316A34A'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%230F172A'/%3E%3Cpath d='M256 120 L96 280 H144 V400 H368 V280 H416 Z' fill='%232563EB'/%3E%3Cpath d='M256 120 L96 280 H144 V400 H256 V120 Z' fill='%2338BDF8' opacity='0.8'/%3E%3Ccircle cx='256' cy='300' r='40' fill='%2316A34A'/%3E%3C/svg%3E">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -39,7 +39,8 @@
 
         /* HEADER */
         .hd { background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 20; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .hd-title { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px;}
+        .hd-title { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;}
+        .hd-title svg { width: 24px; height: 24px; border-radius: 6px;}
         .btn-save { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; backdrop-filter: blur(5px); }
         .btn-save:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
 
@@ -167,7 +168,15 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.0</span></div>
+    <div class="hd-title">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <rect width="512" height="512" fill="#0F172A"/>
+            <path d="M256 120 L96 280 H144 V400 H368 V280 H416 Z" fill="#2563EB"/>
+            <path d="M256 120 L96 280 H144 V400 H256 V120 Z" fill="#38BDF8" opacity="0.8"/>
+            <circle cx="256" cy="300" r="40" fill="#16A34A"/>
+        </svg>
+        MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.1</span>
+    </div>
     <button class="btn-save" onclick="sauvegarderLocal()">Sauvegarder</button>
 </div>
 
@@ -719,7 +728,7 @@
     let totauxSortAsc = true;
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v8_0', db); } 
+        try { await localforage.setItem('mydiag_v8_1', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -2197,7 +2206,7 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v8_0');
+            const savedData = await localforage.getItem('mydiag_v8_1');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
