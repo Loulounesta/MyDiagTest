@@ -80,10 +80,8 @@
         .croquis-title { font-size: 12px; font-weight: 800; color: var(--acc); text-transform: uppercase; }
         .croquis-badge { background: #1E293B; color: #FFF; font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: bold;}
 
-        /* Modifié : object-fit cover strict pour les miniatures, contain pour le visualiseur */
         .thumb { height: 40px; width: 40px; object-fit: cover; border-radius: 6px; border: 1px solid var(--bor); cursor: pointer; background: #fff;}
         #img-viewer-src { max-width:95%; max-height:95%; border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.5); object-fit: contain; }
-
         .doc-item { display:flex; justify-content:space-between; align-items:center; background:#F8FAFC; border:1px solid #E2E8F0; padding:10px; border-radius:8px; margin-bottom:8px; }
 
         .badge-elem { background: #E2E8F0; color: #334155; padding: 3px 6px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; margin-top: 4px;}
@@ -112,7 +110,6 @@
             text-shadow: 1px 1px 0 rgba(0,0,0,0.3); height: 45px; transition: 0.3s;
         }
 
-        /* TABLEAU TOTAUX */
         .tbl-container { overflow-x: auto; background: var(--sur); border-radius: var(--r); border: 1px solid var(--bor); }
         .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
         .tbl th { background: #F8FAFC; padding: 12px; text-align: left; border-bottom: 2px solid var(--bor); color: var(--tx2); cursor: pointer; white-space: nowrap; user-select: none; }
@@ -130,7 +127,7 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v7.2 (PNG & Totaux)</span></div>
+    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v7.3 (Schéma Rampants)</span></div>
     <button class="btn-save" onclick="sauvegarderLocal()">💾 Sauvegarder</button>
 </div>
 
@@ -349,43 +346,76 @@
     </div>
     <div class="coll-acc-body" id="calc-ramp">
         <div class="card" style="padding:15px;">
-            <div style="font-size:12px; color:var(--tx2); margin-bottom:15px; line-height:1.4;">Saisissez les 4 cotes pour générer automatiquement les murs et plafonds sous vos combles ou rampants. <b>Ils seront rattachés au niveau actuellement sélectionné.</b></div>
+            <div style="font-size:12px; color:var(--tx2); margin-bottom:15px; line-height:1.4;">
+                Saisissez les cotes pour générer les murs et plafonds (Pignon Trapézoïdal). <b>Ils seront rattachés au niveau actif.</b>
+            </div>
             
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div>
-                    <div style="font-size:11px; font-weight:700; color:var(--acc); margin-bottom:4px;">L - Long. façade (m)</div>
-                    <input type="number" id="calc-L" placeholder="ex: 8" inputmode="decimal" oninput="runCalc()" style="width:100%; border:1px solid var(--bor); padding:10px; border-radius:8px; font-size:14px; font-weight:bold;">
-                </div>
-                <div>
-                    <div style="font-size:11px; font-weight:700; color:var(--ok); margin-bottom:4px;">l - Prof. pignon (m)</div>
-                    <input type="number" id="calc-l" placeholder="ex: 4" inputmode="decimal" oninput="runCalc()" style="width:100%; border:1px solid var(--bor); padding:10px; border-radius:8px; font-size:14px; font-weight:bold;">
-                </div>
-                <div>
-                    <div style="font-size:11px; font-weight:700; color:var(--acc); margin-bottom:4px;">h - Hauteur basse (m)</div>
-                    <input type="number" id="calc-h" placeholder="ex: 1.5" inputmode="decimal" oninput="runCalc()" style="width:100%; border:1px solid var(--bor); padding:10px; border-radius:8px; font-size:14px; font-weight:bold;">
-                </div>
-                <div>
-                    <div style="font-size:11px; font-weight:700; color:var(--ok); margin-bottom:4px;">H - Haut. faîtage (m)</div>
-                    <input type="number" id="calc-H" placeholder="ex: 3.5" inputmode="decimal" oninput="runCalc()" style="width:100%; border:1px solid var(--bor); padding:10px; border-radius:8px; font-size:14px; font-weight:bold;">
-                </div>
+            <svg viewBox="0 0 300 160" style="width:100%; height:auto; max-width:350px; display:block; margin: 0 auto 20px;">
+                <defs>
+                    <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2563EB"/></marker>
+                    <marker id="arrow-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#16A34A"/></marker>
+                    <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#DC2626"/></marker>
+                    <marker id="arrow-orange" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#D97706"/></marker>
+                </defs>
+                <polygon points="40,120 40,70 100,20 200,20 260,70 260,120" fill="#F1F5F9" stroke="#334155" stroke-width="2"/>
+                <line x1="20" y1="120" x2="280" y2="120" stroke="#0F172A" stroke-width="3"/>
+                
+                <line x1="40" y1="140" x2="260" y2="140" stroke="#2563EB" stroke-width="1.5" marker-start="url(#arrow-blue)" marker-end="url(#arrow-blue)"/>
+                <text x="150" y="155" fill="#2563EB" font-size="12" text-anchor="middle" font-weight="bold">l : Profondeur pignon</text>
+                
+                <line x1="100" y1="10" x2="200" y2="10" stroke="#16A34A" stroke-width="1.5" marker-start="url(#arrow-green)" marker-end="url(#arrow-green)"/>
+                <text x="150" y="32" fill="#16A34A" font-size="11" text-anchor="middle" font-weight="bold">l_plat</text>
+                
+                <line x1="150" y1="120" x2="150" y2="20" stroke="#D97706" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#arrow-orange)"/>
+                <text x="160" y="75" fill="#D97706" font-size="12" font-weight="bold">H</text>
+                
+                <line x1="20" y1="120" x2="20" y2="70" stroke="#DC2626" stroke-width="1.5" marker-start="url(#arrow-red)" marker-end="url(#arrow-red)"/>
+                <line x1="20" y1="70" x2="40" y2="70" stroke="#DC2626" stroke-width="1" stroke-dasharray="2"/>
+                <text x="8" y="100" fill="#DC2626" font-size="12" font-weight="bold">h</text>
+            </svg>
+
+            <div>
+                <div style="font-size:11px; font-weight:700; color:var(--tx2); margin-bottom:4px;">L - Long. de la façade / du bâtiment (m)</div>
+                <input type="number" id="calc-L" placeholder="ex: 10" inputmode="decimal" oninput="runCalc()" style="width:100%; border:1px solid var(--bor); padding:10px; border-radius:8px; font-size:14px; font-weight:bold; margin-bottom:10px;">
             </div>
 
-            <div id="calc-res" style="display:none;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                <div>
+                    <div style="font-size:11px; font-weight:700; color:var(--acc); margin-bottom:4px;">l - Prof. pignon (m)</div>
+                    <input type="number" id="calc-l" placeholder="ex: 8" inputmode="decimal" oninput="runCalc()" style="width:100%; border:1px solid var(--bor); padding:10px; border-radius:8px; font-size:14px; font-weight:bold;">
+                </div>
+                <div>
+                    <div style="font-size:11px; font-weight:700; color:var(--ok); margin-bottom:4px;">l_plat (m) [Facultatif]</div>
+                    <input type="number" id="calc-lplat" placeholder="ex: 3" inputmode="decimal" oninput="runCalc()" style="width:100%; border:1px solid var(--bor); padding:10px; border-radius:8px; font-size:14px; font-weight:bold;">
+                </div>
+                <div>
+                    <div style="font-size:11px; font-weight:700; color:var(--dan); margin-bottom:4px;">h - Haut. basse (m)</div>
+                    <input type="number" id="calc-h" placeholder="ex: 1.2" inputmode="decimal" oninput="runCalc()" style="width:100%; border:1px solid var(--bor); padding:10px; border-radius:8px; font-size:14px; font-weight:bold;">
+                </div>
+                <div>
+                    <div style="font-size:11px; font-weight:700; color:var(--warn); margin-bottom:4px;">H - Haut. faîtage (m)</div>
+                    <input type="number" id="calc-H" placeholder="ex: 2.8" inputmode="decimal" oninput="runCalc()" style="width:100%; border:1px solid var(--bor); padding:10px; border-radius:8px; font-size:14px; font-weight:bold;">
+                </div>
+            </div>
+            
+            <div style="font-size:11px; color:#94A3B8; text-align:center; font-style:italic;">*Note : Pour une toiture classique à 2 pans, cliquez deux fois sur "Ajouter 1 Façade" et "Ajouter 1 Rampant".</div>
+
+            <div id="calc-res" style="display:none; margin-top:10px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bor); padding-top:10px; margin-top:5px;">
-                    <div><div style="font-size:13px; font-weight:700;">Mur Façade (L×h)</div><div style="font-size:16px; font-weight:800; color:var(--acc);" id="res-mur">--</div></div>
-                    <button class="btn-xs" style="background:var(--acc-l); color:var(--acc); padding:8px 12px; flex:0 0 auto;" onclick="addCalc('mur')">+ Ajouter Mur</button>
+                    <div><div style="font-size:13px; font-weight:700;">1 Mur Façade (L×h)</div><div style="font-size:16px; font-weight:800; color:var(--acc);" id="res-mur">--</div></div>
+                    <button class="btn-xs" style="background:var(--acc-l); color:var(--acc); padding:8px 12px; flex:0 0 auto;" onclick="addCalc('mur')">+ Ajouter 1 Façade</button>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bor); padding-top:10px; margin-top:10px;">
-                    <div><div style="font-size:13px; font-weight:700;">Mur Pignon ((h+H)/2 × l)</div><div style="font-size:16px; font-weight:800; color:var(--ok);" id="res-pig">--</div></div>
-                    <button class="btn-xs" style="background:var(--ok-l); color:var(--ok); padding:8px 12px; flex:0 0 auto;" onclick="addCalc('pig')">+ Ajouter Mur</button>
+                    <div><div style="font-size:13px; font-weight:700;">1 Mur Pignon (Trapèze)</div><div style="font-size:16px; font-weight:800; color:var(--ok);" id="res-pig">--</div></div>
+                    <button class="btn-xs" style="background:var(--ok-l); color:var(--ok); padding:8px 12px; flex:0 0 auto;" onclick="addCalc('pig')">+ Ajouter 1 Pignon</button>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bor); padding-top:10px; margin-top:10px;">
-                    <div><div style="font-size:13px; font-weight:700;">Plafond Rampant</div><div style="font-size:16px; font-weight:800; color:var(--warn);" id="res-ramp">--</div></div>
-                    <button class="btn-xs" style="background:var(--warn-l); color:var(--warn); padding:8px 12px; flex:0 0 auto;" onclick="addCalc('ramp')">+ Ajouter Plafond</button>
+                    <div><div style="font-size:13px; font-weight:700;">1 Plafond Rampant</div><div style="font-size:16px; font-weight:800; color:var(--warn);" id="res-ramp">--</div></div>
+                    <button class="btn-xs" style="background:var(--warn-l); color:var(--warn); padding:8px 12px; flex:0 0 auto;" onclick="addCalc('ramp')">+ Ajouter 1 Rampant</button>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bor); padding-top:10px; margin-top:10px;">
-                    <div><div style="font-size:13px; font-weight:700;">Plafond Plat (L×l)</div><div style="font-size:16px; font-weight:800; color:#0F172A;" id="res-plat">--</div></div>
-                    <button class="btn-xs" style="background:#E2E8F0; color:#0F172A; padding:8px 12px; flex:0 0 auto;" onclick="addCalc('plat')">+ Ajouter Plafond</button>
+                <div id="row-calc-plat" style="display:none; justify-content:space-between; align-items:center; border-top:1px solid var(--bor); padding-top:10px; margin-top:10px;">
+                    <div><div style="font-size:13px; font-weight:700;">Plafond Plat (L×l_plat)</div><div style="font-size:16px; font-weight:800; color:#0F172A;" id="res-plat">--</div></div>
+                    <button class="btn-xs" style="background:#E2E8F0; color:#0F172A; padding:8px 12px; flex:0 0 auto;" onclick="addCalc('plat')">+ Ajouter Plaf. plat</button>
                 </div>
             </div>
         </div>
@@ -560,7 +590,7 @@
     <div class="card" style="padding:20px; text-align:center;">
         <div style="font-size:18px; font-weight:800; margin-bottom:15px; color:var(--acc);">Phase finale du diagnostic</div>
         <div style="font-size:13px; color:var(--tx2); margin-bottom:20px; line-height:1.5;">
-            Exportez vos relevés au format adapté pour préparer le transfert vers votre logiciel de certification (ex: LICIEL, Analysimmo...).
+            Exportez vos relevés au format adapté pour préparer le transfert vers votre logiciel de certification.
         </div>
         
         <button class="btn btn-p" onclick="exportExcel()" style="font-size:16px; padding:14px; background:#16A34A; margin-bottom:10px;">📊 EXPORTER EXCEL</button>
@@ -636,7 +666,7 @@
     let totauxSortAsc = true;
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v7_2', db); } 
+        try { await localforage.setItem('mydiag_v7_3', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -814,21 +844,28 @@
         cont.innerHTML = html;
     }
 
-    // --- CALCULATEUR GEOMETRIQUE ---
+    // --- CALCULATEUR GEOMETRIQUE (TRAPEZE) ---
     function runCalc() {
         let L = parseFloat(document.getElementById('calc-L').value);
         let l = parseFloat(document.getElementById('calc-l').value);
+        let l_plat = parseFloat(document.getElementById('calc-lplat').value) || 0;
         let h = parseFloat(document.getElementById('calc-h').value);
         let H = parseFloat(document.getElementById('calc-H').value);
         let resDiv = document.getElementById('calc-res');
 
-        if(isNaN(L) || isNaN(l) || isNaN(h) || isNaN(H) || H < h) { resDiv.style.display = 'none'; return; }
+        if(isNaN(L) || isNaN(l) || isNaN(h) || isNaN(H) || H < h || l_plat > l) { 
+            resDiv.style.display = 'none'; 
+            return; 
+        }
         
         let sMur = L * h;
-        let sPig = ((h + H) / 2) * l;
-        let hyp = Math.sqrt(Math.pow(H - h, 2) + Math.pow(l, 2));
+        let sPig = (l * h) + (((l + l_plat) / 2) * (H - h));
+        
+        let baseRampant = (l - l_plat) / 2;
+        let hyp = Math.sqrt(Math.pow(H - h, 2) + Math.pow(baseRampant, 2));
         let sRamp = L * hyp;
-        let sPlat = L * l;
+        
+        let sPlat = L * l_plat;
 
         lastCalc = { sMur: sMur.toFixed(2), sPig: sPig.toFixed(2), sRamp: sRamp.toFixed(2), sPlat: sPlat.toFixed(2) };
 
@@ -836,6 +873,9 @@
         document.getElementById('res-pig').textContent = lastCalc.sPig + ' m²';
         document.getElementById('res-ramp').textContent = lastCalc.sRamp + ' m²';
         document.getElementById('res-plat').textContent = lastCalc.sPlat + ' m²';
+        
+        document.getElementById('row-calc-plat').style.display = l_plat > 0 ? 'flex' : 'none';
+
         resDiv.style.display = 'block';
     }
 
@@ -849,20 +889,21 @@
             el.h = document.getElementById('calc-h').value; 
             el.ep = ''; el.isoEp = '';
             el.doub = 'Absent'; el.iso = 'Non isolé';
-            db.murs.push(el); toast("Mur Façade ajouté. Modifiez-le ✏️");
+            db.murs.push(el); toast("Façade ajoutée. N'oubliez pas l'orientation ✏️");
         } else if(type === 'pig') {
             el.mat = 'Inconnu'; el.ori = ''; el.donne = 'Extérieur'; 
             el.l = document.getElementById('calc-l').value; 
-            let hMoy = (parseFloat(document.getElementById('calc-h').value) + parseFloat(document.getElementById('calc-H').value)) / 2;
-            el.h = hMoy.toFixed(2); 
+            let sPig = parseFloat(lastCalc.sPig);
+            let fauxH = sPig / parseFloat(el.l);
+            el.h = fauxH.toFixed(2); 
             el.ep = ''; el.isoEp = '';
             el.doub = 'Absent'; el.iso = 'Non isolé';
-            db.murs.push(el); toast("Mur Pignon ajouté. Modifiez-le ✏️");
+            db.murs.push(el); toast("Pignon ajouté. N'oubliez pas l'orientation ✏️");
         } else if(type === 'ramp') {
             el.type = 'Combles aménagés sous rampants'; el.donne = 'Extérieur'; 
             el.s = lastCalc.sRamp;
             el.iso = 'Non isolé'; el.isoEp = '';
-            db.plfs.push(el); toast("Plafond rampant ajouté. Modifiez-le ✏️");
+            db.plfs.push(el); toast("Rampant ajouté. Modifiez-le ✏️");
         } else if(type === 'plat') {
             el.type = 'Inconnu'; el.donne = 'Combles perdus'; 
             el.s = lastCalc.sPlat;
@@ -894,7 +935,6 @@
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas');
-                // On fixe la dimension max tout en gardant strictement le ratio
                 const MAX_DIM = 1000;
                 let width = img.width; 
                 let height = img.height;
@@ -905,7 +945,6 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // Export en PNG pour éviter la perte de qualité et les artefacts JPG
                 const b64 = canvas.toDataURL('image/png'); 
                 saveFileToTarget({ name: file.name, type: 'img', data: b64 });
             };
@@ -1872,166 +1911,24 @@
         }).join('');
     }
 
-    // --- 10. EXPORTS (JSON, EXCEL, ZIP) ---
+    // --- 10. EXPORT ET RESET ---
     function exportData() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
         const a = document.createElement('a'); a.setAttribute("href", dataStr); a.setAttribute("download", "MyDiag_Backup_" + Date.now() + ".json"); document.body.appendChild(a); a.click(); a.remove();
     }
     
-    function exportExcel() {
-        if (typeof XLSX === 'undefined') return alert("La bibliothèque XLSX n'est pas chargée.");
-        toast("Génération du fichier Excel...");
-        
-        let wb = XLSX.utils.book_new();
-        const getAptNum = (id) => { let a = db.appts.find(x=>x.id===id); return a ? a.num : "Inconnu"; };
-
-        // 1. Copro
-        let coproData = [{
-            "Référence": db.copro.ref || "", "Nom": db.copro.nom || "", "Adresse": db.copro.adresse || "",
-            "Année": db.copro.annee || "", "Bâtiments": db.copro.batiments || "", "Étages": db.copro.etages || "",
-            "VMC Type": db.vmc.type || "", "VMC Période": db.vmc.periode || "",
-            "Chauff Col. Energie": db.chaufCol.energie || "", "Chauff Col. Générateur": db.chaufCol.gen || "",
-            "Chauff Col. Emetteur": db.chaufCol.emetteur || "", "Chauff Col. Année": db.chaufCol.annee || "", "Chauff Col. Puissance": db.chaufCol.puissance || "",
-            "ECS Col. Energie": db.ecsCol.energie || "", "ECS Col. Type": db.ecsCol.type || "",
-            "ECS Col. Année": db.ecsCol.annee || "", "ECS Col. Volume": db.ecsCol.vol || ""
-        }];
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(coproData), "Copropriété");
-
-        // 2. Appts
-        let apptsData = db.appts.map(a => ({
-            "Lot": a.num, "Bâtiment": a.bat || "", "Type": a.type === 2 ? "Duplex" : a.type === 3 ? "Triplex" : "Plain-pied",
-            "Étage": a.etage || "", "Niveau ADN": a.niveau || "", "Surface (m²)": a.surf || "", "HSP (m)": a.hsp || ""
-        }));
-        if(apptsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(apptsData), "Appartements");
-
-        // 3. Murs
-        let mursData = db.murs.map(m => ({
-            "Lot": getAptNum(m.aid), "Niveau (Duplex)": m.nivInt || 0, "Orientation": m.ori || "Auto",
-            "Donne sur": m.donne || "", "Matériau": m.mat || "", "Longueur (m)": m.l || "",
-            "Hauteur (m)": m.h || "", "Épaisseur (cm)": m.ep || "", "Doublage": m.doub || "",
-            "Isolant": m.iso || "", "Ép. Isolant (cm)": m.isoEp || ""
-        }));
-        if(mursData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mursData), "Murs");
-
-        // 4. Fens
-        let fensData = db.fens.map(f => ({
-            "Lot": getAptNum(f.aid), "Niveau": f.nivInt || 0, "Repère": f.nom || "", "Orientation": f.ori || "",
-            "Type": f.type || "", "Matériau": f.mat || "", "Vitrage": f.vit || "",
-            "Ép. Lame (mm)": f.ep || "", "Fermeture": f.fer || "", "Largeur (cm)": f.l || "", "Hauteur (cm)": f.h || "",
-            "Quantité": f.nb || 1, "Motifs": f.motifs || 1
-        }));
-        if(fensData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fensData), "Fenêtres");
-
-        // 5. Portes
-        let portesData = db.portes.map(p => ({
-            "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type": p.type || "", "Matériau": p.mat || "",
-            "Donne sur": p.donne || "", "Isolation": p.iso || "", "Sas": p.sas || "",
-            "Largeur (m)": p.l || "", "Hauteur (m)": p.h || ""
-        }));
-        if(portesData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(portesData), "Portes");
-
-        // 6. Plafonds
-        let plfsData = db.plfs.map(p => ({
-            "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type ADN": p.type || "", "Donne sur": p.donne || "",
-            "Longueur (m)": p.l || "", "Largeur (m)": p.larg || "", "Surface (m²)": p.s || "",
-            "Isolant": p.iso || "", "Ép. Isolant (cm)": p.isoEp || ""
-        }));
-        if(plfsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plfsData), "Plafonds");
-
-        // 7. Planchers
-        let plasData = db.plas.map(p => ({
-            "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type ADN": p.type || "", "Donne sur": p.donne || "",
-            "Longueur (m)": p.l || "", "Largeur (m)": p.larg || "", "Surface (m²)": p.s || "",
-            "Isolant": p.iso || "", "Ép. Isolant (cm)": p.isoEp || ""
-        }));
-        if(plasData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plasData), "Planchers");
-
-        // 8. Chaufs
-        let chaufsData = db.chaufs.map(c => ({
-            "Lot": getAptNum(c.aptId), "Énergie": c.energie || "", "Générateur": c.gen || "",
-            "Émetteur": c.emetteur || "", "Année": c.annee || "", "Puissance (kW)": c.puissance || ""
-        }));
-        if(chaufsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(chaufsData), "Chauffages");
-
-        // 9. ECS
-        let ecsData = db.ecss.map(e => ({
-            "Lot": getAptNum(e.aptId), "Énergie": e.energie || "", "Type/Générateur": e.type || "",
-            "Année": e.annee || "", "Volume (L)": e.vol || ""
-        }));
-        if(ecsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ecsData), "ECS");
-
-        let d = new Date();
-        let fName = `Export_MyDiag_${db.copro.ref||'Projet'}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.xlsx`;
-        XLSX.writeFile(wb, fName);
-    }
-    
-    async function exportZip() {
-        if (typeof JSZip === 'undefined') return alert("La bibliothèque JSZip n'est pas chargée.");
-        toast("Préparation du ZIP en cours...");
-        let zip = new JSZip();
-        let hasPhotos = false;
-        
-        if (db.docs && db.docs.length > 0) {
-            let docFolder = zip.folder("Documents_Copro");
-            db.docs.forEach((d, i) => {
-                if (d.data && d.data.includes('base64,')) {
-                    let b64 = d.data.split(',')[1];
-                    let ext = d.type === 'img' ? '.png' : '.pdf';
-                    docFolder.file(d.name || `doc_${i}${ext}`, b64, {base64: true});
-                    hasPhotos = true;
-                }
-            });
+    async function resetTotal() {
+        if(confirm('Attention, cela effacera définitivement tout le projet actuel et ses photos de la mémoire du téléphone. Continuer ?')) {
+            try { await localforage.clear(); location.reload(); } 
+            catch(e) { alert("Erreur lors de la suppression."); }
         }
-        
-        let coproFolder = zip.folder("Systemes_Collectifs");
-        if (db.chaufCol && db.chaufCol.photo && db.chaufCol.photo.includes('base64,')) {
-            coproFolder.file("Plaque_Chauffage_Collectif.png", db.chaufCol.photo.split(',')[1], {base64: true});
-            hasPhotos = true;
-        }
-        if (db.ecsCol && db.ecsCol.photo && db.ecsCol.photo.includes('base64,')) {
-            coproFolder.file("Plaque_ECS_Collective.png", db.ecsCol.photo.split(',')[1], {base64: true});
-            hasPhotos = true;
-        }
-
-        let indFolder = zip.folder("Systemes_Individuels");
-        db.chaufs.forEach((c, i) => {
-            if (c.photo && c.photo.includes('base64,')) {
-                let apt = db.appts.find(a => a.id === c.aptId);
-                let aNum = apt ? apt.num : "Inconnu";
-                indFolder.file(`Chauffage_${aNum}_${i+1}.png`, c.photo.split(',')[1], {base64: true});
-                hasPhotos = true;
-            }
-        });
-        db.ecss.forEach((e, i) => {
-            if (e.photo && e.photo.includes('base64,')) {
-                let apt = db.appts.find(a => a.id === e.aptId);
-                let aNum = apt ? apt.num : "Inconnu";
-                indFolder.file(`ECS_${aNum}_${i+1}.png`, e.photo.split(',')[1], {base64: true});
-                hasPhotos = true;
-            }
-        });
-
-        if (!hasPhotos) {
-            toast("Aucune photo à exporter.");
-            return;
-        }
-
-        let content = await zip.generateAsync({type:"blob"});
-        let a = document.createElement("a");
-        a.href = URL.createObjectURL(content);
-        let d = new Date();
-        a.download = `Photos_MyDiag_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.zip`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        toast("ZIP téléchargé !");
     }
 
     // --- 11. INIT ASYNCHRONE ---
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v7_2');
+            const savedData = await localforage.getItem('mydiag_v7_3');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
