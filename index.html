@@ -3,190 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyDiag - Assistant Expert</title>
+    <title>MyDiag - Relevé Terrain</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --p: #2563eb; --bg: #f8fafc; --txt: #0f172a; --s: #10b981; --accent: #64748b; }
+        :root { --p: #2563eb; --bg: #f8fafc; --txt: #0f172a; --s: #10b981; --bor: #e2e8f0; }
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; color: var(--txt); }
-        .header { background: white; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2000; }
-        .logo { font-weight: 800; color: var(--p); font-size: 1.1rem; }
-        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 50px; z-index: 1900; width: 100%; overflow-x: auto; }
-        .tab-btn { flex: 1; padding: 16px 12px; border: none; background: none; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; white-space: nowrap; }
-        .tab-btn.active { color: white; border-bottom: 3px solid var(--p); background: rgba(255,255,255,0.05); }
+        
+        /* HEADER & NAV */
+        .header { background: white; padding: 15px; border-bottom: 1px solid var(--bor); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2000; }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--p); }
+        .nav-tabs { display: flex; background: #1e293b; position: sticky; top: 54px; z-index: 1900; width: 100%; border-bottom: 3px solid var(--p); }
+        .tab-btn { flex: 1; padding: 15px 5px; border: none; background: none; font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+        .tab-btn.active { color: white; background: rgba(255,255,255,0.1); border-bottom: 3px solid #fbbf24; }
+
+        /* CONTENEURS */
         .container { padding: 15px; max-width: 800px; margin: auto; }
         .view { display: none; }
         .view.active { display: block; }
-        .card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        h3 { margin: 0 0 15px 0; font-size: 0.8rem; color: var(--accent); text-transform: uppercase; border-left: 3px solid var(--p); padding-left: 10px; }
-        label { font-size: 0.65rem; font-weight: 800; color: #64748b; display: block; margin: 8px 0 3px 5px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; background: #fff; margin-bottom: 5px; }
-        .btn { padding: 16px; border-radius: 10px; border: none; font-weight: 800; width: 100%; cursor: pointer; color: white; margin-top: 10px; }
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid var(--bor); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        
+        /* FORMULAIRES */
+        label { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; display: block; margin-top: 10px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; background: #fff; outline: none; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .btn { padding: 16px; border-radius: 10px; border: none; font-weight: 800; width: 100%; font-size: 1rem; cursor: pointer; color: white; margin-top: 10px; text-align: center; }
         .btn-p { background: var(--p); }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 14px; background: white; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 8px; font-weight: 700; }
-        .item-row.selected { border: 2px solid var(--p); background: #eff6ff; }
-        .data-list { font-size: 0.7rem; color: #475569; padding: 8px; border-bottom: 1px solid #f1f5f9; }
+        .btn-s { background: var(--s); }
+
+        /* ACCORDÉON LOTS */
+        .lot-card { background: white; border-radius: 12px; border: 1px solid var(--bor); margin-bottom: 10px; overflow: hidden; }
+        .lot-head { padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; cursor: pointer; background: #fdfdfd; }
+        .lot-body { display: none; padding: 15px; border-top: 1px solid #f1f5f9; background: #fafafa; }
+        .lot-body.active { display: block; }
+
+        /* BOUTONS COMPOSANTS */
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 15px 0; }
+        .tool-btn { padding: 10px 5px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-size: 0.65rem; font-weight: 800; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--txt); }
+        .tool-btn span { font-size: 1.2rem; }
+        .tool-btn:active { background: #eff6ff; border-color: var(--p); }
+
+        /* LISTE DES ÉLÉMENTS */
+        .item-row { background: white; border: 1px solid var(--bor); padding: 10px; border-radius: 8px; margin-bottom: 6px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+        .item-del { background: #fee2e2; color: #dc2626; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        /* MODALES */
+        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; align-items: flex-end; }
+        .modal-box { background: #f8fafc; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 20px; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); }
+        .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 15px; color: var(--p); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="logo">MyDiag <span style="font-weight:400; color:var(--accent);">Expert</span></div>
-    <div style="font-size:0.6rem; font-weight:bold; color:var(--s);">● PHYSIQUE ACTIVE</div>
+    <div class="logo">MyDiag <span style="font-weight:400; color:#64748b;">Terrain</span></div>
+    <div id="sync" style="font-size:0.6rem; font-weight:bold; color:var(--s);">● SAUVEGARDE AUTO</div>
 </div>
 
 <nav class="nav-tabs">
-    <button class="tab-btn active" id="b-home" onclick="go('home')">Projet</button>
-    <button class="tab-btn" id="b-lots" onclick="go('lots')">Lots</button>
-    <button class="tab-btn" id="b-murs" onclick="go('murs')">Parois</button>
-    <button class="tab-btn" id="b-baies" onclick="go('baies')">Baies</button>
-    <button class="tab-btn" id="b-expo" onclick="go('expo')">Export</button>
+    <button class="tab-btn active" id="btn-home" onclick="goTab('home')">Dossier</button>
+    <button class="tab-btn" id="btn-lots" onclick="goTab('lots')">Relevé</button>
+    <button class="tab-btn" id="btn-expo" onclick="goTab('expo')">Export</button>
 </nav>
 
 <div class="container">
     <div id="vw-home" class="view active">
         <div class="card">
-            <h3>📂 Dossier</h3>
-            <label>Référence</label><input type="text" id="cp-c" oninput="sv()">
-            <label>Nom Résidence</label><input type="text" id="cp-n" oninput="sv()">
-            <button class="btn btn-p" onclick="init()">Initialiser les Lots</button>
+            <h3>📂 Référencement du projet</h3>
+            <label>N° de Dossier</label><input type="text" id="co-ref" oninput="save()">
+            <label>Nom Copropriété</label><input type="text" id="co-nom" oninput="save()">
+            <label>Année de construction</label><input type="number" id="co-an" oninput="save()">
+            <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+            <label>Nombre de Bâtiments</label><input type="number" id="co-bat" value="1">
+            <button class="btn btn-p" onclick="initLots()">Générer les échantillons ➡️</button>
         </div>
     </div>
 
-    <div id="vw-lots" class="view"><div id="list-lots"></div></div>
-
-    <div id="vw-murs" class="view">
-        <div class="card">
-            <h3 id="mur-t">Sélectionnez un lot</h3>
-            <div id="f-mur" style="display:none">
-                <label>Type de Paroi</label>
-                <select id="m-type-p"><option value="MUR">Mur extérieur</option><option value="PLAFOND">Plafond / Toiture</option><option value="SOL">Plancher bas</option></select>
-                
-                <div style="display:flex; gap:10px;"><input type="number" id="m-l" placeholder="Long."><input type="number" id="m-h" placeholder="Haut./Larg."></div>
-                
-                <label>Donne sur</label>
-                <select id="m-ds">
-                    <option>Extérieur</option>
-                    <option>Local non chauffé (LNC)</option>
-                    <option>Circulation commune</option>
-                    <option>Parking / Sous-sol</option>
-                    <option>Combles perdus</option>
-                </select>
-
-                <label>Doublage / Lame d'air</label>
-                <select id="m-doub">
-                    <option>Absent</option>
-                    <option>Lame d'air < 15mm</option>
-                    <option>Lame d'air >= 15mm</option>
-                    <option>Inconnu</option>
-                </select>
-
-                <label>Isolation (ADN)</label>
-                <select id="m-i"><option>Non isolé</option><option>Isol. Intérieure</option><option>Isol. Extérieure</option><option>Isol. Répartie</option></select>
-                
-                <button class="btn btn-p" onclick="addM()">Enregistrer Paroi</button>
-            </div>
-        </div>
-        <div id="list-m"></div>
-    </div>
-
-    <div id="vw-baies" class="view">
-        <div class="card">
-            <h3 id="baie-t">Sélectionnez un lot</h3>
-            <div id="f-baie" style="display:none">
-                <label>Menuiserie</label>
-                <select id="ba-m"><option>PVC</option><option>Bois</option><option>Alu Rupture</option><option>Alu Simple</option></select>
-                <label>Vitrage</label>
-                <select id="ba-v"><option>Simple vitrage</option><option>Double vitrage</option><option>Double Vitrage VIR</option></select>
-                <button class="btn btn-p" onclick="addB()">Enregistrer Baie</button>
-            </div>
-        </div>
-        <div id="list-b"></div>
+    <div id="vw-lots" class="view">
+        <div id="list-lots"></div>
     </div>
 
     <div id="vw-expo" class="view">
-        <div class="card"><button class="btn" style="background:#10b981" onclick="xp()">📊 EXPORT ADN ANALYSIMMO</button></div>
+        <div class="card">
+            <h3>📤 Finalisation</h3>
+            <button class="btn btn-s" onclick="exportData()">📊 EXPORT EXCEL ANNALYSIMMO</button>
+            <button class="btn" style="background:#64748b; margin-top:30px;" onclick="resetApp()">🗑️ NOUVEAU PROJET</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-bg" id="mod-mur">
+    <div class="modal-box">
+        <div class="modal-title">🧱 Saisir un Mur</div>
+        <label>Orientation</label><select id="m-ori"><option>Nord</option><option>Sud</option><option>Est</option><option>Ouest</option></select>
+        <label>Donne sur</label><select id="m-donne"><option>Extérieur</option><option>Local non chauffé</option><option>Circulations communes</option><option>Terre (enterré)</option><option>Comble</option></select>
+        <label>Matière (ANNALYSIMMO)</label><select id="m-mat"><option>Béton banché</option><option>Blocs de béton creux</option><option>Briques creuses</option><option>Briques pleines</option><option>Pierre de taille / moellons</option><option>Pans de bois</option><option>Ossature bois</option><option>Inconnu</option></select>
+        <label>Épaisseur mur (cm)</label><input type="number" id="m-ep" inputmode="numeric">
+        <div class="grid-2">
+            <div><label>Long. (m)</label><input type="number" id="m-l" inputmode="decimal"></div>
+            <div><label>Haut. (m)</label><input type="number" id="m-h" inputmode="decimal"></div>
+        </div>
+        <label>Doublage intérieur</label><select id="m-dbl"><option value="Non">Non</option><option value="Oui">Oui</option></select>
+        <label>Type d'isolation</label><select id="m-iso"><option>Non isolé</option><option>ITI (Intérieur)</option><option>ITE (Extérieur)</option></select>
+        <label>Épaisseur isolant (cm)</label><input type="number" id="m-isoep" inputmode="numeric">
+        
+        <div class="grid-2" style="margin-top:20px;">
+            <button class="btn" style="background:#94a3b8;" onclick="closeMod('mod-mur')">Annuler</button>
+            <button class="btn btn-p" style="margin-top:0;" onclick="saveComp('murs')">Valider</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-bg" id="mod-fen">
+    <div class="modal-box">
+        <div class="modal-title">🪟 Saisir une Fenêtre</div>
+        <label>Orientation</label><select id="f-ori"><option>Nord</option><option>Sud</option><option>Est</option><option>Ouest</option></select>
+        <label>Type</label><select id="f-type"><option>Fenêtre battante</option><option>Fenêtre coulissante</option><option>Porte-fenêtre</option><option>Vélux</option></select>
+        <label>Matière</label><select id="f-mat"><option>Bois</option><option>PVC</option><option>Métal RPT</option><option>Métal sans RPT</option></select>
+        <div class="grid-2">
+            <div><label>Larg. (cm)</label><input type="number" id="f-l" inputmode="numeric"></div>
+            <div><label>Haut. (cm)</label><input type="number" id="f-h" inputmode="numeric"></div>
+        </div>
+        <label>Vitrage</label><select id="f-vit"><option>Simple vitrage</option><option>Double vitrage</option><option>Double Vitrage VIR</option><option>Triple vitrage</option></select>
+        <label>Ép. lame d'air (mm)</label><input type="number" id="f-ep" placeholder="ex: 16">
+        <label>Fermeture / Volet</label><select id="f-fer"><option>Sans fermeture</option><option>Volet roulant</option><option>Volet battant</option><option>Persienne</option></select>
+        <label>Quantité</label><input type="number" id="f-nb" value="1">
+        
+        <div class="grid-2" style="margin-top:20px;">
+            <button class="btn" style="background:#94a3b8;" onclick="closeMod('mod-fen')">Annuler</button>
+            <button class="btn btn-p" style="margin-top:0;" onclick="saveComp('fens')">Valider</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-bg" id="mod-plf">
+    <div class="modal-box">
+        <div class="modal-title">🔝 Saisir un Plafond</div>
+        <label>Type de plafond</label><select id="plf-type"><option>Dalle béton</option><option>Bois sous solives</option><option>Entrevous / poutrelles</option><option>Combles sous rampants</option><option>Inconnu</option></select>
+        <label>Donne sur</label><select id="plf-donne"><option>Combles perdus</option><option>Extérieur (Toiture/Terrasse)</option><option>Local non chauffé</option><option>Local chauffé</option></select>
+        <div class="grid-2">
+            <div><label>Long. (m)</label><input type="number" id="plf-l" inputmode="decimal"></div>
+            <div><label>Larg. (m)</label><input type="number" id="plf-li" inputmode="decimal"></div>
+        </div>
+        <label>Isolation</label><select id="plf-iso"><option>Aucune</option><option>Soufflé</option><option>Sous rampant</option><option>ITI</option><option>ITE</option></select>
+        <label>Épaisseur isolant (cm)</label><input type="number" id="plf-isoep" inputmode="numeric">
+        
+        <div class="grid-2" style="margin-top:20px;">
+            <button class="btn" style="background:#94a3b8;" onclick="closeMod('mod-plf')">Annuler</button>
+            <button class="btn btn-p" style="margin-top:0;" onclick="saveComp('plfs')">Valider</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-bg" id="mod-pla">
+    <div class="modal-box">
+        <div class="modal-title">🔽 Saisir un Plancher</div>
+        <label>Type de plancher</label><select id="pla-type"><option>Dalle béton</option><option>Entrevous / poutrelles</option><option>Bois sur solives</option><option>Inconnu</option></select>
+        <label>Donne sur</label><select id="pla-donne"><option>Terre-plein</option><option>Vide sanitaire</option><option>Sous-sol non chauffé</option><option>Extérieur</option></select>
+        <div class="grid-2">
+            <div><label>Long. (m)</label><input type="number" id="pla-l" inputmode="decimal"></div>
+            <div><label>Larg. (m)</label><input type="number" id="pla-li" inputmode="decimal"></div>
+        </div>
+        <label>Isolation</label><select id="pla-iso"><option>Aucune</option><option>Sous dalle</option><option>ITI</option><option>ITE</option></select>
+        <label>Épaisseur isolant (cm)</label><input type="number" id="pla-isoep" inputmode="numeric">
+        
+        <div class="grid-2" style="margin-top:20px;">
+            <button class="btn" style="background:#94a3b8;" onclick="closeMod('mod-pla')">Annuler</button>
+            <button class="btn btn-p" style="margin-top:0;" onclick="saveComp('plas')">Valider</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-bg" id="mod-por">
+    <div class="modal-box">
+        <div class="modal-title">🚪 Saisir une Porte Palière</div>
+        <label>Matière</label><select id="por-mat"><option>Bois</option><option>Métallique</option><option>PVC</option></select>
+        <label>Type</label><select id="por-type"><option>Opaque pleine</option><option>Vitrée simple vitrage</option><option>Vitrée double vitrage</option></select>
+        <div class="grid-2">
+            <div><label>Larg. (cm)</label><input type="number" id="por-l" inputmode="numeric"></div>
+            <div><label>Haut. (cm)</label><input type="number" id="por-h" inputmode="numeric"></div>
+        </div>
+        <label>Propriétés</label>
+        <select id="por-opt"><option>Standard</option><option>Isolée</option><option>Précédée d'un sas</option></select>
+        
+        <div class="grid-2" style="margin-top:20px;">
+            <button class="btn" style="background:#94a3b8;" onclick="closeMod('mod-por')">Annuler</button>
+            <button class="btn btn-p" style="margin-top:0;" onclick="saveComp('portes')">Valider</button>
+        </div>
     </div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('diag_v14_2') || '{"l":[],"m":[],"b":[],"co":{}}');
-    let cur = null;
+    // ETAT DE L'APPLICATION
+    let db = JSON.parse(localStorage.getItem('mydiag_v15') || '{"co":{}, "lots":[], "murs":[], "fens":[], "plfs":[], "plas":[], "portes":[]}');
+    let openApts = {};
+    let curLotId = null;
 
-    function go(id) {
-        document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-        document.getElementById('vw-'+id).classList.add('active');
-        document.getElementById('b-'+id).classList.add('active');
-        if(id==='lots') renderL();
-        if(id==='murs') renderM();
-        if(id==='baies') renderB();
+    // NAVIGATION
+    function goTab(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('vw-' + id).classList.add('active');
+        document.getElementById('btn-' + id).classList.add('active');
+        if(id === 'lots') renderLots();
     }
 
-    function sv(){ db.co.c=document.getElementById('cp-c').value; db.co.n=document.getElementById('cp-n').value; localStorage.setItem('diag_v14_2',JSON.stringify(db)); }
-
-    function init(){
-        db.l = [];
-        for(let b=1;b<=2;b++){ for(let i=1;i<=3;i++){ db.l.push({id:`b${b}l${i}`, n:`Lot ${i} - Bât ${b}`, s:0}); } }
-        sv(); go('lots');
+    function save() {
+        db.co.ref = document.getElementById('co-ref').value;
+        db.co.nom = document.getElementById('co-nom').value;
+        db.co.an = document.getElementById('co-an').value;
+        localStorage.setItem('mydiag_v15', JSON.stringify(db));
     }
 
-    function renderL(){
-        const c = document.getElementById('list-lots');
-        c.innerHTML = db.l.map(l => `
-            <div class="item-row ${cur===l.id?'selected':''}" onclick="sel('${l.id}','${l.n}')">
-                <span>${l.n}</span>
-                <input type="number" style="width:70px; padding:5px; margin:0;" value="${l.s}" onchange="upS('${l.id}',this.value)" placeholder="m²">
-            </div>`).join('');
+    // GESTION DES LOTS
+    function initLots() {
+        const nb = parseInt(document.getElementById('co-bat').value) || 1;
+        db.lots = [];
+        for(let b=1; b<=nb; b++) {
+            for(let l=1; l<=2; l++) { // 2 lots par défaut par bat
+                db.lots.push({ id: `b${b}l${l}`, bat: b, nom: `Bât ${b} - Lot ${l}`, shab: '', hsp: '' });
+            }
+        }
+        save(); goTab('lots');
     }
 
-    function sel(id, n){ cur=id; renderL(); document.getElementById('mur-t').innerText=n; document.getElementById('baie-t').innerText=n; document.getElementById('f-mur').style.display='block'; document.getElementById('f-baie').style.display='block'; }
+    function toggleApt(id) { openApts[id] = !openApts[id]; renderLots(); }
 
-    function upS(id, v){ db.l.find(x=>x.id===id).s=parseFloat(v)||0; sv(); }
+    function updateLotVal(id, field, val) {
+        const lot = db.lots.find(l => l.id === id);
+        if(lot) { lot[field] = val; save(); }
+    }
 
-    function addM(){
-        const s=(parseFloat(document.getElementById('m-l').value)*parseFloat(document.getElementById('m-h').value)).toFixed(2);
-        db.m.push({
-            lid:cur, 
-            type: document.getElementById('m-type-p').value,
-            s, 
-            ds:document.getElementById('m-ds').value, 
-            doub:document.getElementById('m-doub').value, 
-            i:document.getElementById('m-i').value
+    function renderLots() {
+        const cont = document.getElementById('list-lots');
+        let html = ""; let lastB = null;
+        
+        if(!db.lots.length) { cont.innerHTML = "<p style='text-align:center;color:#64748b;'>Générez les lots dans l'onglet Dossier.</p>"; return; }
+
+        db.lots.forEach(l => {
+            if(l.bat !== lastB) { lastB = l.bat; html += `<div style="background:#1e293b; color:white; padding:8px 12px; border-radius:8px; font-size:0.8rem; font-weight:bold; margin:15px 0 8px 0;">BÂTIMENT ${lastB}</div>`; }
+            
+            // Comptage des éléments
+            const cM = db.murs.filter(x=>x.lid===l.id).length;
+            const cF = db.fens.filter(x=>x.lid===l.id).length;
+            const cPlf = db.plfs.filter(x=>x.lid===l.id).length;
+            const cPla = db.plas.filter(x=>x.lid===l.id).length;
+            const cPor = db.portes.filter(x=>x.lid===l.id).length;
+
+            html += `
+            <div class="lot-card">
+                <div class="lot-head" onclick="toggleApt('${l.id}')">
+                    <span>${l.nom} <small style="color:var(--p)">(${l.shab||0} m²)</small></span>
+                    <span>${openApts[l.id] ? '▼' : '▶'}</span>
+                </div>
+                <div class="lot-body ${openApts[l.id] ? 'active' : ''}">
+                    <div class="grid-2">
+                        <div><label style="margin-top:0">SHAB (m²)</label><input type="number" value="${l.shab}" onchange="updateLotVal('${l.id}','shab',this.value)"></div>
+                        <div><label style="margin-top:0">HSP (m)</label><input type="number" value="${l.hsp}" onchange="updateLotVal('${l.id}','hsp',this.value)"></div>
+                    </div>
+                    
+                    <div class="tools-grid">
+                        <button class="tool-btn" onclick="openMod('mod-mur', '${l.id}')"><span>🧱</span>Murs (${cM})</button>
+                        <button class="tool-btn" onclick="openMod('mod-fen', '${l.id}')"><span>🪟</span>Fenêtres (${cF})</button>
+                        <button class="tool-btn" onclick="openMod('mod-plf', '${l.id}')"><span>🔝</span>Plafonds (${cPlf})</button>
+                        <button class="tool-btn" onclick="openMod('mod-pla', '${l.id}')"><span>🔽</span>Planchers (${cPla})</button>
+                        <button class="tool-btn" onclick="openMod('mod-por', '${l.id}')"><span>🚪</span>Portes (${cPor})</button>
+                    </div>
+
+                    <div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
+                        ${renderItems(l.id)}
+                    </div>
+                </div>
+            </div>`;
         });
-        sv(); renderM();
+        cont.innerHTML = html;
     }
 
-    function renderM(){
-        const l=document.getElementById('list-m');
-        l.innerHTML=db.m.filter(x=>x.lid===cur).map(x=>`<div class="data-list"><b>${x.type}</b>: ${x.s}m² sur ${x.ds} | Doublage: ${x.doub} | ${x.i}</div>`).join('');
+    function renderItems(lid) {
+        let html = '';
+        db.murs.filter(x=>x.lid===lid).forEach(m => html += `<div class="item-row">🧱 Mur ${m.ori} - ${m.mat} <button class="item-del" onclick="delItem('murs', ${m.id})">X</button></div>`);
+        db.fens.filter(x=>x.lid===lid).forEach(f => html += `<div class="item-row">🪟 Fen. ${f.ori} - ${f.vit} <button class="item-del" onclick="delItem('fens', ${f.id})">X</button></div>`);
+        db.plfs.filter(x=>x.lid===lid).forEach(p => html += `<div class="item-row">🔝 Plaf. ${p.type} <button class="item-del" onclick="delItem('plfs', ${p.id})">X</button></div>`);
+        db.plas.filter(x=>x.lid===lid).forEach(p => html += `<div class="item-row">🔽 Planch. ${p.type} <button class="item-del" onclick="delItem('plas', ${p.id})">X</button></div>`);
+        db.portes.filter(x=>x.lid===lid).forEach(p => html += `<div class="item-row">🚪 Porte ${p.mat} <button class="item-del" onclick="delItem('portes', ${p.id})">X</button></div>`);
+        return html || '<div style="color:#94a3b8; font-size:0.75rem; text-align:center;">Aucun élément saisi</div>';
     }
 
-    function addB(){
-        db.b.push({lid:cur, m:document.getElementById('ba-m').value, v:document.getElementById('ba-v').value});
-        sv(); renderB();
+    // MODALES & SAISIE COMPOSANTS
+    function openMod(modId, lotId) { curLotId = lotId; document.getElementById(modId).style.display = 'flex'; }
+    function closeMod(modId) { document.getElementById(modId).style.display = 'none'; }
+    function delItem(table, id) { db[table] = db[table].filter(x => x.id !== id); save(); renderLots(); }
+
+    function saveComp(table) {
+        let item = { id: Date.now(), lid: curLotId };
+        
+        if(table === 'murs') {
+            item.ori = document.getElementById('m-ori').value; item.donne = document.getElementById('m-donne').value;
+            item.mat = document.getElementById('m-mat').value; item.ep = document.getElementById('m-ep').value;
+            item.l = document.getElementById('m-l').value; item.h = document.getElementById('m-h').value;
+            item.dbl = document.getElementById('m-dbl').value; item.iso = document.getElementById('m-iso').value;
+            item.isoep = document.getElementById('m-isoep').value;
+            closeMod('mod-mur');
+        } 
+        else if(table === 'fens') {
+            item.ori = document.getElementById('f-ori').value; item.type = document.getElementById('f-type').value;
+            item.mat = document.getElementById('f-mat').value; item.l = document.getElementById('f-l').value;
+            item.h = document.getElementById('f-h').value; item.vit = document.getElementById('f-vit').value;
+            item.ep = document.getElementById('f-ep').value; item.fer = document.getElementById('f-fer').value;
+            item.nb = document.getElementById('f-nb').value;
+            closeMod('mod-fen');
+        }
+        else if(table === 'plfs') {
+            item.type = document.getElementById('plf-type').value; item.donne = document.getElementById('plf-donne').value;
+            item.l = document.getElementById('plf-l').value; item.li = document.getElementById('plf-li').value;
+            item.iso = document.getElementById('plf-iso').value; item.isoep = document.getElementById('plf-isoep').value;
+            closeMod('mod-plf');
+        }
+        else if(table === 'plas') {
+            item.type = document.getElementById('pla-type').value; item.donne = document.getElementById('pla-donne').value;
+            item.l = document.getElementById('pla-l').value; item.li = document.getElementById('pla-li').value;
+            item.iso = document.getElementById('pla-iso').value; item.isoep = document.getElementById('pla-isoep').value;
+            closeMod('mod-pla');
+        }
+        else if(table === 'portes') {
+            item.mat = document.getElementById('por-mat').value; item.type = document.getElementById('por-type').value;
+            item.l = document.getElementById('por-l').value; item.h = document.getElementById('por-h').value;
+            item.opt = document.getElementById('por-opt').value;
+            closeMod('mod-por');
+        }
+
+        db[table].push(item);
+        save(); renderLots();
     }
 
-    function renderB(){
-        const l=document.getElementById('list-b');
-        l.innerHTML=db.b.filter(x=>x.lid===cur).map(x=>`<div class="data-list">• ${x.m} | ${x.v}</div>`).join('');
+    // EXPORT
+    function exportData() {
+        const wb = XLSX.utils.book_new();
+        
+        // Lots
+        const wsLots = XLSX.utils.json_to_sheet(db.lots);
+        XLSX.utils.book_append_sheet(wb, wsLots, "Lots");
+        
+        // Murs
+        const mData = db.murs.map(m => ({ Lot: db.lots.find(l=>l.id===m.lid).nom, Orientation: m.ori, DonneSur: m.donne, Matiere: m.mat, Epaisseur: m.ep, L: m.l, H: m.h, Doublage: m.dbl, Isolation: m.iso, EpIso: m.isoep }));
+        if(mData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mData), "Murs");
+
+        // Fenêtres
+        const fData = db.fens.map(f => ({ Lot: db.lots.find(l=>l.id===f.lid).nom, Orientation: f.ori, Type: f.type, Matiere: f.mat, L_cm: f.l, H_cm: f.h, Vitrage: f.vit, EpLame: f.ep, Fermeture: f.fer, Quantite: f.nb }));
+        if(fData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fData), "Fenêtres");
+
+        // Plafonds/Planchers/Portes... (Simplifié pour l'exemple d'export)
+        const pData = db.plfs.map(p => ({ Lot: db.lots.find(l=>l.id===p.lid).nom, Paroi: 'Plafond', Type: p.type, DonneSur: p.donne, Isolation: p.iso }));
+        db.plas.forEach(p => pData.push({ Lot: db.lots.find(l=>l.id===p.lid).nom, Paroi: 'Plancher', Type: p.type, DonneSur: p.donne, Isolation: p.iso }));
+        if(pData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pData), "Planchers_Plafonds");
+
+        XLSX.writeFile(wb, `RELEVE_COMPLET_${db.co.ref || 'PROJET'}.xlsx`);
     }
 
-    function xp(){
-        const data = db.m.map(x=>({
-            "Lot":db.l.find(l=>l.id===x.lid).n, 
-            "Type": x.type,
-            "Surface":x.s, 
-            "Donne sur":x.ds, 
-            "Doublage":x.doub, 
-            "Isolation":x.i
-        }));
-        const ws=XLSX.utils.json_to_sheet(data), wb=XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb,ws,"DATA_ANNALYSIMMO");
-        XLSX.writeFile(wb, `RELEVE_PHYS_EXPORT.xlsx`);
-    }
+    function resetApp() { if(confirm('Tout effacer ?')) { localStorage.clear(); location.reload(); } }
 
-    window.onload=()=>{ document.getElementById('cp-c').value=db.co.c||''; document.getElementById('cp-n').value=db.co.n||''; go('home'); };
+    window.onload = () => {
+        document.getElementById('co-ref').value = db.co.ref || '';
+        document.getElementById('co-nom').value = db.co.nom || '';
+        document.getElementById('co-an').value = db.co.an || '';
+        goTab('home');
+    };
 </script>
 </body>
 </html>
