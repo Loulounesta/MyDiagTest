@@ -121,9 +121,9 @@
         /* CANVAS CROQUIS */
         .canvas-container { background:var(--sur); border: 1px solid var(--bor); border-radius: var(--r); padding:16px; margin-bottom:20px; box-shadow: 0 8px 24px rgba(15,23,42,0.04); }
         #croquis-canvas { width: 100%; height: 260px; background: #F8FAFC; border-radius: 12px; border: 2px dashed #E2E8F0; margin-top: 12px;}
-        .croquis-header { display: flex; justify-content: space-between; align-items: center; }
-        .croquis-title { font-size: 14px; font-weight: 800; color: var(--acc); text-transform: uppercase; letter-spacing: -0.5px; }
-        .croquis-badge { background: #1E293B; color: #FFF; font-size: 11px; padding: 4px 8px; border-radius: 6px; font-weight: bold;}
+        .croquis-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+        .croquis-title { font-size: 13px; font-weight: 800; color: var(--acc); text-transform: uppercase; letter-spacing: -0.5px; white-space: nowrap; }
+        .croquis-badge { background: #1E293B; color: #FFF; font-size: 11px; padding: 6px 10px; border-radius: 6px; font-weight: bold;}
 
         /* PHOTOS ET MINIATURES */
         .thumb { height: 44px; width: 44px; object-fit: cover; border-radius: 8px; border: 1px solid var(--bor); cursor: pointer; background: #fff;}
@@ -177,7 +177,7 @@
             <path d="M256 120 L96 280 H144 V400 H256 V120 Z" fill="#38BDF8" opacity="0.8"/>
             <circle cx="256" cy="300" r="40" fill="#16A34A"/>
         </svg>
-        MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.5</span>
+        MyDiag - DPE <span style="font-size:11px; color:#94A3B8; font-weight:600; margin-left:4px; opacity:0.8;">v8.6</span>
     </div>
     <div style="display:flex; align-items:center; gap:12px;">
         <div id="voyant-save" style="width:12px; height:12px; border-radius:50%; background-color:#475569; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);"></div>
@@ -329,9 +329,9 @@
     <div class="canvas-container" id="croquis-container" style="display:none;">
         <div class="croquis-header">
             <span class="croquis-title">📐 Topographie du niveau</span>
-            <div>
-                <button class="btn-xs" style="background:#F1F5F9; color:var(--tx2); margin-right:8px; border:1px solid var(--bor);" onclick="exporterCroquis()">💾 PNG</button>
-                <span class="croquis-badge">Saisie Horaire ↻</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn-xs" style="background:#F1F5F9; color:var(--tx2); border:1px solid var(--bor);" onclick="exporterCroquis()">💾 Joindre aux Docs</button>
+                <span class="croquis-badge">↻</span>
             </div>
         </div>
         <canvas id="croquis-canvas" width="400" height="260"></canvas>
@@ -727,7 +727,7 @@
 
     // --- 2. BASE DE DONNÉES GLOBALE & VARIABLE TEMP PHOTOS ---
     let db = {copro:{}, docs:[], vmc:{}, chaufCol:{}, ecsCol:{}, appts:[], chaufs:[], ecss:[], murs:[], fens:[], modelesFens:[], portes:[], plfs:[], plas:[]};
-    let tempPhotos = { chauf: {}, ecs: {} }; // Stocke la photo avant de valider l'ajout d'un système
+    let tempPhotos = { chauf: {}, ecs: {} }; 
     let expAppts = {};
     let curAppt = null;
     let curNivInt = 0; 
@@ -739,11 +739,11 @@
 
     async function sauvegarderLocal() { 
         try { 
-            await localforage.setItem('mydiag_v8_5', db); 
+            await localforage.setItem('mydiag_v8_6', db); 
             let v = document.getElementById('voyant-save');
             if(v) {
                 v.classList.remove('saved-blink');
-                void v.offsetWidth; // Force reflow pour relancer l'animation CSS
+                void v.offsetWidth; 
                 v.classList.add('saved-blink');
             }
         } 
@@ -1129,29 +1129,26 @@
         if(db.ecsCol.photo) { ecsImg.src = db.ecsCol.photo; ecsImg.style.display = 'block'; } else { ecsImg.style.display = 'none'; }
     }
 
-    // --- 4. MOTEUR DE DESSIN 2D (BIM) & EXPORT CROQUIS ---
+    // --- 4. MOTEUR DE DESSIN 2D (BIM) & EXPORT CROQUIS INTERNE ---
     window.exporterCroquis = function() {
         const canvas = document.getElementById('croquis-canvas');
         if(!canvas) return;
         const dataUrl = canvas.toDataURL('image/png');
         let aptObj = db.appts.find(a => a.id === curAppt);
         let nom = aptObj ? aptObj.num : "inconnu";
+        let filename = "Croquis_" + nom + "_N" + curNivInt + ".png";
         
-        try {
-            const a = document.createElement('a');
-            a.href = dataUrl;
-            a.download = "Croquis_" + nom + "_N" + curNivInt + ".png";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            toast("Croquis " + nom + " téléchargé !");
-        } catch(e) {
-            let w = window.open('about:blank');
-            let img = new Image();
-            img.src = dataUrl;
-            w.document.body.appendChild(img);
-            toast("Appui long sur l'image pour sauvegarder.");
+        // Cherche si un croquis de ce niveau existe déjà
+        let existingIndex = db.docs.findIndex(d => d.name === filename);
+        if (existingIndex >= 0) {
+            db.docs[existingIndex].data = dataUrl;
+        } else {
+            db.docs.push({ id: Date.now(), name: filename, type: 'img', data: dataUrl });
         }
+        
+        sauvegarderLocal();
+        renderDocs();
+        toast("Croquis " + nom + " ajouté aux documents 📁");
     };
 
     function isSchemaClosed(aptId) {
@@ -2296,7 +2293,7 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v8_5');
+            const savedData = await localforage.getItem('mydiag_v8_6');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
