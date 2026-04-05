@@ -109,7 +109,7 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v6.5 Complète</span></div>
+    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v6.6 (Correctif ADN)</span></div>
     <button class="btn-save" onclick="sauvegarderLocal()">💾 Sauvegarder</button>
 </div>
 
@@ -339,7 +339,7 @@
         <div class="fr" style="border-bottom:none;">
             <span class="fl" style="color:#0369a1;">Bibliothèque</span>
             <select id="f-bibli" onchange="chargerModeleFen(this.value)" style="color:#0369a1;">
-                <option value="">-- Modèles sauvegardés --</option>
+                <option value="">-- Nouvelle Fenêtre --</option>
             </select>
         </div>
     </div>
@@ -498,7 +498,7 @@
         DONNE_SUR_MURS: ["Extérieur", "Local non chauffé (autre que véranda)", "Local non chauffé et non accessible", "Circulations communes", "Local chauffé", "Bâtiment ou espace autre qu'habitation", "Comble", "Terre (paroi enterrée)", "Sous-sol non chauffé"],
         FEN_TYPE: ["Fenêtres battantes", "Fenêtres coulissantes", "Portes-fenêtres coulissantes", "Portes-fenêtres battantes sans soubassement", "Portes-fenêtres battantes avec soubassement", "Fenêtres sans ouverture possible", "Portes-fenêtres sans ouverture possible"],
         FEN_VITRAGE: ["Simple vitrage vertical", "Double vitrage vertical", "Survitrage vertical", "Triple vitrage vertical", "Brique de verre pleine", "Brique de verre creuse", "Polycarbonate"],
-        FEN_MATIERE: ["Menuiserie PVC", "Menuiserie Bois", "Menuiserie métallique à rupture de pont thermique", "Menuiserie métallique sans rupture de pont thermique", "Menuiserie Bois / Métal", "Inconnu"],
+        FEN_MATIERE: ["Menuiserie PVC", "Menuiserie Bois", "Menuiserie métallique à rupture de pont thermique", "Menuiserie métallique sans rupture de pont thermique", "Menuiserie Bois / Métal"],
         FEN_FERMETURE: ["Jalousie accordéon", "Fermeture sans ajours, volets roulants Alu", "Volet roulant PVC ou bois (épaisseur tablier ≤ 12mm)", "Persienne coulissante", "Volet roulant PVC ou bois (épaisseur tablier > 12mm)"],
         PLAFONDS: ["Dalle béton", "Bois sous solives bois", "Bois sur solives bois", "Entre solives bois", "Bois sur solives métallique", "Bois sous solives métallique", "Entrevous, terre-cuite, poutrelles béton", "Combles aménagés sous rampants", "Plaques de plâtre", "Inconnu"],
         DONNE_SUR_PLAFOND: ["Terrasse", "Combles aménagés", "Combles perdus", "Local chauffé", "Local non chauffé", "Circulations communes", "Extérieur"],
@@ -537,7 +537,7 @@
     let lastCalc = {};
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v6_5', db); } 
+        try { await localforage.setItem('mydiag_v6_6', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -1057,10 +1057,7 @@
                 if(arrName === 'fens') {
                     let maxFen = 0;
                     db.fens.forEach(f => {
-                        if(f.nom) {
-                            let m = f.nom.match(/Fenêtre (\d+)/);
-                            if(m && parseInt(m[1]) > maxFen) maxFen = parseInt(m[1]);
-                        }
+                        if(f.nom) { let m = f.nom.match(/Fenêtre (\d+)/); if(m && parseInt(m[1]) > maxFen) maxFen = parseInt(m[1]); }
                     });
                     clone.nom = "Fenêtre " + (maxFen + 1);
                     db.fens.push(clone);
@@ -1188,6 +1185,7 @@
             btn.textContent = "Ajouter Chauffage"; btn.removeAttribute('data-edit-id');
         } else { db.chaufs.push(obj); }
         
+        // Reset local form inputs
         document.getElementById('ifc-energie-'+aptId).value = ''; document.getElementById('ifc-gen-'+aptId).value = '';
         document.getElementById('ifc-emetteur-'+aptId).value = ''; document.getElementById('ifc-annee-'+aptId).value = '';
         document.getElementById('ifc-puissance-'+aptId).value = '';
@@ -1529,7 +1527,7 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v6_5');
+            const savedData = await localforage.getItem('mydiag_v6_6');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
