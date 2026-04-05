@@ -8,8 +8,50 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MyDiag - DPE">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230F172A'/%3E%3Cpath d='M256 120 L100 270 H150 V400 H362 V270 H412 Z' fill='%232563EB'/%3E%3Cpath d='M256 190 C200 190 180 240 180 280 C180 330 220 360 256 360 C292 360 332 330 332 280 C332 240 312 190 256 190 Z' fill='%2316A34A'/%3E%3Cpath d='M256 360 L256 260' stroke='%23FFF' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230F172A'/%3E%3Cpath d='M256 120 L100 270 H150 V400 H362 V270 H412 Z' fill='%232563EB'/%3E%3Cpath d='M256 190 C200 190 180 240 180 280 C180 330 220 360 256 360 C292 360 332 330 332 280 C332 240 312 190 256 190 Z' fill='%2316A34A'/%3E%3Cpath d='M256 360 L256 260' stroke='%23FFF' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E">
+    
+    <script>
+        (function() {
+            var canvas = document.createElement('canvas');
+            canvas.width = 180; canvas.height = 180;
+            var ctx = canvas.getContext('2d');
+            
+            // Fond sombre (Apple va rogner les bords en carré arrondi tout seul)
+            ctx.fillStyle = '#0F172A';
+            ctx.fillRect(0, 0, 180, 180);
+
+            // Toit de la maison (Bleu)
+            ctx.fillStyle = '#2563EB';
+            ctx.beginPath();
+            ctx.moveTo(90, 30);
+            ctx.lineTo(25, 90);
+            ctx.lineTo(155, 90);
+            ctx.fill();
+
+            // Corps de la maison (Bleu)
+            ctx.fillRect(45, 90, 90, 60);
+
+            // Feuille DPE (Vert)
+            ctx.fillStyle = '#16A34A';
+            ctx.beginPath();
+            ctx.arc(90, 105, 28, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Tige
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(90, 135);
+            ctx.lineTo(90, 90);
+            ctx.stroke();
+
+            // Injection forcée pour Apple
+            var link = document.createElement('link');
+            link.rel = 'apple-touch-icon';
+            link.href = canvas.toDataURL('image/png');
+            document.head.appendChild(link);
+        })();
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <style>
@@ -95,7 +137,7 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v5.0</span></div>
+    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v5.1</span></div>
     <button class="btn-save" onclick="sauvegarderLocal()">💾 Sauvegarder</button>
 </div>
 
@@ -231,7 +273,6 @@
             <select id="m-doub">
                 <option value="Absent">Absent</option>
                 <option value="Inconnu">Inconnu</option>
-                <option value="Connu : Plâtre, bois, brique...">Connu : Plâtre, bois, brique...</option>
                 <option value="Connu avec lame d'air de moins de 15 mm">Connu avec lame d'air de moins de 15 mm</option>
                 <option value="Connu avec lame d'air de 15 mm ou plus">Connu avec lame d'air de 15 mm ou plus</option>
             </select>
@@ -362,7 +403,7 @@
     let currentUploadTarget = null;
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v5_0', db); } 
+        try { await localforage.setItem('mydiag_v5_1', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -1066,7 +1107,7 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v5_0');
+            const savedData = await localforage.getItem('mydiag_v5_1');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
