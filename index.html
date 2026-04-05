@@ -88,7 +88,7 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v4.6 Biblio Fenêtres</span></div>
+    <div class="hd-title">MyDiag <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v4.8 Murs / Doublage</span></div>
     <button class="btn-save" onclick="sauvegarderLocal()">💾 Sauvegarder</button>
 </div>
 
@@ -115,12 +115,12 @@
 <div id="vw-copro" class="vw">
     <div class="sl">Identification</div>
     <div class="card">
-        <div class="fr"><span class="fl">Référence</span><input type="text" id="copro-ref" placeholder="N° dossier" oninput="saveCoproData()"></div>
+        <div class="fr"><span class="fl">Référence</span><input type="text" inputmode="numeric" pattern="[0-9]*" id="copro-ref" placeholder="N° dossier" oninput="saveCoproData()"></div>
         <div class="fr"><span class="fl">Nom Copro</span><input type="text" id="copro-nom" placeholder="ex: Les Lilas" oninput="saveCoproData()"></div>
         <div class="fr"><span class="fl">Adresse</span><input type="text" id="copro-adresse" placeholder="Adresse" oninput="saveCoproData()"></div>
-        <div class="fr"><span class="fl">Année constr.</span><input type="number" id="copro-annee" placeholder="ex: 1975" oninput="saveCoproData()"></div>
-        <div class="fr"><span class="fl">Nb bâtiments</span><input type="number" id="copro-batiments" placeholder="ex: 3" oninput="saveCoproData()"></div>
-        <div class="fr"><span class="fl">Nb d'étages</span><input type="number" id="copro-etages" placeholder="ex: 4" oninput="saveCoproData(); updateEtageOptions('apt-etage');"></div>
+        <div class="fr"><span class="fl">Année constr.</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-annee" placeholder="ex: 1975" oninput="saveCoproData()"></div>
+        <div class="fr"><span class="fl">Nb bâtiments</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-batiments" placeholder="ex: 3" oninput="saveCoproData()"></div>
+        <div class="fr"><span class="fl">Nb d'étages</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-etages" placeholder="ex: 4" oninput="saveCoproData(); updateEtageOptions('apt-etage');"></div>
     </div>
 
     <div class="coll-acc-hd" onclick="toggleAcc('docs-acc', this)"><span>📂 Documents & Justificatifs</span> <span>▶</span></div>
@@ -146,8 +146,8 @@
             <div class="fr"><span class="fl">Énergie</span><select id="col-chauf-energie" onchange="updateChaufGen('col-chauf-energie', 'col-chauf-gen', 'col-chauf-emetteur'); saveCoproData()"><option value="">—</option><option>Electrique</option><option>Gaz naturel</option><option>GPL</option><option>Fioul</option><option>Bois</option><option>Charbon</option><option>Réseau de chaleur</option></select></div>
             <div class="fr"><span class="fl">Générateur</span><select id="col-chauf-gen" onchange="checkChaudiereECS('col'); saveCoproData()"><option value="">—</option></select></div>
             <div class="fr"><span class="fl">Émetteur</span><select id="col-chauf-emetteur" onchange="saveCoproData()"><option value="">—</option></select></div>
-            <div class="fr"><span class="fl">Année</span><input type="number" id="col-chauf-annee" placeholder="ex: 2012" oninput="saveCoproData()"></div>
-            <div class="fr"><span class="fl" style="color:var(--warn);">Puissance (kW)</span><input type="number" id="col-chauf-puissance" placeholder="ex: 180" inputmode="decimal" oninput="saveCoproData()"></div>
+            <div class="fr"><span class="fl">Année</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="col-chauf-annee" placeholder="ex: 2012" oninput="saveCoproData()"></div>
+            <div class="fr"><span class="fl" style="color:var(--warn);">Puissance (kW)</span><input type="number" inputmode="decimal" step="any" id="col-chauf-puissance" placeholder="ex: 180" oninput="saveCoproData()"></div>
             <div class="fr" style="justify-content:space-between;">
                 <span class="fl">Photo Plaque</span>
                 <div style="display:flex; align-items:center; gap:10px;">
@@ -163,8 +163,8 @@
         <div class="card">
             <div class="fr"><span class="fl">Énergie</span><select id="col-ecs-energie" onchange="updateEcsGen('col-ecs-energie', 'col-ecs-type'); saveCoproData()"><option value="">—</option><option>Electrique</option><option>Gaz naturel</option><option>GPL</option><option>Fioul</option><option>Bois</option><option>Charbon</option><option>Réseau de chaleur</option></select></div>
             <div class="fr"><span class="fl">Type/Générateur</span><select id="col-ecs-type" onchange="saveCoproData()"><option value="">—</option></select></div>
-            <div class="fr"><span class="fl">Année</span><input type="number" id="col-ecs-annee" placeholder="ex: 2012" oninput="saveCoproData()"></div>
-            <div class="fr"><span class="fl">Volume (L)</span><input type="number" id="col-ecs-vol" placeholder="ex: 1000" oninput="saveCoproData()"></div>
+            <div class="fr"><span class="fl">Année</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="col-ecs-annee" placeholder="ex: 2012" oninput="saveCoproData()"></div>
+            <div class="fr"><span class="fl">Volume (L)</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="col-ecs-vol" placeholder="ex: 1000" oninput="saveCoproData()"></div>
             <div class="fr" style="justify-content:space-between;">
                 <span class="fl">Photo Plaque</span>
                 <div style="display:flex; align-items:center; gap:10px;">
@@ -186,8 +186,8 @@
             <div class="fr"><span class="fl">Bâtiment n°</span><select id="apt-bat"><option value="">—</option><option>1</option><option>2</option><option>3</option></select></div>
             <div class="fr"><span class="fl">Étage</span><select id="apt-etage" onchange="autoSetNiveau(this.value, 'apt-niveau')"></select></div>
             <div class="fr"><span class="fl">Niveau ADN</span><select id="apt-niveau"><option value="">—</option><option value="RDC">RDC</option><option value="Intermédiaire">Intermédiaire</option><option value="Dernier étage">Dernier étage</option></select></div>
-            <div class="fr"><span class="fl">Surface hab. (m²)</span><input type="number" id="apt-surf" inputmode="decimal"></div>
-            <div class="fr"><span class="fl">HSP (m)</span><input type="number" id="apt-hsp" placeholder="ex: 2.50" inputmode="decimal"></div>
+            <div class="fr"><span class="fl">Surface hab. (m²)</span><input type="number" inputmode="decimal" step="any" id="apt-surf"></div>
+            <div class="fr"><span class="fl">HSP (m)</span><input type="number" inputmode="decimal" step="any" id="apt-hsp" placeholder="ex: 2.50"></div>
         </div>
         <div class="btn-row">
             <button class="btn btn-s" onclick="hideNouvelAppt()">Annuler</button>
@@ -219,7 +219,17 @@
         <div class="fr"><span class="fl">Orientation</span><select id="m-ori"><option>Nord</option><option>Est</option><option>Sud</option><option>Ouest</option></select></div>
         <div class="fr"><span class="fl">Donne sur</span><select id="m-donne"></select></div>
         <div class="fr"><span class="fl">Matériau (ADN)</span><select id="m-mat"></select></div>
-        <div class="fr"><span class="fl">L x H (m)</span><input type="number" id="m-l" placeholder="Long." style="margin-right:5px;" inputmode="decimal"><input type="number" id="m-h" placeholder="Haut." inputmode="decimal"></div>
+        <div class="fr"><span class="fl">L x H (m)</span><input type="number" inputmode="decimal" step="any" id="m-l" placeholder="Long." style="margin-right:5px;"><input type="number" inputmode="decimal" step="any" id="m-h" placeholder="Haut."></div>
+        
+        <div class="fr"><span class="fl">Doublage</span>
+            <select id="m-doub">
+                <option value="Pas de doublage">Pas de doublage</option>
+                <option value="Inconnu">Inconnu</option>
+                <option value="Lame d'air (> 15 mm)">Lame d'air (> 15 mm)</option>
+                <option value="Présence isolant inconnu">Présence isolant inconnu</option>
+            </select>
+        </div>
+        
         <div class="fr"><span class="fl">Isolant</span><select id="m-iso"><option>Non isolé</option><option>Isolation Intérieure (ITI)</option><option>Isolation Extérieure (ITE)</option></select></div>
     </div>
     <button class="btn btn-p" id="btn-save-murs" onclick="sauverParoi('murs')">Enregistrer ce mur</button>
@@ -243,10 +253,10 @@
         <div class="fr"><span class="fl">Type</span><select id="f-type"></select></div>
         <div class="fr"><span class="fl">Matière</span><select id="f-mat"></select></div>
         <div class="fr"><span class="fl">Vitrage</span><select id="f-vit"></select></div>
-        <div class="fr"><span class="fl">Ép. Lame (mm)</span><input type="number" id="f-ep" placeholder="ex: 16" inputmode="numeric"></div>
+        <div class="fr"><span class="fl">Ép. Lame (mm)</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="f-ep" placeholder="ex: 16"></div>
         <div class="fr"><span class="fl">Fermeture</span><select id="f-fer"></select></div>
-        <div class="fr"><span class="fl">L x H (cm)</span><input type="number" id="f-l" placeholder="Larg." style="margin-right:5px;" inputmode="numeric"><input type="number" id="f-h" placeholder="Haut." inputmode="numeric"></div>
-        <div class="fr"><span class="fl">Qté / Motifs</span><input type="number" id="f-nb" placeholder="Qté" style="margin-right:5px;" value="1" inputmode="numeric"><input type="number" id="f-motifs" placeholder="Motifs" value="1" inputmode="numeric"></div>
+        <div class="fr"><span class="fl">L x H (cm)</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="f-l" placeholder="Larg." style="margin-right:5px;"><input type="number" inputmode="numeric" pattern="[0-9]*" id="f-h" placeholder="Haut."></div>
+        <div class="fr"><span class="fl">Qté / Motifs</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="f-nb" placeholder="Qté" style="margin-right:5px;" value="1"><input type="number" inputmode="numeric" pattern="[0-9]*" id="f-motifs" placeholder="Motifs" value="1"></div>
     </div>
     <button class="btn btn-p" id="btn-save-fens" onclick="sauverParoi('fens')">Enregistrer cette fenêtre</button>
     <div id="list-fens" style="margin-top:15px;"></div>
@@ -257,7 +267,7 @@
     <div class="card">
         <div class="fr"><span class="fl">Type de Porte</span><select id="po-type"><option>Porte opaque pleine</option><option>Porte vitrée</option><option>Porte semi-vitrée</option><option>Inconnu</option></select></div>
         <div class="fr"><span class="fl">Donne sur</span><select id="po-donne"><option>Extérieur</option><option>Circulations communes</option><option>Local non chauffé</option><option>Autre</option></select></div>
-        <div class="fr"><span class="fl">L x H (m)</span><input type="number" id="po-l" placeholder="Larg." style="margin-right:5px;" inputmode="decimal"><input type="number" id="po-h" placeholder="Haut." inputmode="decimal"></div>
+        <div class="fr"><span class="fl">L x H (m)</span><input type="number" inputmode="decimal" step="any" id="po-l" placeholder="Larg." style="margin-right:5px;"><input type="number" inputmode="decimal" step="any" id="po-h" placeholder="Haut."></div>
     </div>
     <button class="btn btn-p" id="btn-save-portes" onclick="sauverParoi('portes')">Enregistrer cette porte</button>
     <div id="list-portes" style="margin-top:15px;"></div>
@@ -269,9 +279,9 @@
         <div class="fr"><span class="fl">Type ADN</span><select id="p-type"></select></div>
         <div class="fr"><span class="fl">Donne sur</span><select id="p-donne"></select></div>
         <div class="fr"><span class="fl">Dimensions</span>
-            <input type="number" id="p-l" placeholder="L (m)" style="margin-right:5px;" inputmode="decimal">
-            <input type="number" id="p-larg" placeholder="l (m)" style="margin-right:5px;" inputmode="decimal">
-            <input type="number" id="p-s" placeholder="OU Surf(m²)" style="background:#e0f2fe; color:#0369a1;" inputmode="decimal">
+            <input type="number" inputmode="decimal" step="any" id="p-l" placeholder="L (m)" style="margin-right:5px;">
+            <input type="number" inputmode="decimal" step="any" id="p-larg" placeholder="l (m)" style="margin-right:5px;">
+            <input type="number" inputmode="decimal" step="any" id="p-s" placeholder="OU Surf(m²)" style="background:#e0f2fe; color:#0369a1;">
         </div>
     </div>
     <button class="btn btn-p" id="btn-save-plfs" onclick="sauverParoi('plfs')">Enregistrer ce plafond</button>
@@ -284,9 +294,9 @@
         <div class="fr"><span class="fl">Type ADN</span><select id="s-type"></select></div>
         <div class="fr"><span class="fl">Donne sur</span><select id="s-donne"></select></div>
         <div class="fr"><span class="fl">Dimensions</span>
-            <input type="number" id="s-l" placeholder="L (m)" style="margin-right:5px;" inputmode="decimal">
-            <input type="number" id="s-larg" placeholder="l (m)" style="margin-right:5px;" inputmode="decimal">
-            <input type="number" id="s-s" placeholder="OU Surf(m²)" style="background:#e0f2fe; color:#0369a1;" inputmode="decimal">
+            <input type="number" inputmode="decimal" step="any" id="s-l" placeholder="L (m)" style="margin-right:5px;">
+            <input type="number" inputmode="decimal" step="any" id="s-larg" placeholder="l (m)" style="margin-right:5px;">
+            <input type="number" inputmode="decimal" step="any" id="s-s" placeholder="OU Surf(m²)" style="background:#e0f2fe; color:#0369a1;">
         </div>
     </div>
     <button class="btn btn-p" id="btn-save-plas" onclick="sauverParoi('plas')">Enregistrer ce plancher</button>
@@ -346,7 +356,7 @@
     let currentUploadTarget = null;
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v4_6', db); } 
+        try { await localforage.setItem('mydiag_v4_8', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -431,11 +441,10 @@
         let curX = 0, curY = 0;
         mursApt.forEach(m => {
             let l = parseFloat(m.l) || 0;
-            // Horaire : N(+X), E(+Y), S(-X), O(-Y)
-            if (m.ori === 'Nord') curX += l;
-            else if (m.ori === 'Est') curY += l;
-            else if (m.ori === 'Sud') curX -= l;
-            else if (m.ori === 'Ouest') curY -= l;
+            if (m.ori === 'Nord') curY -= l;
+            else if (m.ori === 'Est') curX += l;
+            else if (m.ori === 'Sud') curY += l;
+            else if (m.ori === 'Ouest') curX -= l;
         });
         
         let err = Math.sqrt(curX*curX + curY*curY);
@@ -466,11 +475,10 @@
 
         mursApt.forEach(m => {
             let l = parseFloat(m.l) || 0;
-            // Repère Cartographique avec dessin horaire
-            if (m.ori === 'Nord') curX += l;
-            else if (m.ori === 'Est') curY += l;
-            else if (m.ori === 'Sud') curX -= l;
-            else if (m.ori === 'Ouest') curY -= l;
+            if (m.ori === 'Nord') curY -= l;
+            else if (m.ori === 'Est') curX += l;
+            else if (m.ori === 'Sud') curY += l;
+            else if (m.ori === 'Ouest') curX -= l;
             points.push({ x: curX, y: curY });
         });
 
@@ -840,8 +848,8 @@
                 body = `<div class="appt-body open">
                     <div class="card" style="margin-bottom:10px; border-color:#CBD5E1;">
                         <div class="fr"><span class="fl">Identifiant</span><select onchange="updateApptField('${a.id}', 'num', this.value)">${getAptNumOptionsHtml(a.num)}</select></div>
-                        <div class="fr"><span class="fl">Surface (m²)</span><input type="number" value="${a.surf||''}" onchange="updateApptField('${a.id}', 'surf', this.value)"></div>
-                        <div class="fr"><span class="fl">HSP (m)</span><input type="number" value="${a.hsp||''}" onchange="updateApptField('${a.id}', 'hsp', this.value)"></div>
+                        <div class="fr"><span class="fl">Surface (m²)</span><input type="number" inputmode="decimal" step="any" value="${a.surf||''}" onchange="updateApptField('${a.id}', 'surf', this.value)"></div>
+                        <div class="fr"><span class="fl">HSP (m)</span><input type="number" inputmode="decimal" step="any" value="${a.hsp||''}" onchange="updateApptField('${a.id}', 'hsp', this.value)"></div>
                         <div class="fr"><span class="fl">Étage</span>
                             <select onchange="updateApptEtageLive('${a.id}', this.value)">${getEtageOptionsHtml(a.etage)}</select>
                         </div>
@@ -866,7 +874,7 @@
                         <select id="ifc-energie-${a.id}" onchange="updateChaufGen('ifc-energie-${a.id}', 'ifc-gen-${a.id}', 'ifc-emetteur-${a.id}')" style="width:100%; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid var(--bor);"><option value="">Énergie</option><option>Electrique</option><option>Gaz naturel</option><option>GPL</option><option>Fioul</option><option>Bois</option><option>Charbon</option></select>
                         <select id="ifc-gen-${a.id}" onchange="checkChaudiereECS('ind', '${a.id}')" style="width:100%; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid var(--bor);"><option value="">Générateur</option></select>
                         <select id="ifc-emetteur-${a.id}" style="width:100%; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid var(--bor);"><option value="">Émetteur</option></select>
-                        <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="number" id="ifc-annee-${a.id}" placeholder="Année" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"><input type="number" id="ifc-puissance-${a.id}" placeholder="Puiss. kW" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"></div>
+                        <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="number" inputmode="numeric" pattern="[0-9]*" id="ifc-annee-${a.id}" placeholder="Année" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"><input type="number" inputmode="decimal" step="any" id="ifc-puissance-${a.id}" placeholder="Puiss. kW" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"></div>
                         <button id="btn-chauf-${a.id}" class="btn-s" style="padding:8px; width:100%;" onclick="ajouterChauf('${a.id}')">Ajouter Chauffage</button>
                     </div>
 
@@ -875,7 +883,7 @@
                         ${eList}
                         <select id="ife-energie-${a.id}" onchange="updateEcsGen('ife-energie-${a.id}', 'ife-type-${a.id}')" style="width:100%; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid var(--bor);"><option value="">Énergie</option><option>Electrique</option><option>Gaz naturel</option><option>GPL</option><option>Fioul</option><option>Bois</option><option>Charbon</option></select>
                         <select id="ife-type-${a.id}" style="width:100%; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid var(--bor);"><option value="">Type</option></select>
-                        <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="number" id="ife-annee-${a.id}" placeholder="Année" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"><input type="number" id="ife-vol-${a.id}" placeholder="Vol (L)" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"></div>
+                        <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="number" inputmode="numeric" pattern="[0-9]*" id="ife-annee-${a.id}" placeholder="Année" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"><input type="number" inputmode="numeric" pattern="[0-9]*" id="ife-vol-${a.id}" placeholder="Vol (L)" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"></div>
                         <button id="btn-ecs-${a.id}" class="btn-s" style="padding:8px; width:100%;" onclick="ajouterEcs('${a.id}')">Ajouter ECS</button>
                     </div>
 
@@ -929,10 +937,17 @@
         
         let el = editParoiId ? db[type].find(x => x.id === editParoiId) : { id: Date.now(), aid: curAppt };
         
-        if(type === 'murs') { el.ori = document.getElementById('m-ori').value; el.donne = document.getElementById('m-donne').value; el.mat = document.getElementById('m-mat').value; el.l = document.getElementById('m-l').value; el.h = document.getElementById('m-h').value; el.iso = document.getElementById('m-iso').value; }
+        if(type === 'murs') { 
+            el.ori = document.getElementById('m-ori').value; 
+            el.donne = document.getElementById('m-donne').value; 
+            el.mat = document.getElementById('m-mat').value; 
+            el.l = document.getElementById('m-l').value; 
+            el.h = document.getElementById('m-h').value; 
+            el.doub = document.getElementById('m-doub').value;
+            el.iso = document.getElementById('m-iso').value; 
+        }
         else if (type === 'fens') { 
             let ftype = document.getElementById('f-type').value; let fmat = document.getElementById('f-mat').value; let fvit = document.getElementById('f-vit').value; let fep = document.getElementById('f-ep').value; let ffer = document.getElementById('f-fer').value; let fl = document.getElementById('f-l').value; let fh = document.getElementById('f-h').value;
-            // Gestion Bibliothèque
             let existingMod = db.modelesFens.find(m => m.type === ftype && m.mat === fmat && m.vit === fvit && m.ep === fep && m.fer === ffer && m.l === fl && m.h === fh);
             if(!existingMod) { existingMod = { id: 'mod_' + Date.now(), nom: 'Fenêtre ' + (db.modelesFens.length + 1), type:ftype, mat:fmat, vit:fvit, ep:fep, fer:ffer, l:fl, h:fh }; db.modelesFens.push(existingMod); renderBibliFens(); }
             
@@ -950,7 +965,7 @@
         sauvegarderLocal();
         renderElementsList(type);
         
-        if(type === 'murs') { document.getElementById('m-l').value = ''; drawCroquis(); } 
+        if(type === 'murs') { document.getElementById('m-l').value = ''; document.getElementById('m-doub').value = 'Pas de doublage'; drawCroquis(); } 
         else if (type === 'fens') { document.getElementById('f-bibli').value = ''; document.getElementById('f-l').value = ''; document.getElementById('f-h').value = ''; document.getElementById('f-ep').value = ''; document.getElementById('f-nb').value = '1'; document.getElementById('f-motifs').value = '1'; }
         else { document.querySelectorAll(`#vw-${type} input[type="number"]`).forEach(i => i.value = ''); }
     }
@@ -959,7 +974,16 @@
         editParoiId = id;
         const p = db[type].find(x => x.id === id);
         
-        if(type === 'murs') { document.getElementById('m-ori').value = p.ori; document.getElementById('m-donne').value = p.donne; document.getElementById('m-mat').value = p.mat; document.getElementById('m-l').value = p.l; document.getElementById('m-h').value = p.h; document.getElementById('m-iso').value = p.iso; document.getElementById('btn-save-murs').textContent = "Modifier ce mur"; }
+        if(type === 'murs') { 
+            document.getElementById('m-ori').value = p.ori; 
+            document.getElementById('m-donne').value = p.donne; 
+            document.getElementById('m-mat').value = p.mat; 
+            document.getElementById('m-l').value = p.l; 
+            document.getElementById('m-h').value = p.h; 
+            document.getElementById('m-doub').value = p.doub || 'Pas de doublage';
+            document.getElementById('m-iso').value = p.iso; 
+            document.getElementById('btn-save-murs').textContent = "Modifier ce mur"; 
+        }
         else if (type === 'fens') { document.getElementById('f-bibli').value = ''; document.getElementById('f-ori').value = p.ori || 'Nord'; document.getElementById('f-type').value = p.type; document.getElementById('f-mat').value = p.mat; document.getElementById('f-vit').value = p.vit; document.getElementById('f-ep').value = p.ep || ''; document.getElementById('f-fer').value = p.fer; document.getElementById('f-l').value = p.l; document.getElementById('f-h').value = p.h; document.getElementById('f-nb').value = p.nb || '1'; document.getElementById('f-motifs').value = p.motifs || '1'; document.getElementById('btn-save-fens').textContent = "Modifier cette fenêtre"; }
         else if (type === 'portes') { document.getElementById('po-type').value = p.type; document.getElementById('po-donne').value = p.donne; document.getElementById('po-l').value = p.l; document.getElementById('po-h').value = p.h; document.getElementById('btn-save-portes').textContent = "Modifier cette porte"; }
         else if (type === 'plfs') { document.getElementById('p-type').value = p.type; document.getElementById('p-donne').value = p.donne; document.getElementById('p-l').value = p.l || ''; document.getElementById('p-larg').value = p.larg || ''; document.getElementById('p-s').value = p.s || ''; document.getElementById('btn-save-plfs').textContent = "Modifier ce plafond"; }
@@ -987,6 +1011,8 @@
                 titleText = `${x.nom ? x.nom + ' - ' : ''}${x.mat}`;
             } else if (type === 'plfs' || type === 'plas') {
                 if (x.s) dimText = `Surf: ${x.s}m²`; else dimText = `Dim: ${x.l||'?'} x ${x.larg||'?'}m`;
+            } else if (type === 'murs') {
+                dimText = `Dim: ${x.l||'?'} x ${x.h||'?'}m | Doub: ${x.doub||'Non'} | Iso: ${x.iso||'Non'}`;
             } else { dimText = `Dim: ${x.l||'?'} x ${x.h||'?'}m`; }
             const badgeText = type === 'fens' ? (x.ori || 'N/A') : (type === 'portes' ? 'Porte' : (x.ori || 'Surf.'));
 
@@ -1016,10 +1042,12 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v4_6');
+            const savedData = await localforage.getItem('mydiag_v4_8');
             if (savedData) { 
                 db = savedData; 
-                if(!db.docs) db.docs = []; if(!db.portes) db.portes = []; if(!db.modelesFens) db.modelesFens = [];
+                if(!db.docs) db.docs = []; 
+                if(!db.portes) db.portes = []; 
+                if(!db.modelesFens) db.modelesFens = [];
             }
             
             ['copro-ref','copro-nom','copro-adresse','copro-annee','copro-batiments','copro-etages'].forEach(id => { const k = id.replace('copro-',''); if(db.copro[k]) document.getElementById(id).value = db.copro[k]; });
