@@ -100,7 +100,7 @@
 <input type="file" id="global-uploader" style="display:none;" accept="image/*,application/pdf" capture="environment">
 
 <div class="hd">
-    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v6.1 Fermeture Auto</span></div>
+    <div class="hd-title">MyDiag - DPE <span style="font-size:10px; color:#94A3B8; font-weight:normal;">v6.2 Auto-Surface</span></div>
     <button class="btn-save" onclick="sauvegarderLocal()">💾 Sauvegarder</button>
 </div>
 
@@ -425,7 +425,7 @@
     let lastCalc = {};
 
     async function sauvegarderLocal() { 
-        try { await localforage.setItem('mydiag_v6_1', db); } 
+        try { await localforage.setItem('mydiag_v6_2', db); } 
         catch (err) { console.error("Erreur de sauvegarde", err); }
     }
 
@@ -711,6 +711,15 @@
         } else {
             txt = `<span style="color:#16A34A;">✅ Périmètre fermé</span><br>Surface géométrique : <b>${area.toFixed(1)} m²</b>`;
             ctx.beginPath(); ctx.moveTo(endPx, endPy); ctx.lineTo(startPx, startPy); ctx.strokeStyle = '#16A34A'; ctx.lineWidth = 2; ctx.stroke();
+            
+            // --- NOUVEAUTÉ : REPORT AUTO DE LA SURFACE ---
+            let curAptObj = db.appts.find(a => a.id === curAppt);
+            if (curAptObj && (!curAptObj.surf || curAptObj.surf === "")) {
+                curAptObj.surf = area.toFixed(1);
+                sauvegarderLocal();
+                renderApptsList(); // Met à jour l'onglet Appartement discrètement
+                toast("Surface calculée (" + area.toFixed(1) + " m²) reportée !");
+            }
         }
         msg.innerHTML = txt;
     }
@@ -1285,7 +1294,7 @@
     window.onload = async () => {
         peuplerSelects();
         try {
-            const savedData = await localforage.getItem('mydiag_v6_1');
+            const savedData = await localforage.getItem('mydiag_v6_2');
             if (savedData) { 
                 db = savedData; 
                 if(!db.docs) db.docs = []; 
