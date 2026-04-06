@@ -1005,13 +1005,29 @@
     window.fermerPolygone = function(aptId, cX, cY) {
         let dx = -cX; let dy = -cY; let l = Math.sqrt(dx*dx + dy*dy).toFixed(2);
         let ori = ''; if (Math.abs(dx) >= Math.abs(dy)) { ori = dx >= 0 ? 'Nord' : 'Sud'; } else { ori = dy >= 0 ? 'Est' : 'Ouest'; }
-        let m = { id: Date.now(), aid: aptId, nivInt: curNivInt, ori: ori, donne: 'Extérieur', mat: 'Inconnu', l: String(l), h: '', doub: 'ABSENT', iso: 'Non', vectX: dx, vectY: dy };
-        db.murs.push(m); sauvegarderLocal(); renderElementsList('murs'); drawCroquis(); toast('Mur de fermeture (' + l + 'm) généré.');
+        
+        // On récupère les valeurs actuelles du formulaire pour le mur de fermeture
+        const currentMat = document.getElementById('m-mat').value || 'Inconnu';
+        const currentH = document.getElementById('m-h').value || '';
+        const currentEp = document.getElementById('m-ep').value || '';
+        const currentDonne = document.getElementById('m-donne').value || 'Extérieur';
+        const currentIso = document.getElementById('m-iso').value || 'Non';
+        const currentIsoEp = document.getElementById('m-iso-ep').value || '';
+        const currentDoub = document.getElementById('m-doub').value || 'ABSENT';
+
+        let m = { 
+            id: Date.now(), aid: aptId, nivInt: curNivInt, ori: ori, 
+            donne: currentDonne, mat: currentMat, l: String(l), h: currentH, 
+            ep: currentEp, iso: currentIso, isoEp: currentIsoEp, doub: currentDoub,
+            vectX: dx, vectY: dy 
+        };
+        
+        db.murs.push(m); 
+        sauvegarderLocal(); 
+        renderElementsList('murs'); 
+        drawCroquis(); 
+        toast('Mur de fermeture (' + l + 'm) généré avec succès.');
     };
-    
-    function getShortMat(mat) {
-        if(!mat) return ""; if(mat.includes("Pierre")) return "Pierre"; if(mat.includes("Béton banché")) return "Béton"; if(mat.includes("Blocs de béton")) return "Parpaing"; if(mat.includes("Briques pleines")) return "Brique pl."; if(mat.includes("Briques creuses") || mat.includes("alvéolaire")) return "Brique cr."; if(mat.includes("Pisé")) return "Pisé"; if(mat.includes("bois")) return "Bois"; return "Inc.";
-    }
 
     function drawCroquis() {
         const canvas = document.getElementById('croquis-canvas'); if (!canvas) return;
@@ -1435,7 +1451,24 @@
             el.ori = document.getElementById('f-ori').value; el.type = ftype; el.mat = fmat; el.vit = fvit; el.ep = fep; el.fer = ffer; el.l = fl; el.h = fh; el.diam = fdiam; el.surf = fsurf; el.nb = document.getElementById('f-nb').value; el.motifs = document.getElementById('f-motifs').value; 
         } else if (type === 'portes') { el.type = document.getElementById('po-type').value; el.mat = document.getElementById('po-mat').value; el.donne = document.getElementById('po-donne').value; el.iso = document.getElementById('po-iso').value; el.sas = document.getElementById('po-sas').value; el.l = document.getElementById('po-l').value; el.h = document.getElementById('po-h').value; } else if (type === 'plfs') { el.type = document.getElementById('p-type').value; el.donne = document.getElementById('p-donne').value; el.l = document.getElementById('p-l').value; el.larg = document.getElementById('p-larg').value; el.s = document.getElementById('p-s').value; el.iso = document.getElementById('p-iso').value; el.isoEp = document.getElementById('p-iso-ep').value;} else if (type === 'plas') { el.type = document.getElementById('s-type').value; el.donne = document.getElementById('s-donne').value; el.l = document.getElementById('s-l').value; el.larg = document.getElementById('s-larg').value; el.s = document.getElementById('s-s').value; el.iso = document.getElementById('s-iso').value; el.isoEp = document.getElementById('s-iso-ep').value;}
         if(!editParoiId) db[type].push(el); editParoiId = null; document.getElementById('btn-save-' + type).textContent = "Enregistrer"; sauvegarderLocal(); renderElementsList(type);
-        if(type === 'murs') { document.getElementById('m-l').value = ''; drawCroquis(); } else if (type === 'fens') { document.getElementById('f-bibli').value = ''; document.getElementById('f-l').value = ''; document.getElementById('f-h').value = ''; document.getElementById('f-diam').value = ''; document.getElementById('f-nb').value = '1'; document.getElementById('f-motifs').value = '1'; } else { document.querySelectorAll(`#vw-${type} input[type="number"]`).forEach(i => i.value = ''); } toast("Élément enregistré ✓");
+        
+        // --- LOGIQUE DE MÉMOIRE : On ne vide que les dimensions pour l'élément suivant ---
+        if(type === 'murs') { 
+            document.getElementById('m-l').value = ''; // On garde HSP, Matière, Epaisseur, etc.
+            drawCroquis(); 
+        } else if (type === 'fens') { 
+            document.getElementById('f-l').value = ''; 
+            document.getElementById('f-h').value = ''; 
+            document.getElementById('f-diam').value = ''; 
+            // On garde f-nb et f-motifs (souvent identiques pour une façade)
+        } else if (type === 'portes') {
+            document.getElementById('po-l').value = ''; document.getElementById('po-h').value = '';
+        } else if (type === 'plfs') {
+            document.getElementById('p-l').value = ''; document.getElementById('p-larg').value = ''; document.getElementById('p-s').value = '';
+        } else if (type === 'plas') {
+            document.getElementById('s-l').value = ''; document.getElementById('s-larg').value = ''; document.getElementById('s-s').value = '';
+        }
+        toast("Enregistré ✓ Propriétés conservées.");
     }
 
     function editerParoi(type, id) {
