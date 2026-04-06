@@ -188,8 +188,9 @@
     <div class="card">
         <div class="fr"><span class="fl">Référence</span><input type="text" inputmode="numeric" pattern="[0-9]*" id="copro-ref" placeholder="N° dossier" oninput="saveCoproData()"></div>
         <div class="fr"><span class="fl">Nom Copro</span><input type="text" id="copro-nom" placeholder="ex: Les Lilas" oninput="saveCoproData()"></div>
-        <div class="fr"><span class="fl">Adresse</span><input type="text" id="copro-adresse" placeholder="Adresse complète" oninput="saveCoproData()"></div>
-        <div class="fr"><span class="fl">Année constr.</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-annee" placeholder="ex: 1975" oninput="saveCoproData()"></div>
+        <div class="fr"><span class="fl">Adresse</span><input type="text" id="copro-adresse" placeholder="Rue et numéro" oninput="saveCoproData()"></div>
+        <div class="fr"><span class="fl">Code Postal</span><input type="text" inputmode="numeric" pattern="[0-9]*" id="copro-cp" placeholder="ex: 75000" oninput="saveCoproData()"></div>
+        <div class="fr"><span class="fl">Ville</span><input type="text" id="copro-ville" placeholder="Ville" oninput="saveCoproData()"></div>        <div class="fr"><span class="fl">Année constr.</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-annee" placeholder="ex: 1975" oninput="saveCoproData()"></div>
         <div class="fr"><span class="fl">Nb bâtiments</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-batiments" placeholder="ex: 3" oninput="saveCoproData(); updateBatimentOptions('apt-bat');"></div>
         <div class="fr"><span class="fl">Nb d'étages</span><input type="number" inputmode="numeric" pattern="[0-9]*" id="copro-etages" placeholder="ex: 4" oninput="saveCoproData(); updateEtageOptions('apt-etage');"></div>
     </div>
