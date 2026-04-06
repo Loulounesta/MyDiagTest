@@ -153,6 +153,7 @@
     <div class="tab" onclick="goTab('bim')">🏗️ Synthèse BIM</div>
     <div class="tab" onclick="goTab('totaux')">🧮 Totaux</div>
     <div class="tab" onclick="goTab('export')">📤 Export</div>
+    <div class="tab" onclick="goTab('aide')">❓ Aide</div>
 </div>
 
 <div id="vw-accueil" class="vw on">
@@ -519,7 +520,63 @@
 </div>
 
 <div id="sys-toast" class="toast">Action effectuée ✓</div>
+<div id="vw-aide" class="vw">
+    <div class="card" style="padding:24px; line-height:1.7;">
+        <div style="text-align:center; margin-bottom:24px;">
+            <img src="apple-touch-icon.png" style="width:80px; border-radius:15px; margin-bottom:10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <h2 style="color:var(--acc); margin:0;">Guide Utilisateur MyDiag-DPE</h2>
+            <div style="font-size:12px; color:var(--tx2); margin-top:5px; font-weight:700;">
+                Développé par <b>Cyril LOUIS</b><br>
+                Disponible sur Mobiles, Tablettes et PC/Mac
+            </div>
+        </div>
 
+        <div style="background:var(--ok-l); padding:15px; border-radius:12px; border-left:5px solid var(--ok); margin-bottom:25px; font-size:14px; color:var(--tx);">
+            <b>💡 Philosophie :</b> L'application est "Offline-First". Les données sont stockées localement dans votre navigateur. Vous pouvez travailler sans réseau (sous-sols, zones blanches).
+        </div>
+
+        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc);">🏢 1. Configuration de la Copropriété</h3>
+        <p style="font-size:14px; color:var(--tx2); margin:10px 0;">
+            Commencez par l'onglet <b>Copro</b>. Renseignez la référence dossier et l'adresse. 
+            L'adresse est découpée en 3 champs (Adresse, CP, Ville) pour garantir un export propre vers Annalyssimmo et une localisation GPS exacte via le bouton 📍.
+        </p>
+
+        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc); margin-top:25px;">🧱 2. Topographie et Murs</h3>
+        <p style="font-size:14px; color:var(--tx2); margin:10px 0;">
+            L'onglet <b>Murs</b> est le cœur du relevé. Pour chaque niveau de l'échantillon :
+        </p>
+        <ul style="font-size:14px; color:var(--tx2); margin-left:20px;">
+            <li><b>Saisie en série :</b> L'appli mémorise le descriptif (Matériau, HSP, Épaisseur, Isolation) du mur précédent. Vous n'avez qu'à changer l'orientation et la longueur pour le suivant.</li>
+            <li><b>Fermeture Auto :</b> Dès que le tracé est presque fini, utilisez "Fermer automatiquement". L'appli génère le dernier mur et calcule instantanément la surface du polygone.</li>
+            <li><b>Calculatrice :</b> Pour les rampants ou pignons complexes, utilisez l'outil géométrique rétractable en haut de page.</li>
+        </ul>
+
+        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc); margin-top:25px;">🚪 3. Menuiseries et Éléments</h3>
+        <ul style="font-size:14px; color:var(--tx2); margin-left:20px;">
+            <li><b>Bibliothèque de modèles :</b> Dès que vous enregistrez une fenêtre, elle devient un "modèle" sélectionnable en haut de l'onglet <b>Fenêtres</b> pour être réutilisée sans re-saisie.</li>
+            <li><b>Photos techniques :</b> Utilisez l'icône 📷 pour les plaques signalétiques. Les photos sont compressées à 1024px pour économiser l'espace tout en restant lisibles.</li>
+        </ul>
+
+        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc); margin-top:25px;">📊 4. Gestion et Synthèse</h3>
+        <ul style="font-size:14px; color:var(--tx2); margin-left:20px;">
+            <li><b>Duplication (🔄) :</b> Un lot identique ? Saisissez-en un de A à Z, puis dupliquez-le. Tous les murs, fenêtres et systèmes sont copiés.</li>
+            <li><b>Badges de suivi :</b> Dans la liste des appts, les badges (🧱, 🪟, 🔥, 🚿) passent en couleur dès qu'un élément est présent, vous permettant de vérifier l'avancement d'un coup d'œil.</li>
+            <li><b>Synthèse BIM :</b> Visualisez la structure de la copro (étages et surfaces) pour vérifier la représentativité de vos échantillons.</li>
+        </ul>
+
+        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc); margin-top:25px;">📤 5. Export et Transfert</h3>
+        <p style="font-size:14px; color:var(--tx2); margin:10px 0;">L'onglet <b>Export</b> propose trois formats complémentaires :</p>
+        <ul style="font-size:14px; color:var(--tx2); margin-left:20px;">
+            <li><b>Excel :</b> Relevé structuré pour saisie rapide dans Annalyssimmo.</li>
+            <li><b>ZIP Photos :</b> Toutes les photos renommées et classées par lot.</li>
+            <li><b>JSON (Backup) :</b> Archive brute permettant de recharger le dossier sur un autre appareil (PC ou Mac).</li>
+        </ul>
+
+        <div style="margin-top:40px; padding:15px; background:#F8FAFC; border-radius:10px; text-align:center; font-size:11px; color:#94A3B8;">
+            Version 8.12 • MyDiag-DPE est un outil métier indépendant destiné à faciliter le relevé de terrain.
+        </div>
+    </div>
+</div>
 <script>
     // --- VARIABLES ET BASE ---
     let db = {copro:{}, docs:[], vmc:{}, chaufCol:{}, ecsCol:{}, appts:[], chaufs:[], ecss:[], murs:[], fens:[], modelesFens:[], portes:[], plfs:[], plas:[]};
