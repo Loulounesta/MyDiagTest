@@ -521,59 +521,74 @@
 
 <div id="sys-toast" class="toast">Action effectuée ✓</div>
 <div id="vw-aide" class="vw">
-    <div class="card" style="padding:24px; line-height:1.7;">
-        <div style="text-align:center; margin-bottom:24px;">
-            <img src="apple-touch-icon.png" style="width:80px; border-radius:15px; margin-bottom:10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-            <h2 style="color:var(--acc); margin:0;">Guide Utilisateur MyDiag-DPE</h2>
-            <div style="font-size:12px; color:var(--tx2); margin-top:5px; font-weight:700;">
-                Développé par <b>Cyril LOUIS</b><br>
-                Disponible sur Mobiles, Tablettes et PC/Mac
+    <div class="card" style="padding:28px; line-height:1.7; background: #fff;">
+        <div style="text-align:center; margin-bottom:30px;">
+            <div style="display:inline-block; position:relative;">
+                <img src="apple-touch-icon.png" style="width:90px; border-radius:20px; box-shadow: 0 10px 25px rgba(37,99,235,0.2);">
+                <div style="position:absolute; bottom:-5px; right:-5px; background:var(--ok); color:white; font-size:10px; padding:3px 8px; border-radius:10px; font-weight:800; border:2px solid white;">PRO</div>
+            </div>
+            <h2 style="color:var(--tx); margin-top:15px; font-size:24px; letter-spacing:-0.5px;">MyDiag-DPE</h2>
+            <div style="font-size:13px; color:var(--tx2); margin-top:5px; font-weight:600;">
+                L'excellence du relevé terrain par <span style="color:var(--acc);">Cyril LOUIS</span><br>
+                <span style="font-weight:400; opacity:0.8;">Disponible sur Mobiles, Tablettes et PC/Mac</span>
             </div>
         </div>
 
-        <div style="background:var(--ok-l); padding:15px; border-radius:12px; border-left:5px solid var(--ok); margin-bottom:25px; font-size:14px; color:var(--tx);">
-            <b>💡 Philosophie :</b> L'application est "Offline-First". Les données sont stockées localement dans votre navigateur. Vous pouvez travailler sans réseau (sous-sols, zones blanches).
+        <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding:20px; border-radius:16px; margin-bottom:30px; border:1px solid #BFDBFE;">
+            <b style="color:var(--acc); font-size:16px; display:block; margin-bottom:8px;">✨ Pourquoi choisir MyDiag-DPE ?</b>
+            <span style="font-size:14px; color:#1E40AF;">
+                Conçue par un expert pour des experts, cette application transforme la contrainte du relevé en un processus fluide, rapide et 100% sécurisé. 
+                Gagnez jusqu'à 30 minutes par dossier en éliminant la double saisie.
+            </span>
         </div>
 
-        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc);">🏢 1. Configuration de la Copropriété</h3>
-        <p style="font-size:14px; color:var(--tx2); margin:10px 0;">
-            Commencez par l'onglet <b>Copro</b>. Renseignez la référence dossier et l'adresse. 
-            L'adresse est découpée en 3 champs (Adresse, CP, Ville) pour garantir un export propre vers Annalyssimmo et une localisation GPS exacte via le bouton 📍.
+        <h3 style="color:var(--tx); font-size:18px; margin-bottom:12px; display:flex; align-items:center; gap:10px;">
+            <span style="background:var(--acc); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">1</span>
+            Le Tracé "Magique"
+        </h3>
+        <p style="font-size:14px; color:var(--tx2); margin-bottom:15px; padding-left:38px;">
+            Oubliez le papier. Dans l'onglet <b>Murs</b>, dessinez votre plan en temps réel. 
+            <br><br>
+            <b style="color:var(--tx);">💡 Le Secret du schéma parfait :</b> Saisissez toujours vos murs en suivant le <b>sens horaire</b>. Cette méthode permet à l'algorithme de comprendre l'orientation naturelle du logement et de préparer une fermeture parfaite du polygone.
         </p>
 
-        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc); margin-top:25px;">🧱 2. Topographie et Murs</h3>
-        <p style="font-size:14px; color:var(--tx2); margin:10px 0;">
-            L'onglet <b>Murs</b> est le cœur du relevé. Pour chaque niveau de l'échantillon :
+        <h3 style="color:var(--tx); font-size:18px; margin-bottom:12px; display:flex; align-items:center; gap:10px; margin-top:25px;">
+            <span style="background:var(--acc); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">2</span>
+            Calculatrice Intelligente Intégrée
+        </h3>
+        <div style="background:#F8FAFC; padding:15px; border-radius:12px; margin-left:38px; border:1px dashed var(--bor);">
+            <p style="font-size:14px; color:var(--tx2);">
+                Plus besoin de calculatrice externe pour les géométries complexes. L'outil intégré en haut de l'onglet Murs automatise tout :
+            </p>
+            <ul style="font-size:13px; color:var(--tx); margin-top:10px; margin-left:20px; font-weight:600;">
+                <li>📐 Calcul automatique des surfaces de Pignons</li>
+                <li>🏠 Déduction des surfaces de Rampants</li>
+                <li>📏 Extraction de la Surface Habitable (≥1.80m) sous rampants</li>
+                <li>🔗 Report direct dans les fiches parois</li>
+            </ul>
+        </div>
+
+        <h3 style="color:var(--tx); font-size:18px; margin-bottom:12px; display:flex; align-items:center; gap:10px; margin-top:25px;">
+            <span style="background:var(--acc); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">3</span>
+            Automatisation et Mémoire
+        </h3>
+        <ul style="font-size:14px; color:var(--tx2); margin-left:58px; margin-bottom:20px;">
+            <li><b>Mémoire de saisie :</b> L'appli retient vos matériaux et isolations. Ne changez que la longueur pour le mur suivant !</li>
+            <li><b>Bibliothèque :</b> Créez une fenêtre une fois, réutilisez-la partout.</li>
+            <li><b>Duplication 🔄 :</b> Un appartement identique au dessus ? Un clic suffit pour cloner l'intégralité du lot.</li>
+        </ul>
+
+        <h3 style="color:var(--tx); font-size:18px; margin-bottom:12px; display:flex; align-items:center; gap:10px; margin-top:25px;">
+            <span style="background:var(--acc); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">4</span>
+            Export Direct Annalyssimmo
+        </h3>
+        <p style="font-size:14px; color:var(--tx2); margin-bottom:15px; padding-left:38px;">
+            D'un geste, générez votre fichier <b>Excel structuré</b>, votre <b>ZIP de photos classées</b> par lot et votre <b>Sauvegarde JSON</b>. Importez, validez, certifiez. C'est aussi simple que cela.
         </p>
-        <ul style="font-size:14px; color:var(--tx2); margin-left:20px;">
-            <li><b>Saisie en série :</b> L'appli mémorise le descriptif (Matériau, HSP, Épaisseur, Isolation) du mur précédent. Vous n'avez qu'à changer l'orientation et la longueur pour le suivant.</li>
-            <li><b>Fermeture Auto :</b> Dès que le tracé est presque fini, utilisez "Fermer automatiquement". L'appli génère le dernier mur et calcule instantanément la surface du polygone.</li>
-            <li><b>Calculatrice :</b> Pour les rampants ou pignons complexes, utilisez l'outil géométrique rétractable en haut de page.</li>
-        </ul>
 
-        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc); margin-top:25px;">🚪 3. Menuiseries et Éléments</h3>
-        <ul style="font-size:14px; color:var(--tx2); margin-left:20px;">
-            <li><b>Bibliothèque de modèles :</b> Dès que vous enregistrez une fenêtre, elle devient un "modèle" sélectionnable en haut de l'onglet <b>Fenêtres</b> pour être réutilisée sans re-saisie.</li>
-            <li><b>Photos techniques :</b> Utilisez l'icône 📷 pour les plaques signalétiques. Les photos sont compressées à 1024px pour économiser l'espace tout en restant lisibles.</li>
-        </ul>
-
-        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc); margin-top:25px;">📊 4. Gestion et Synthèse</h3>
-        <ul style="font-size:14px; color:var(--tx2); margin-left:20px;">
-            <li><b>Duplication (🔄) :</b> Un lot identique ? Saisissez-en un de A à Z, puis dupliquez-le. Tous les murs, fenêtres et systèmes sont copiés.</li>
-            <li><b>Badges de suivi :</b> Dans la liste des appts, les badges (🧱, 🪟, 🔥, 🚿) passent en couleur dès qu'un élément est présent, vous permettant de vérifier l'avancement d'un coup d'œil.</li>
-            <li><b>Synthèse BIM :</b> Visualisez la structure de la copro (étages et surfaces) pour vérifier la représentativité de vos échantillons.</li>
-        </ul>
-
-        <h3 style="border-bottom:2px solid var(--acc); padding-bottom:5px; color:var(--acc); margin-top:25px;">📤 5. Export et Transfert</h3>
-        <p style="font-size:14px; color:var(--tx2); margin:10px 0;">L'onglet <b>Export</b> propose trois formats complémentaires :</p>
-        <ul style="font-size:14px; color:var(--tx2); margin-left:20px;">
-            <li><b>Excel :</b> Relevé structuré pour saisie rapide dans Annalyssimmo.</li>
-            <li><b>ZIP Photos :</b> Toutes les photos renommées et classées par lot.</li>
-            <li><b>JSON (Backup) :</b> Archive brute permettant de recharger le dossier sur un autre appareil (PC ou Mac).</li>
-        </ul>
-
-        <div style="margin-top:40px; padding:15px; background:#F8FAFC; border-radius:10px; text-align:center; font-size:11px; color:#94A3B8;">
-            Version 8.12 • MyDiag-DPE est un outil métier indépendant destiné à faciliter le relevé de terrain.
+        <div style="margin-top:40px; padding:20px; background:var(--tx); border-radius:16px; text-align:center;">
+            <div style="color:white; font-weight:700; font-size:15px;">Prêt à révolutionner vos diagnostics ?</div>
+            <div style="color:#94A3B8; font-size:12px; margin-top:5px;">Version 8.12 • L'outil pensé pour le terrain.</div>
         </div>
     </div>
 </div>
