@@ -356,7 +356,7 @@
         if(db.copro.adresse) {
             addrEl.style.display = 'flex';
             addrEl.querySelector('span').textContent = db.copro.adresse;
-            // Lien Universel Google Maps
+            // Lien Universel Google Maps réparé (v8.9)
             addrEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(db.copro.adresse)}`;
         } else {
             addrEl.style.display = 'none';
@@ -479,6 +479,733 @@
             let k = id.replace('copro-',''); if(db.copro[k]) document.getElementById(id).value = db.copro[k];
         });
     };
+
+    // --- (Le reste du code JavaScript métier reste exactement identique) ---
+    const ADN = {
+        MURS: ["Pierre de taille moellons constitués d'un seul matériau / inconnu", "Pierre de taille moellons avec remplissage tout venant", "Pisé ou béton de terre stabilisée", "Pans de bois sans remplissage", "Briques pleines simples", "Briques creuses", "Blocs de béton pleins", "Blocs de béton creux", "Béton banché", "Brique terre cuite alvéolaire", "Ossature bois sans remplissage", "Inconnu"],
+        DONNE_SUR_MURS: ["Extérieur", "Local non chauffé (autre que véranda)", "Local non chauffé et non accessible", "Circulations communes", "Local chauffé", "Bâtiment ou espace autre qu'habitation", "Comble", "Terre (paroi enterrée)", "Sous-sol non chauffé"],
+        FEN_TYPE: ["Fenêtres battantes", "Fenêtres coulissantes", "Portes-fenêtres coulissantes", "Portes-fenêtres battantes sans soubassement", "Portes-fenêtres battantes avec soubassement", "Fenêtres sans ouverture possible", "Portes-fenêtres sans ouverture possible", "Fenêtre de toit (Velux)", "Hublot"],
+        FEN_VITRAGE: ["Simple vitrage vertical", "Double vitrage vertical", "Survitrage vertical", "Triple vitrage vertical", "Brique de verre pleine", "Brique de verre creuse", "Polycarbonate"],
+        FEN_MATIERE: ["Menuiserie PVC", "Menuiserie bois", "Menuiserie métallique avec rupture de pont thermique", "Menuiserie métallique sans rupture de pont thermique", "Menuiserie bois/métal"],
+        FEN_FERMETURE: ["Jalousie accordéon", "Fermeture sans ajours, volets roulants Alu", "Volet roulant PVC ou bois (épaisseur tablier ≤ 12mm)", "Persienne coulissante", "Volet roulant PVC ou bois (épaisseur tablier > 12mm)"],
+        PLAFONDS: ["Dalle béton", "Bois sous solives bois", "Bois sur solives bois", "Entre solives bois", "Bois sur solives métallique", "Bois sous solives métallique", "Entrevous, terre-cuite, poutrelles béton", "Combles aménagés sous rampants", "Plaques de plâtre", "Inconnu"],
+        DONNE_SUR_PLAFOND: ["Terrasse", "Combles aménagés", "Combles perdus", "Local chauffé", "Local non chauffé", "Circulations communes", "Extérieur"],
+        PLANCHERS: ["Dalle béton", "Entre solives bois", "Bois sur solives bois", "Entre solives métallique", "Bois sur solives métalliques", "Entrevous, terre-cuite, poutrelles béton", "Voutains en brique", "Entrevous isolants", "Inconnu"],
+        DONNE_SUR_PLANCHER: ["Terre-plein", "Vide sanitaire", "Local non chauffé", "Local chauffé", "Extérieur", "Circulations communes", "Terre (paroi enterrée)", "Sous-sol non chauffé"]
+    };
+
+    const CHAUF_GEN_MAP = {
+        "Electrique": ["Pompe à chaleur Air/Eau", "Pompe à chaleur Air/Air", "Convecteur électrique NFC", "Panneau rayonnant électrique", "Radiateur électrique", "Plancher rayonnant électrique", "Chaudière électrique", "Installation collective unique"],
+        "Gaz naturel": ["Radiateur gaz à ventouse", "Chaudière basse température", "Chaudière standard", "Chaudière condensation", "Chaudière PAC hybride", "Installation collective unique"],
+        "GPL": ["Chaudière basse température", "Chaudière standard", "Chaudière condensation", "Installation collective unique"],
+        "Fioul": ["Chaudière basse température", "Chaudière standard", "Chaudière condensation", "Installation collective unique"],
+        "Réseau de chaleur": ["Installation collective unique multi bâtiment"]
+    };
+    const EMETTEUR_MAP = {
+        "Electrique": ["Radiateur", "Plancher chauffant", "Plafond chauffant", "Air soufflé"],
+        "Gaz naturel": ["Radiateur", "Plancher chauffant", "Plafond chauffant", "Air soufflé"],
+        "GPL": ["Radiateur", "Plancher chauffant", "Air soufflé"],
+        "Fioul": ["Radiateur", "Plancher chauffant", "Air soufflé"],
+        "Réseau de chaleur": ["Radiateur", "Plancher chauffant", "Air soufflé"]
+    };
+    const ECS_GEN_MAP = {
+        "Electrique": ["Chauffe eau thermodynamique", "Chauffe-eau horizontal", "Chauffe-eau vertical", "Pompe à chaleur Air/Eau", "Chaudière électrique", "Installation collective unique"],
+        "Gaz naturel": ["Chauffe-eau gaz instantané", "Accumulateur gaz", "Chaudière basse température", "Chaudière standard", "Chaudière condensation", "Production par la chaudière", "Installation collective unique"],
+        "GPL": ["Production par la chaudière", "Installation collective unique"],
+        "Fioul": ["Production par la chaudière", "Installation collective unique"],
+        "Réseau de chaleur": ["Installation collective unique multi bâtiment"]
+    };
+
+    function renderTotauxTable() {
+        const cat = document.getElementById('totaux-category').value;
+        const cont = document.getElementById('totaux-table-container');
+        if(!db[cat] || db[cat].length === 0) {
+            cont.innerHTML = '<div style="padding:24px; text-align:center; color:var(--tx2); font-weight:600;">Aucune donnée pour cette catégorie.</div>';
+            return;
+        }
+        
+        let data = db[cat].map(item => {
+            let apt = db.appts.find(a => a.id === item.aid);
+            let aptNum = apt ? apt.num : "?";
+            let surf = 0;
+            
+            if(cat === 'murs' || cat === 'portes') {
+                surf = (parseFloat(item.l)||0) * (parseFloat(item.h)||0);
+            } else if (cat === 'fens') {
+                let fSurf = parseFloat(item.surf);
+                if(isNaN(fSurf)) {
+                    if(item.type === 'Hublot') fSurf = (Math.PI * Math.pow((parseFloat(item.diam)||0)/2, 2) / 10000);
+                    else fSurf = ((parseFloat(item.l)||0) * (parseFloat(item.h)||0)) / 10000;
+                }
+                surf = fSurf * (parseFloat(item.nb)||1);
+            } else if (cat === 'plfs' || cat === 'plas') {
+                if(item.s) surf = parseFloat(item.s);
+                else surf = (parseFloat(item.l)||0) * (parseFloat(item.larg)||0);
+            }
+            
+            return { ...item, aptNum, surf: surf.toFixed(2) };
+        });
+
+        if(totauxSortCol) {
+            data.sort((a, b) => {
+                let valA = a[totauxSortCol] || "";
+                let valB = b[totauxSortCol] || "";
+                if (!isNaN(parseFloat(valA)) && !isNaN(parseFloat(valB))) {
+                    valA = parseFloat(valA); valB = parseFloat(valB);
+                }
+                if(valA < valB) return totauxSortAsc ? -1 : 1;
+                if(valA > valB) return totauxSortAsc ? 1 : -1;
+                return 0;
+            });
+        }
+
+        let th = (label, col) => {
+            let arrow = totauxSortCol === col ? (totauxSortAsc ? ' ▲' : ' ▼') : '';
+            return `<th onclick="sortTotaux('${col}')">${label}${arrow}</th>`;
+        };
+
+        let html = '<table class="tbl"><thead><tr>';
+        html += th('Lot', 'aptNum');
+        if(cat === 'murs') {
+            html += th('Ori.', 'ori') + th('Matériau', 'mat') + th('L (m)', 'l') + th('H (m)', 'h');
+        } else if (cat === 'fens') {
+            html += th('Ori.', 'ori') + th('Type', 'type') + th('Matériau', 'mat') + th('Dim/Diam', 'l') + th('Qté', 'nb');
+        } else if (cat === 'portes') {
+            html += th('Type', 'type') + th('Matériau', 'mat') + th('L (m)', 'l') + th('H (m)', 'h');
+        } else {
+            html += th('Type', 'type') + th('Donne sur', 'donne') + th('L (m)', 'l') + th('larg (m)', 'larg');
+        }
+        html += th('Surf. (m²)', 'surf');
+        html += '</tr></thead><tbody>';
+
+        let totalSurf = 0;
+        data.forEach(d => {
+            totalSurf += parseFloat(d.surf);
+            html += '<tr>';
+            html += `<td><strong>${d.aptNum}</strong></td>`;
+            if(cat === 'murs') html += `<td>${d.ori||''}</td><td>${(d.mat||'').substring(0,15)}...</td><td>${d.l||''}</td><td>${d.h||''}</td>`;
+            else if (cat === 'fens') {
+                let dimStr = d.type === 'Hublot' ? `Ø${d.diam}cm` : `${d.l}x${d.h}cm`;
+                let shortFenMat = (d.mat||'').replace("Menuiserie ", "");
+                if(shortFenMat === "métallique avec rupture de pont thermique") shortFenMat = "Métal (avec RPT)";
+                if(shortFenMat === "métallique sans rupture de pont thermique") shortFenMat = "Métal (sans RPT)";
+                html += `<td>${d.ori||''}</td><td>${(d.type||'').substring(0,10)}..</td><td>${shortFenMat.substring(0,12)}..</td><td>${dimStr}</td><td>${d.nb||'1'}</td>`;
+            }
+            else if (cat === 'portes') html += `<td>${(d.type||'').substring(0,15)}..</td><td>${d.mat||''}</td><td>${d.l||''}</td><td>${d.h||''}</td>`;
+            else html += `<td>${(d.type||'').substring(0,15)}..</td><td>${(d.donne||'').substring(0,15)}..</td><td>${d.l||''}</td><td>${d.larg||''}</td>`;
+            html += `<td style="font-weight:900; color:var(--acc);">${d.surf}</td>`;
+            html += '</tr>';
+        });
+
+        html += `</tbody><tfoot><tr>`;
+        let colSpan = cat==='murs' ? 5 : cat==='fens' ? 6 : cat==='portes' ? 5 : 5;
+        html += `<td colspan="${colSpan}" style="text-align:right;">TOTAL SURFACES :</td><td>${totalSurf.toFixed(2)} m²</td>`;
+        html += `</tr></tfoot></table>`;
+
+        cont.innerHTML = html;
+    }
+
+    window.sortTotaux = function(col) {
+        if(totauxSortCol === col) totauxSortAsc = !totauxSortAsc;
+        else { totauxSortCol = col; totauxSortAsc = true; }
+        renderTotauxTable();
+    };
+
+    function renderBIM() {
+        const cont = document.getElementById('bim-container');
+        if(db.appts.length === 0) {
+            cont.innerHTML = '<div style="text-align:center; padding:20px; color:var(--tx2);">Ajoutez des échantillons pour voir la modélisation.</div>';
+            return;
+        }
+
+        let html = '';
+        const bats = [...new Set(db.appts.map(a => a.bat || '1'))].sort();
+
+        bats.forEach(b => {
+            let apptsBat = db.appts.filter(a => (a.bat || '1') === b);
+            const floorOrder = {"Sous-sol": -1, "RDC": 0, "Combles": 999};
+            const getFloorVal = (f) => {
+                if (floorOrder[f] !== undefined) return floorOrder[f];
+                if (f && f.startsWith('R+')) return parseInt(f.replace('R+', ''));
+                return 0; 
+            };
+
+            let floors = {};
+            apptsBat.forEach(a => {
+                let f = a.etage || 'RDC';
+                if(!floors[f]) floors[f] = [];
+                floors[f].push(a);
+            });
+
+            let sortedFloors = Object.keys(floors).sort((x, y) => getFloorVal(y) - getFloorVal(x)); 
+
+            html += `<div class="card" style="padding:15px; margin-top:15px;">`;
+            html += `<h3 style="color:var(--acc); margin-bottom:15px; text-align:center;">🏢 Bâtiment ${b}</h3>`;
+            html += `<div style="display:flex; flex-direction:column; gap:5px; align-items:center;">`;
+            
+            let totSurf = 0;
+
+            sortedFloors.forEach(f => {
+                html += `<div style="display:flex; gap:5px; width:100%; justify-content:center;">`;
+                html += `<div style="width:60px; font-weight:bold; font-size:12px; color:var(--tx2); display:flex; align-items:center; justify-content:flex-end; padding-right:10px;">${f}</div>`;
+                html += `<div style="display:flex; gap:5px; flex:1; flex-wrap:wrap;">`;
+                floors[f].forEach(a => {
+                    totSurf += parseFloat(a.surf || 0);
+                    let w = Math.max(50, Math.min((parseFloat(a.surf || 40) * 1.5), 150)); 
+                    html += `<div class="tetris-block" style="width:${w}px;">
+                        <div>${a.num}</div>
+                        <div style="font-size:9px; opacity:0.8;">${a.surf ? a.surf + 'm²' : ''}</div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            });
+
+            html += `</div>`;
+            html += `<div style="margin-top:20px; padding-top:15px; border-top:1px dashed var(--bor); text-align:center;">`;
+            html += `<div style="font-size:12px; color:var(--tx2);">Surface Échantillonnée</div>`;
+            html += `<div style="font-size:20px; font-weight:900; color:var(--ok);">${totSurf.toFixed(1)} m²</div>`;
+            
+            let nbEtagesDeclares = parseInt(db.copro.etages) || sortedFloors.length;
+            let surfMoyEtage = totSurf / sortedFloors.length;
+            let surfEstimee = surfMoyEtage * nbEtagesDeclares;
+            
+            html += `<div style="font-size:12px; color:var(--tx2); margin-top:12px;">Extrapolation estimée Bâtiment (Basée sur ${nbEtagesDeclares} niveaux)</div>`;
+            html += `<div style="font-size:20px; font-weight:900; color:#D97706;">~ ${surfEstimee.toFixed(0)} m²</div>`;
+            html += `</div></div>`;
+        });
+        cont.innerHTML = html;
+    }
+
+    function runCalc() {
+        let L = parseFloat(document.getElementById('calc-L').value);
+        let l = parseFloat(document.getElementById('calc-l').value);
+        let l_plat = parseFloat(document.getElementById('calc-lplat').value) || 0;
+        let h = parseFloat(document.getElementById('calc-h').value);
+        let H = parseFloat(document.getElementById('calc-H').value);
+        let resDiv = document.getElementById('calc-res');
+
+        if(isNaN(L) || isNaN(l) || isNaN(h) || isNaN(H) || H < h || l_plat > l) { resDiv.style.display = 'none'; return; }
+        
+        let sMur = L * h;
+        let sPig = (l * h) + (((l + l_plat) / 2) * (H - h));
+        let baseRampant = (l - l_plat) / 2;
+        let hyp = Math.sqrt(Math.pow(H - h, 2) + Math.pow(baseRampant, 2));
+        let sRamp = L * hyp;
+        let sPlat = L * l_plat;
+
+        let sHabitable = 0;
+        if (H < 1.80) {
+            sHabitable = 0;
+        } else if (h >= 1.80) {
+            sHabitable = L * l;
+        } else {
+            let x_180 = (1.80 - h) * (baseRampant / (H - h));
+            let l_hab = l - (2 * x_180);
+            sHabitable = L * l_hab;
+        }
+
+        lastCalc = { sMur: sMur.toFixed(2), sPig: sPig.toFixed(2), sRamp: sRamp.toFixed(2), sPlat: sPlat.toFixed(2), sHab: sHabitable.toFixed(2) };
+        document.getElementById('res-mur').textContent = lastCalc.sMur + ' m²';
+        document.getElementById('res-pig').textContent = lastCalc.sPig + ' m²';
+        document.getElementById('res-ramp').textContent = lastCalc.sRamp + ' m²';
+        document.getElementById('res-plat').textContent = lastCalc.sPlat + ' m²';
+        document.getElementById('res-shab').textContent = lastCalc.sHab + ' m²';
+        document.getElementById('row-calc-plat').style.display = l_plat > 0 ? 'flex' : 'none';
+        resDiv.style.display = 'block';
+    }
+
+    window.applyHabSurface = function() {
+        if(!curAppt) return alert("Sélectionnez un appartement !");
+        if(!lastCalc.sHab) return;
+        updateApptField(curAppt, 'surf', lastCalc.sHab);
+        let surfInput = document.querySelector(`#vw-appts input[value="${lastCalc.sHab}"]`);
+        if(surfInput) surfInput.value = lastCalc.sHab;
+        toast("Surface habitable (" + lastCalc.sHab + " m²) appliquée au lot !");
+    };
+
+    function addCalc(type) {
+        if(!curAppt) return alert("Sélectionnez un appartement !");
+        let el = { id: Date.now(), aid: curAppt, nivInt: curNivInt };
+        if(type === 'mur') {
+            el.mat = 'Inconnu'; el.ori = ''; el.donne = 'Extérieur'; 
+            el.l = document.getElementById('calc-L').value; el.h = document.getElementById('calc-h').value; 
+            el.ep = ''; el.isoEp = ''; el.doub = 'ABSENT'; el.iso = 'Non'; db.murs.push(el); toast("Mur Façade ajouté. Modifiez-le ✏️");
+        } else if(type === 'pig') {
+            el.mat = 'Inconnu'; el.ori = ''; el.donne = 'Extérieur'; el.l = document.getElementById('calc-l').value; 
+            let sPig = parseFloat(lastCalc.sPig); let fauxH = sPig / parseFloat(el.l); el.h = fauxH.toFixed(2); 
+            el.ep = ''; el.isoEp = ''; el.doub = 'ABSENT'; el.iso = 'Non'; db.murs.push(el); toast("Mur Pignon ajouté. Modifiez-le ✏️");
+        } else if(type === 'ramp') {
+            el.type = 'Combles aménagés sous rampants'; el.donne = 'Extérieur'; el.s = lastCalc.sRamp; el.iso = 'Non'; el.isoEp = ''; db.plfs.push(el); toast("Plafond rampant ajouté. Modifiez-le ✏️");
+        } else if(type === 'plat') {
+            el.type = 'Inconnu'; el.donne = 'Combles perdus'; el.s = lastCalc.sPlat; el.iso = 'Non'; el.isoEp = ''; db.plfs.push(el); toast("Plafond plat ajouté. Modifiez-le ✏️");
+        }
+        sauvegarderLocal(); renderElementsList(type === 'mur' || type === 'pig' ? 'murs' : 'plfs');
+        if(type === 'mur' || type === 'pig') drawCroquis();
+    }
+
+    function viewImage(src) {
+        if(!src) return;
+        document.getElementById('img-viewer-src').src = src;
+        document.getElementById('img-viewer').style.display = 'flex';
+    }
+
+    function renderCoproPhotos() {
+        const chImg = document.getElementById('img-chaufCol');
+        if(db.chaufCol.photo) { chImg.src = db.chaufCol.photo; chImg.style.display = 'block'; } else { chImg.style.display = 'none'; }
+        const ecsImg = document.getElementById('img-ecsCol');
+        if(db.ecsCol.photo) { ecsImg.src = db.ecsCol.photo; ecsImg.style.display = 'block'; } else { ecsImg.style.display = 'none'; }
+    }
+
+    function isSchemaClosed(aptId) {
+        const mursApt = db.murs.filter(m => m.aid === aptId && (m.nivInt||0) === curNivInt);
+        if (mursApt.length < 3) return false;
+        let curX = 0, curY = 0;
+        mursApt.forEach(m => {
+            let l = parseFloat(m.l) || 0;
+            if (m.vectX !== undefined && m.vectY !== undefined) {
+                let origL = Math.sqrt(m.vectX*m.vectX + m.vectY*m.vectY);
+                if (origL > 0) { curX += m.vectX * (l / origL); curY += m.vectY * (l / origL); } else { curX += m.vectX; curY += m.vectY; }
+            } else {
+                if (m.ori === 'Nord') curX += l; else if (m.ori === 'Est') curY += l; else if (m.ori === 'Sud') curX -= l; else if (m.ori === 'Ouest') curY -= l;
+            }
+        });
+        return Math.sqrt(curX*curX + curY*curY) <= 0.15;
+    }
+
+    window.fermerPolygone = function(aptId, cX, cY) {
+        let dx = -cX; let dy = -cY; let l = Math.sqrt(dx*dx + dy*dy).toFixed(2);
+        let ori = ''; if (Math.abs(dx) >= Math.abs(dy)) { ori = dx >= 0 ? 'Nord' : 'Sud'; } else { ori = dy >= 0 ? 'Est' : 'Ouest'; }
+        let m = { id: Date.now(), aid: aptId, nivInt: curNivInt, ori: ori, donne: 'Extérieur', mat: 'Inconnu', l: String(l), h: '', doub: 'ABSENT', iso: 'Non', vectX: dx, vectY: dy };
+        db.murs.push(m); sauvegarderLocal(); renderElementsList('murs'); drawCroquis(); toast('Mur de fermeture (' + l + 'm) généré.');
+    };
+    
+    function getShortMat(mat) {
+        if(!mat) return ""; if(mat.includes("Pierre")) return "Pierre"; if(mat.includes("Béton banché")) return "Béton"; if(mat.includes("Blocs de béton")) return "Parpaing"; if(mat.includes("Briques pleines")) return "Brique pl."; if(mat.includes("Briques creuses") || mat.includes("alvéolaire")) return "Brique cr."; if(mat.includes("Pisé")) return "Pisé"; if(mat.includes("bois")) return "Bois"; return "Inc.";
+    }
+
+    function drawCroquis() {
+        const canvas = document.getElementById('croquis-canvas'); if (!canvas) return;
+        const ctx = canvas.getContext('2d'); const container = document.getElementById('croquis-container'); const msg = document.getElementById('croquis-msg');
+        if (!curAppt) { container.style.display = 'none'; return; }
+        const mursApt = db.murs.filter(m => m.aid === curAppt && (m.nivInt||0) === curNivInt);
+        if (mursApt.length === 0) { container.style.display = 'none'; return; }
+
+        container.style.display = 'block';
+        const rect = canvas.getBoundingClientRect(); canvas.width = rect.width * 2; canvas.height = rect.height * 2; ctx.scale(2, 2);
+        const cw = rect.width; const ch = rect.height; ctx.clearRect(0, 0, cw, ch);
+
+        let points = [{ x: 0, y: 0 }]; let curX = 0, curY = 0;
+        mursApt.forEach(m => {
+            let l = parseFloat(m.l) || 0;
+            if (m.vectX !== undefined && m.vectY !== undefined) {
+                let origL = Math.sqrt(m.vectX*m.vectX + m.vectY*m.vectY);
+                if (origL > 0) { curX += m.vectX * (l / origL); curY += m.vectY * (l / origL); } else { curX += m.vectX; curY += m.vectY; }
+            } else {
+                if (m.ori === 'Nord') curX += l; else if (m.ori === 'Est') curY += l; else if (m.ori === 'Sud') curX -= l; else if (m.ori === 'Ouest') curY -= l;
+            }
+            points.push({ x: curX, y: curY });
+        });
+
+        let area = 0;
+        for (let i = 0; i < points.length - 1; i++) { area += points[i].x * points[i+1].y - points[i+1].x * points[i].y; }
+        area += points[points.length - 1].x * points[0].y - points[0].x * points[points.length - 1].y; area = Math.abs(area) / 2;
+
+        let minX = Math.min(...points.map(p => p.x)); let maxX = Math.max(...points.map(p => p.x)); let minY = Math.min(...points.map(p => p.y)); let maxY = Math.max(...points.map(p => p.y));
+        let width = Math.max(maxX - minX, 0.1); let height = Math.max(maxY - minY, 0.1);
+        let padding = 45; let scaleX = (cw - padding * 2) / width; let scaleY = (ch - padding * 2) / height; let scale = Math.min(scaleX, scaleY);
+        let offsetX = (cw - (width * scale)) / 2; let offsetY = (ch - (height * scale)) / 2;
+
+        ctx.beginPath(); ctx.strokeStyle = '#2563EB'; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        points.forEach((p, i) => { let px = offsetX + (p.x - minX) * scale; let py = offsetY + (p.y - minY) * scale; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }); ctx.stroke();
+
+        ctx.font = "bold 11px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        for (let i = 0; i < points.length - 1; i++) {
+            let p1 = points[i]; let p2 = points[i+1]; let midX = (p1.x + p2.x) / 2; let midY = (p1.y + p2.y) / 2;
+            let px = offsetX + (midX - minX) * scale; let py = offsetY + (midY - minY) * scale;
+            let dx = p2.x - p1.x; let dy = p2.y - p1.y; let len = Math.hypot(dx, dy); let nx = -dy / len; let ny = dx / len; let textPx = px + nx * 14; let textPy = py + ny * 14;
+            let shortMat = getShortMat(mursApt[i].mat); let epText = mursApt[i].ep ? ` (${mursApt[i].ep}cm)` : ''; let text = mursApt[i].l + "m " + shortMat + epText;
+            let tw = ctx.measureText(text).width;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)"; ctx.fillRect(textPx - tw/2 - 4, textPy - 10, tw + 8, 20); ctx.fillStyle = "#0F172A"; ctx.fillText(text, textPx, textPy);
+        }
+
+        let compX = 25; let compY = 30;
+        ctx.beginPath(); ctx.moveTo(compX, compY - 10); ctx.lineTo(compX, compY + 10); ctx.moveTo(compX - 10, compY); ctx.lineTo(compX + 10, compY); ctx.strokeStyle = "#94A3B8"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(compX, compY - 12); ctx.lineTo(compX - 4, compY - 2); ctx.lineTo(compX + 4, compY - 2); ctx.fillStyle = "#EF4444"; ctx.fill();
+        ctx.fillStyle = "#1E293B"; ctx.font = "bold 12px sans-serif"; ctx.fillText("N", compX, compY - 18);
+
+        let startP = points[0]; let endP = points[points.length - 1];
+        let startPx = offsetX + (startP.x - minX) * scale; let startPy = offsetY + (startP.y - minY) * scale;
+        let endPx = offsetX + (endP.x - minX) * scale; let endPy = offsetY + (endP.y - minY) * scale;
+
+        ctx.beginPath(); ctx.arc(startPx, startPy, 6, 0, 2 * Math.PI); ctx.fillStyle = '#16A34A'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(endPx, endPy, 6, 0, 2 * Math.PI); ctx.fillStyle = '#EF4444'; ctx.fill(); ctx.stroke();
+
+        let err = Math.sqrt(Math.pow(curX, 2) + Math.pow(curY, 2)); let txt = '';
+        if (mursApt.length < 2) {
+            txt = '<span style="color:#94A3B8;">Tracez au moins 2 murs pour pouvoir fermer le polygone...</span>';
+        } else if (err > 0.15) {
+            txt = `<span style="color:var(--dan); font-weight:800;">⚠️ Écart fermeture : ${err.toFixed(2)} m</span><br><span style="color:var(--ok); font-weight:800;">Surface estimée : ${area.toFixed(1)} m²</span><br><button class="btn-xs" style="margin-top:12px; padding:10px 16px; background:var(--warn-l); color:var(--warn); border:1px solid #FDE68A; cursor:pointer;" onclick="fermerPolygone('${curAppt}', ${curX}, ${curY})">🔗 Fermer automatiquement</button>`;
+            ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.moveTo(endPx, endPy); ctx.lineTo(startPx, startPy); ctx.strokeStyle = '#EF4444'; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
+        } else {
+            txt = `<span style="color:var(--ok); font-size:14px; font-weight:800;">✅ Périmètre fermé</span><br><span style="font-size:15px; color:var(--tx);">Surface (Niveau ${curNivInt}) : <b>${area.toFixed(1)} m²</b></span>`;
+            ctx.beginPath(); ctx.moveTo(endPx, endPy); ctx.lineTo(startPx, startPy); ctx.strokeStyle = '#16A34A'; ctx.lineWidth = 2; ctx.stroke();
+            let curAptObj = db.appts.find(a => a.id === curAppt);
+            if (curAptObj) {
+                if (!curAptObj.surfs) curAptObj.surfs = {};
+                curAptObj.surfs[curNivInt] = parseFloat(area.toFixed(1));
+                let tot = 0; for(let k in curAptObj.surfs) tot += curAptObj.surfs[k];
+                if (curAptObj.surf !== tot.toFixed(1)) {
+                    curAptObj.surf = tot.toFixed(1); sauvegarderLocal();
+                    let surfInput = document.querySelector(`#vw-appts input[value="${curAptObj.surf}"]`);
+                    if(surfInput) surfInput.value = curAptObj.surf;
+                    toast(`Surface N${curNivInt} reportée. Total : ${curAptObj.surf} m²`);
+                }
+            }
+        }
+        msg.innerHTML = txt; updateApptBadges(curAppt);
+    }
+
+    function peuplerSelects() {
+        const fill = (id, arr) => { const el = document.getElementById(id); if(el) el.innerHTML = arr.map(v => `<option value="${v}">${v}</option>`).join(''); };
+        fill('m-mat', ADN.MURS); fill('m-donne', ADN.DONNE_SUR_MURS); fill('f-type', ADN.FEN_TYPE); fill('f-mat', ADN.FEN_MATIERE); fill('f-vit', ADN.FEN_VITRAGE); fill('f-fer', ADN.FEN_FERMETURE); fill('p-type', ADN.PLAFONDS); fill('p-donne', ADN.DONNE_SUR_PLAFOND); fill('s-type', ADN.PLANCHERS); fill('s-donne', ADN.DONNE_SUR_PLANCHER);
+    }
+
+    function renderBibliFens() {
+        const sel = document.getElementById('f-bibli'); if(!sel) return;
+        let html = '<option value="">-- Modèles sauvegardés --</option>';
+        if(db.modelesFens) { db.modelesFens.forEach(m => { html += `<option value="${m.id}">${m.nom}</option>`; }); }
+        sel.innerHTML = html;
+    }
+
+    function chargerModeleFen(modId) {
+        if(!modId) { ['f-type','f-mat','f-vit','f-ep','f-fer','f-l','f-h', 'f-diam'].forEach(id => { let el = document.getElementById(id); if(el) el.value = ''; }); toggleFenType(); return; }
+        const m = db.modelesFens.find(x => x.id === modId);
+        if(m) {
+            document.getElementById('f-type').value = m.type; toggleFenType(); document.getElementById('f-mat').value = m.mat; document.getElementById('f-vit').value = m.vit; document.getElementById('f-ep').value = m.ep || ''; document.getElementById('f-fer').value = m.fer; document.getElementById('f-l').value = m.l; document.getElementById('f-h').value = m.h; if(document.getElementById('f-diam')) document.getElementById('f-diam').value = m.diam || '';
+        }
+    }
+
+    function getBatimentOptionsHtml(selected = "") {
+        const nb = parseInt(document.getElementById('copro-batiments').value) || 1; let html = '<option value="">—</option>';
+        for(let i=1; i<=nb; i++) { html += `<option value="${i}" ${selected == i ? 'selected' : ''}>${i}</option>`; } return html;
+    }
+    function updateBatimentOptions(selectId, selectedValue = "") { const select = document.getElementById(selectId); if(!select) return; select.innerHTML = getBatimentOptionsHtml(selectedValue); }
+    function getEtageOptionsHtml(selected = "") {
+        const n = parseInt(document.getElementById('copro-etages').value) || 0; let html = '<option value="">—</option><option value="Sous-sol">Sous-sol</option><option value="RDC">RDC</option>';
+        for(let i=1; i<n; i++) html += `<option value="R+${i}">R+${i}</option>`; html += '<option value="Combles">Combles</option>'; if(selected) html = html.replace(`value="${selected}"`, `value="${selected}" selected`); return html;
+    }
+    function updateEtageOptions(selectId, selectedValue = "") { const select = document.getElementById(selectId); if(!select) return; select.innerHTML = getEtageOptionsHtml(selectedValue); }
+    function autoSetNiveau(etage, niveauSelectId) {
+        const niveauSelect = document.getElementById(niveauSelectId); if(!niveauSelect || !etage) return;
+        const n = parseInt(document.getElementById('copro-etages').value) || 0;
+        if(etage === 'RDC') niveauSelect.value = 'RDC'; else if (etage === 'Combles' || etage === `R+${n-1}`) niveauSelect.value = 'Dernier étage'; else if (etage.startsWith('R+')) niveauSelect.value = 'Intermédiaire'; else if (etage === 'Sous-sol') niveauSelect.value = 'Intermédiaire';
+    }
+
+    function getAptNumOptionsHtml(selected = "") {
+        let html = '<option value="">— Sélectionner —</option>';
+        for(let i=1; i<=50; i++) { let val = 'E' + String(i).padStart(2, '0'); html += `<option value="${val}" ${selected===val?'selected':''}>${val}</option>`; } return html;
+    }
+
+    function updateChaufGen(eId, gId, emId) {
+        const en = document.getElementById(eId).value; const g = document.getElementById(gId); const em = document.getElementById(emId);
+        g.innerHTML = '<option value="">—</option>'; if(en && CHAUF_GEN_MAP[en]) CHAUF_GEN_MAP[en].forEach(x => g.innerHTML += `<option value="${x}">${x}</option>`);
+        if(em) { em.innerHTML = '<option value="">—</option>'; if(en && EMETTEUR_MAP[en]) EMETTEUR_MAP[en].forEach(x => em.innerHTML += `<option value="${x}">${x}</option>`); }
+    }
+    function updateEcsGen(eId, tId) {
+        const en = document.getElementById(eId).value; const t = document.getElementById(tId);
+        t.innerHTML = '<option value="">—</option>'; if(en && ECS_GEN_MAP[en]) ECS_GEN_MAP[en].forEach(x => t.innerHTML += `<option value="${x}">${x}</option>`);
+    }
+    
+    function checkChaudiereECS(prefix, aptId = null) {
+        const genId = prefix === 'col' ? 'col-chauf-gen' : `ifc-gen-${aptId}`; const eId = prefix === 'col' ? 'col-chauf-energie' : `ifc-energie-${aptId}`; const ecsEId = prefix === 'col' ? 'col-ecs-energie' : `ife-energie-${aptId}`; const ecsTId = prefix === 'col' ? 'col-ecs-type' : `ife-type-${aptId}`;
+        const gen = document.getElementById(genId).value;
+        if (gen.includes('Chaudière') && confirm("Le générateur est une chaudière. Créer automatiquement l'ECS liée ?")) {
+            if(prefix === 'col') {
+                document.getElementById(ecsEId).value = document.getElementById(eId).value; updateEcsGen(ecsEId, ecsTId);
+                setTimeout(() => { document.getElementById(ecsTId).value = "Production par la chaudière"; document.getElementById('ecs-acc').classList.add('open'); document.getElementById('ecs-acc').previousElementSibling.querySelector('span:last-child').textContent = '▼'; saveCoproData(); }, 50);
+            } else {
+                let eVal = document.getElementById(eId).value; db.ecss.push({ id: String(Date.now()+1), aptId: aptId, type: "Production par la chaudière", energie: eVal, annee: "", vol: "" }); sauvegarderLocal(); document.getElementById('ecs-list-'+aptId).innerHTML = buildEcsListHTML(aptId); updateApptBadges(aptId); toast("ECS liée générée ✓");
+            }
+        }
+    }
+
+    function showNouvelAppt() { document.getElementById('apt-num').innerHTML = getAptNumOptionsHtml(); updateEtageOptions('apt-etage'); updateBatimentOptions('apt-bat'); document.getElementById('new-apt-form').style.display = 'block'; }
+    function hideNouvelAppt() { document.getElementById('new-apt-form').style.display = 'none'; }
+    
+    function creerAppt() {
+        const num = document.getElementById('apt-num').value; if(!num) return alert("Numéro requis");
+        const a = { id: String(Date.now()), num, bat: document.getElementById('apt-bat').value, etage: document.getElementById('apt-etage').value, niveau: document.getElementById('apt-niveau').value, surf: document.getElementById('apt-surf').value, hsp: document.getElementById('apt-hsp').value, type: parseInt(document.getElementById('apt-type').value) || 1 };
+        db.appts.push(a); expAppts[a.id] = true; curAppt = a.id; curNivInt = 0; sauvegarderLocal(); document.getElementById('apt-num').value = ''; document.getElementById('apt-hsp').value = ''; hideNouvelAppt(); renderApptsList();
+    }
+    
+    function dupAppt(id) {
+        const src = db.appts.find(a => a.id === id); if(!src) return;
+        let maxNum = 0; db.appts.forEach(apt => { let digits = apt.num.match(/\d+/); if(digits) { let n = parseInt(digits[0]); if(n > maxNum) maxNum = n; } });
+        let newNumStr = "E" + String(maxNum + 1).padStart(2, '0');
+        const newId = String(Date.now()); const newApt = {...src, id: newId, num: newNumStr}; if (src.surfs) newApt.surfs = JSON.parse(JSON.stringify(src.surfs)); db.appts.push(newApt);
+        const cloneItems = (arrName, fk) => { const items = db[arrName].filter(x => x[fk] === id); items.forEach(item => { let clone = {...item, id: Date.now() + Math.random(), [fk]: newId}; if(arrName === 'fens') { let maxFen = 0; db.fens.forEach(f => { if(f.nom) { let m = f.nom.match(/Fenêtre (\d+)/); if(m && parseInt(m[1]) > maxFen) maxFen = parseInt(m[1]); } }); clone.nom = "Fenêtre " + (maxFen + 1); db.fens.push(clone); } else { db[arrName].push(clone); } }); };
+        cloneItems('murs', 'aid'); cloneItems('fens', 'aid'); cloneItems('portes', 'aid'); cloneItems('plfs', 'aid'); cloneItems('plas', 'aid'); cloneItems('chaufs', 'aptId'); cloneItems('ecss', 'aptId');
+        curAppt = newId; curNivInt = 0; expAppts[newId] = true; sauvegarderLocal(); renderApptsList(); toast("Appartement dupliqué sous " + newNumStr + " ✓");
+    }
+
+    function toggleAppt(id) { expAppts[id] = !expAppts[id]; renderApptsList(); }
+    
+    function suppAppt(id) { 
+        if(confirm("Supprimer définitivement l'appartement et toutes ses parois/systèmes ?")) { 
+            db.appts = db.appts.filter(a=>a.id!==id); db.murs = db.murs.filter(m=>m.aid!==id); db.fens = db.fens.filter(f=>f.aid!==id); db.portes = db.portes.filter(p=>p.aid!==id); db.plfs = db.plfs.filter(p=>p.aid!==id); db.plas = db.plas.filter(p=>p.aid!==id); db.chaufs = db.chaufs.filter(c=>c.aptId!==id); db.ecss = db.ecss.filter(e=>e.aptId!==id); 
+            if(curAppt === id) curAppt = null; sauvegarderLocal(); renderApptsList(); 
+        } 
+    }
+    
+    function updateApptField(id, field, value) { const a = db.appts.find(x => x.id === id); if(a) { a[field] = value; sauvegarderLocal(); if(field === 'type') renderApptsList(); } }
+
+    function updateApptEtageLive(aptId, etageVal) {
+        updateApptField(aptId, 'etage', etageVal); const n = parseInt(document.getElementById('copro-etages').value) || 0; let niveau = "";
+        if(etageVal === 'RDC') niveau = 'RDC'; else if (etageVal === 'Combles' || etageVal === `R+${n-1}`) niveau = 'Dernier étage'; else if (etageVal.startsWith('R+')) niveau = 'Intermédiaire'; else if (etageVal === 'Sous-sol') niveau = 'Intermédiaire';
+        if(niveau) { updateApptField(aptId, 'niveau', niveau); const nivSelect = document.getElementById(`edit-niveau-${aptId}`); if(nivSelect) nivSelect.value = niveau; }
+    }
+
+    function buildChaufListHTML(aptId) {
+        const apt = db.appts.find(a => a.id === aptId); const aptNum = apt ? apt.num : ''; const myC = db.chaufs.filter(c => c.aptId === aptId);
+        return myC.map((c, index) => `
+            <div class="item-row" style="align-items:flex-start;">
+                <div style="flex:1; padding-right:12px; min-width:0;">
+                    <div style="font-weight:800; color:var(--tx); font-size:14px; margin-bottom:6px;">🔥 Chauff. ${aptNum} - ${index + 1}</div>
+                    <div style="color:var(--tx2); font-size:12px; line-height:1.4;">${c.energie} · ${c.gen}<br>${c.emetteur||''} | ${c.puissance?c.puissance+'kW':''} | ${c.annee?c.annee:''}</div>
+                    <div style="margin-top:8px;">${c.photo ? `<img src="${c.photo}" class="thumb" style="margin:0;" onclick="viewImage('${c.photo}')">` : ''}</div>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; width: 94px; justify-content:flex-start; flex-shrink:0;">
+                    <button class="btn-xs" style="color:var(--acc); background:var(--acc-l); border:1px solid #BFDBFE; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="triggerUpload('chaufInd', '${c.id}')">📷</button>
+                    <button class="btn-xs" style="color:var(--ok); background:var(--ok-l); border:1px solid #BBF7D0; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="clonerChauf('${c.id}')">🔄</button>
+                    <button class="btn-xs" style="color:var(--acc); background:var(--acc-l); border:1px solid #BFDBFE; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="editerChauf('${aptId}','${c.id}')">✏️</button>
+                    <button class="btn-xs" style="color:var(--dan); background:var(--dan-l); border:1px solid #FECACA; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="suppChauf('${c.id}', '${aptId}')">❌</button>
+                </div>
+            </div>`).join('');
+    }
+
+    function buildEcsListHTML(aptId) {
+        const apt = db.appts.find(a => a.id === aptId); const aptNum = apt ? apt.num : ''; const myE = db.ecss.filter(e => e.aptId === aptId);
+        return myE.map((e, index) => `
+            <div class="item-row" style="align-items:flex-start;">
+                <div style="flex:1; padding-right:12px; min-width:0;">
+                    <div style="font-weight:800; color:var(--tx); font-size:14px; margin-bottom:6px;">🚿 ECS ${aptNum} - ${index + 1}</div>
+                    <div style="color:var(--tx2); font-size:12px; line-height:1.4;">${e.energie} · ${e.type}<br>${e.vol?e.vol+'L':''} | ${e.annee?e.annee:''}</div>
+                    <div style="margin-top:8px;">${e.photo ? `<img src="${e.photo}" class="thumb" style="margin:0;" onclick="viewImage('${e.photo}')">` : ''}</div>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; width: 94px; justify-content:flex-start; flex-shrink:0;">
+                    <button class="btn-xs" style="color:var(--acc); background:var(--acc-l); border:1px solid #BFDBFE; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="triggerUpload('ecsInd', '${e.id}')">📷</button>
+                    <button class="btn-xs" style="color:var(--ok); background:var(--ok-l); border:1px solid #BBF7D0; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="clonerEcs('${e.id}')">🔄</button>
+                    <button class="btn-xs" style="color:var(--acc); background:var(--acc-l); border:1px solid #BFDBFE; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="editerEcs('${aptId}','${e.id}')">✏️</button>
+                    <button class="btn-xs" style="color:var(--dan); background:var(--dan-l); border:1px solid #FECACA; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="suppEcs('${e.id}', '${aptId}')">❌</button>
+                </div>
+            </div>`).join('');
+    }
+
+    function updateApptBadges(aptId) {
+        let el = document.getElementById('badges-' + aptId); if(!el) return;
+        const myC = db.chaufs.filter(c => c.aptId === aptId); const myE = db.ecss.filter(e => e.aptId === aptId);
+        const m = db.murs.filter(x=>x.aid===aptId).length; const f = db.fens.filter(x=>x.aid===aptId).length; const p = db.plfs.filter(x=>x.aid===aptId).length; const s = db.plas.filter(x=>x.aid===aptId).length; const po = db.portes.filter(x=>x.aid===aptId).length;
+        const badgeSchema = (m>2) ? '<span class="badge-elem badge-ok">📐 Plans Actifs</span>' : '<span class="badge-elem badge-warn">📐 Plan Vide</span>';
+        el.innerHTML = `<span class="badge-elem">🧱 ${m}</span> <span class="badge-elem">🪟 ${f}</span> <span class="badge-elem">🚪 ${po}</span> <span class="badge-elem">🔝 ${p}</span> <span class="badge-elem">🔽 ${s}</span> <span class="badge-elem ${myC.length?'badge-ok':'badge-warn'}">🔥 ${myC.length}</span> <span class="badge-elem ${myE.length?'badge-ok':'badge-warn'}">🚿 ${myE.length}</span> ${badgeSchema}`;
+    }
+
+    function ajouterChauf(aptId) {
+        const e = document.getElementById('ifc-energie-'+aptId).value; const g = document.getElementById('ifc-gen-'+aptId).value;
+        const btn = document.getElementById('btn-chauf-'+aptId); const editId = btn.getAttribute('data-edit-id');
+        if(!e||!g) return alert("Énergie et générateur requis");
+        let obj = { id: editId || String(Date.now()), aptId, energie: e, gen: g, emetteur: document.getElementById('ifc-emetteur-'+aptId).value, annee: document.getElementById('ifc-annee-'+aptId).value, puissance: document.getElementById('ifc-puissance-'+aptId).value };
+        if (tempPhotos.chauf[aptId]) { obj.photo = tempPhotos.chauf[aptId]; delete tempPhotos.chauf[aptId]; }
+        if(editId) { const old = db.chaufs.find(x => x.id === editId); if(old && old.photo && !obj.photo) obj.photo = old.photo; db.chaufs[db.chaufs.findIndex(x => x.id === editId)] = obj; btn.textContent = "Ajouter Chauffage"; btn.removeAttribute('data-edit-id'); } else { db.chaufs.push(obj); }
+        document.getElementById('ifc-energie-'+aptId).value = ''; document.getElementById('ifc-gen-'+aptId).value = ''; document.getElementById('ifc-emetteur-'+aptId).value = ''; document.getElementById('ifc-annee-'+aptId).value = ''; document.getElementById('ifc-puissance-'+aptId).value = '';
+        sauvegarderLocal(); document.getElementById('chauf-list-'+aptId).innerHTML = buildChaufListHTML(aptId); renderApptsList(); updateApptBadges(aptId); toast("Chauffage enregistré ✓");
+    }
+    
+    function clonerChauf(id) { const src = db.chaufs.find(x => x.id === id); if(!src) return; db.chaufs.push({...src, id: Date.now() + Math.random()}); sauvegarderLocal(); document.getElementById('chauf-list-'+src.aptId).innerHTML = buildChaufListHTML(src.aptId); updateApptBadges(src.aptId); toast("Chauffage cloné ✓"); }
+    function editerChauf(aptId, chaufId) { const c = db.chaufs.find(x => x.id === chaufId); document.getElementById(`ifc-energie-${aptId}`).value = c.energie; updateChaufGen(`ifc-energie-${aptId}`, `ifc-gen-${aptId}`, `ifc-emetteur-${aptId}`); setTimeout(() => { document.getElementById(`ifc-gen-${aptId}`).value = c.gen; document.getElementById(`ifc-emetteur-${aptId}`).value = c.emetteur; document.getElementById(`ifc-annee-${aptId}`).value = c.annee || ''; document.getElementById(`ifc-puissance-${aptId}`).value = c.puissance || ''; const btn = document.getElementById(`btn-chauf-${aptId}`); btn.textContent = "Modifier ce chauffage"; btn.setAttribute('data-edit-id', chaufId); }, 50); window.scrollTo(0, document.getElementById(`ifc-energie-${aptId}`).offsetTop - 100); }
+    function suppChauf(id, aptId) { db.chaufs = db.chaufs.filter(c => c.id !== id); sauvegarderLocal(); document.getElementById('chauf-list-'+aptId).innerHTML = buildChaufListHTML(aptId); updateApptBadges(aptId); }
+
+    function ajouterEcs(aptId) {
+        const e = document.getElementById('ife-energie-'+aptId).value; const t = document.getElementById('ife-type-'+aptId).value;
+        const btn = document.getElementById('btn-ecs-'+aptId); const editId = btn.getAttribute('data-edit-id');
+        if(!e||!t) return alert("Type et énergie requis");
+        let obj = { id: editId || String(Date.now()), aptId, type: t, energie: e, annee: document.getElementById('ife-annee-'+aptId).value, vol: document.getElementById('ife-vol-'+aptId).value };
+        if (tempPhotos.ecs[aptId]) { obj.photo = tempPhotos.ecs[aptId]; delete tempPhotos.ecs[aptId]; }
+        if(editId) { const old = db.ecss.find(x => x.id === editId); if(old && old.photo && !obj.photo) obj.photo = old.photo; db.ecss[db.ecss.findIndex(x => x.id === editId)] = obj; btn.textContent = "Ajouter ECS"; btn.removeAttribute('data-edit-id'); } else { db.ecss.push(obj); }
+        document.getElementById('ife-energie-'+aptId).value = ''; document.getElementById('ife-type-'+aptId).value = ''; document.getElementById('ife-annee-'+aptId).value = ''; document.getElementById('ife-vol-'+aptId).value = '';
+        sauvegarderLocal(); document.getElementById('ecs-list-'+aptId).innerHTML = buildEcsListHTML(aptId); renderApptsList(); updateApptBadges(aptId); toast("ECS enregistrée ✓");
+    }
+    
+    function clonerEcs(id) { const src = db.ecss.find(x => x.id === id); if(!src) return; db.ecss.push({...src, id: Date.now() + Math.random()}); sauvegarderLocal(); document.getElementById('ecs-list-'+src.aptId).innerHTML = buildEcsListHTML(src.aptId); updateApptBadges(src.aptId); toast("ECS clonée ✓"); }
+    function editerEcs(aptId, ecsId) { const e = db.ecss.find(x => x.id === ecsId); document.getElementById(`ife-energie-${aptId}`).value = e.energie; updateEcsGen(`ife-energie-${aptId}`, `ife-type-${aptId}`); setTimeout(() => { document.getElementById(`ife-type-${aptId}`).value = e.type; document.getElementById(`ife-annee-${aptId}`).value = e.annee || ''; document.getElementById(`ife-vol-${aptId}`).value = e.vol || ''; const btn = document.getElementById(`btn-ecs-${aptId}`); btn.textContent = "Modifier cette ECS"; btn.setAttribute('data-edit-id', ecsId); }, 50); window.scrollTo(0, document.getElementById(`ife-energie-${aptId}`).offsetTop - 100); }
+    function suppEcs(id, aptId) { db.ecss = db.ecss.filter(e => e.id !== id); sauvegarderLocal(); document.getElementById('ecs-list-'+aptId).innerHTML = buildEcsListHTML(aptId); updateApptBadges(aptId); }
+
+    function renderApptsList() {
+        const cont = document.getElementById('appts-liste'); document.getElementById('appts-count-lbl').textContent = db.appts.length + " appartement(s)";
+        if(!db.appts.length) { cont.innerHTML = '<div style="text-align:center; padding:20px; color:#64748b;">Aucun lot saisi.</div>'; return; }
+        cont.innerHTML = db.appts.map(a => {
+            const isExp = expAppts[a.id]; let typeStr = a.type === 2 ? " (Duplex)" : a.type === 3 ? " (Triplex)" : ""; let body = '';
+            if(isExp) {
+                body = `<div class="appt-body open">
+                    <div class="card" style="margin-bottom:10px; border-color:#CBD5E1;">
+                        <div class="fr"><span class="fl">Identifiant</span><select onchange="updateApptField('${a.id}', 'num', this.value)">${getAptNumOptionsHtml(a.num)}</select></div>
+                        <div class="fr"><span class="fl">Type de lot</span><select onchange="updateApptField('${a.id}', 'type', parseInt(this.value));"><option value="1" ${a.type===1 || !a.type ? 'selected':''}>Plain-pied</option><option value="2" ${a.type===2 ? 'selected':''}>Duplex</option><option value="3" ${a.type===3 ? 'selected':''}>Triplex</option></select></div>
+                        <div class="fr"><span class="fl">Bâtiment n°</span><select onchange="updateApptField('${a.id}', 'bat', this.value)">${getBatimentOptionsHtml(a.bat)}</select></div>
+                        <div class="fr"><span class="fl">Surface (m²)</span><input type="number" inputmode="decimal" step="any" value="${a.surf||''}" onchange="updateApptField('${a.id}', 'surf', this.value)"></div>
+                        <div class="fr"><span class="fl">HSP (m)</span><input type="number" inputmode="decimal" step="any" value="${a.hsp||''}" onchange="updateApptField('${a.id}', 'hsp', this.value)"></div>
+                        <div class="fr"><span class="fl">Étage princ.</span><select onchange="updateApptEtageLive('${a.id}', this.value)">${getEtageOptionsHtml(a.etage)}</select></div>
+                        <div class="fr"><span class="fl">Niveau ADN</span><select id="edit-niveau-${a.id}" onchange="updateApptField('${a.id}', 'niveau', this.value)"><option value="">—</option><option value="RDC" ${a.niveau==='RDC'?'selected':''}>RDC</option><option value="Intermédiaire" ${a.niveau==='Intermédiaire'?'selected':''}>Intermédiaire</option><option value="Dernier étage" ${a.niveau==='Dernier étage'?'selected':''}>Dernier étage</option></select></div>
+                    </div>
+                    <div class="quick-btns" style="grid-template-columns: repeat(3, 1fr);">
+                        <button class="qbtn" onclick="curAppt='${a.id}'; curNivInt=0; goTab('murs')">🧱 Murs</button><button class="qbtn" onclick="curAppt='${a.id}'; curNivInt=0; goTab('fen')">🪟 Fenêtres</button><button class="qbtn" onclick="curAppt='${a.id}'; curNivInt=0; goTab('portes')">🚪 Portes</button><button class="qbtn" onclick="curAppt='${a.id}'; curNivInt=0; goTab('plafonds')">🔝 Plafonds</button><button class="qbtn" onclick="curAppt='${a.id}'; curNivInt=0; goTab('planchers')">🔽 Planchers</button><button class="qbtn" style="color:var(--ok); border-color:var(--ok-l);" onclick="dupAppt('${a.id}')">🔄 Dupliquer Appt</button>
+                    </div>
+                    <div style="background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid var(--bor); margin-top:10px;">
+                        <div style="font-weight:bold; font-size:12px; margin-bottom:5px;">🔥 Chauffage indiv.</div>
+                        <div id="chauf-list-${a.id}">${buildChaufListHTML(a.id)}</div>
+                        <div style="display:flex; gap:8px; margin-bottom:5px; align-items:center;">
+                            <select id="ifc-energie-${a.id}" onchange="updateChaufGen('ifc-energie-${a.id}', 'ifc-gen-${a.id}', 'ifc-emetteur-${a.id}')" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor); background:#fff;"><option value="">Énergie</option><option>Electrique</option><option>Gaz naturel</option><option>GPL</option><option>Fioul</option><option>Bois</option><option>Charbon</option></select>
+                            ${tempPhotos.chauf[a.id] ? `<img src="${tempPhotos.chauf[a.id]}" class="thumb" style="width:34px;height:34px;margin:0;" onclick="viewImage(this.src)">` : ''}
+                            <button class="btn-xs" style="background:var(--acc-l); color:var(--acc); border:1px solid #BFDBFE; padding:8px 12px; font-size:16px;" onclick="triggerUpload('chaufIndTemp', '${a.id}')">📷</button>
+                        </div>
+                        <select id="ifc-gen-${a.id}" onchange="checkChaudiereECS('ind', '${a.id}')" style="width:100%; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid var(--bor); background:#fff;"><option value="">Générateur</option></select>
+                        <select id="ifc-emetteur-${a.id}" style="width:100%; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid var(--bor); background:#fff;"><option value="">Émetteur</option></select>
+                        <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="number" inputmode="numeric" pattern="[0-9]*" id="ifc-annee-${a.id}" placeholder="Année" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"><input type="number" inputmode="decimal" step="any" id="ifc-puissance-${a.id}" placeholder="Puiss. kW" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"></div>
+                        <button id="btn-chauf-${a.id}" class="btn-s" style="padding:8px; width:100%;" onclick="ajouterChauf('${a.id}')">Ajouter Chauffage</button>
+                    </div>
+                    <div style="background:#F8FAFC; padding:10px; border-radius:8px; border:1px solid var(--bor); margin-top:10px;">
+                        <div style="font-weight:bold; font-size:12px; margin-bottom:5px;">🚿 ECS indiv.</div>
+                        <div id="ecs-list-${a.id}">${buildEcsListHTML(a.id)}</div>
+                        <div style="display:flex; gap:8px; margin-bottom:5px; align-items:center;">
+                            <select id="ife-energie-${a.id}" onchange="updateEcsGen('ife-energie-${a.id}', 'ife-type-${a.id}')" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor); background:#fff;"><option value="">Énergie</option><option>Electrique</option><option>Gaz naturel</option><option>GPL</option><option>Fioul</option><option>Bois</option><option>Charbon</option></select>
+                            ${tempPhotos.ecs[a.id] ? `<img src="${tempPhotos.ecs[a.id]}" class="thumb" style="width:34px;height:34px;margin:0;" onclick="viewImage(this.src)">` : ''}
+                            <button class="btn-xs" style="background:var(--acc-l); color:var(--acc); border:1px solid #BFDBFE; padding:8px 12px; font-size:16px;" onclick="triggerUpload('ecsIndTemp', '${a.id}')">📷</button>
+                        </div>
+                        <select id="ife-type-${a.id}" style="width:100%; padding:8px; margin-bottom:5px; border-radius:6px; border:1px solid var(--bor); background:#fff;"><option value="">Type</option></select>
+                        <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="number" inputmode="numeric" pattern="[0-9]*" id="ife-annee-${a.id}" placeholder="Année" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"><input type="number" inputmode="numeric" pattern="[0-9]*" id="ife-vol-${a.id}" placeholder="Vol (L)" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--bor);"></div>
+                        <button id="btn-ecs-${a.id}" class="btn-s" style="padding:8px; width:100%;" onclick="ajouterEcs('${a.id}')">Ajouter ECS</button>
+                    </div>
+                    <div style="margin-top:15px; text-align:right;"><button class="btn-xs" style="color:var(--dan); border:1px solid var(--dan);" onclick="suppAppt('${a.id}')">Supprimer l'appartement</button></div>
+                </div>`;
+            }
+            const isCur = curAppt === a.id ? 'border: 2px solid var(--acc); background: #F8FAFC;' : '';
+            return `<div class="appt-card" style="${isCur}">
+                <div class="appt-header" onclick="toggleAppt('${a.id}')">
+                    <div style="flex:1;">
+                        <div class="appt-num">${a.num}${typeStr} <span style="font-size:12px; color:gray; font-weight:normal;">${a.surf?a.surf+'m²':''}</span></div>
+                        <div id="badges-${a.id}" style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;"></div>
+                    </div>
+                    <span style="color:var(--tx2); font-size:14px; padding-left:10px;">${isExp ? '▼' : '▶'}</span>
+                </div>
+                ${body}
+            </div>`;
+        }).join('');
+        db.appts.forEach(a => updateApptBadges(a.id));
+    }
+
+    function verifierAptActif(tab) {
+        let prefix = tab === 'murs' ? 'murs' : tab === 'fen' ? 'fen' : tab === 'portes' ? 'por' : tab === 'plafonds' ? 'plf' : 'pla';
+        let banner = document.getElementById(prefix + '-apt-banner'); let nivContainer = document.getElementById(prefix + '-niv-container');
+        if(!curAppt) {
+            banner.textContent = "⚠ Sélectionnez un appartement dans l'onglet 'Appts'"; banner.style.background = "var(--dan-l)"; banner.style.color = "var(--dan)";
+            if(nivContainer) nivContainer.innerHTML = ''; if(tab === 'murs') document.getElementById('m-h').value = '';
+        } else {
+            let apt = db.appts.find(a => a.id === curAppt); let typeText = apt.type === 2 ? " (Duplex)" : apt.type === 3 ? " (Triplex)" : "";
+            banner.textContent = "Saisie en cours : " + apt.num + typeText; banner.style.background = "var(--ok-l)"; banner.style.color = "var(--ok)";
+            if (apt.type && apt.type > 1) {
+                let html = '<div style="display:flex; gap:5px; margin-bottom:15px;">';
+                for(let i=0; i<apt.type; i++) { let active = (curNivInt === i) ? 'niv-on' : 'niv-off'; let lbl = i === 0 ? "Niveau Bas" : i === 1 ? (apt.type === 3 ? "Niveau Inter." : "Niveau Haut") : "Niveau Haut"; html += `<button class="niv-btn ${active}" onclick="setNivInt(${i}, '${tab}')">${lbl}</button>`; }
+                html += '</div>'; if(nivContainer) nivContainer.innerHTML = html;
+            } else { curNivInt = 0; if(nivContainer) nivContainer.innerHTML = ''; }
+            if(tab === 'murs' && !editParoiId) { document.getElementById('m-h').value = apt.hsp || ''; }
+        }
+    }
+
+    function sauverParoi(type) {
+        if(!curAppt) return alert("Sélectionnez un appartement !");
+        let el = editParoiId ? db[type].find(x => x.id === editParoiId) : { id: Date.now(), aid: curAppt }; el.nivInt = curNivInt; 
+        if(type === 'murs') { 
+            let oldOri = el.ori; el.ori = document.getElementById('m-ori').value; el.donne = document.getElementById('m-donne').value; el.mat = document.getElementById('m-mat').value; el.l = document.getElementById('m-l').value; el.h = document.getElementById('m-h').value; el.ep = document.getElementById('m-ep').value; el.doub = document.getElementById('m-doub').value; el.iso = document.getElementById('m-iso').value; el.isoEp = document.getElementById('m-iso-ep').value; 
+            if (el.vectX !== undefined && oldOri !== el.ori) { delete el.vectX; delete el.vectY; }
+        } else if (type === 'fens') { 
+            let ftype = document.getElementById('f-type').value; let fmat = document.getElementById('f-mat').value; let fvit = document.getElementById('f-vit').value; let fep = document.getElementById('f-ep').value; let ffer = document.getElementById('f-fer').value; let fl = document.getElementById('f-l').value; let fh = document.getElementById('f-h').value; let fdiam = document.getElementById('f-diam') ? document.getElementById('f-diam').value : ''; let fsurf = 0;
+            if (ftype === 'Hublot') { fl = ''; fh = ''; fsurf = (Math.PI * Math.pow((parseFloat(fdiam)||0)/2, 2) / 10000).toFixed(3); } else { fdiam = ''; fsurf = (((parseFloat(fl)||0) * (parseFloat(fh)||0)) / 10000).toFixed(3); }
+            let dimStr = ftype === 'Hublot' ? `Ø${fdiam}` : `${fl}x${fh}`; let modName = `Modèle ${db.modelesFens.length + 1} (${fmat} ${dimStr})`;
+            let existingMod = db.modelesFens.find(m => m.type === ftype && m.mat === fmat && m.vit === fvit && m.ep === fep && m.fer === ffer && m.l === fl && m.h === fh && m.diam === fdiam); if(!existingMod) { existingMod = { id: 'mod_' + Date.now(), nom: modName, type:ftype, mat:fmat, vit:fvit, ep:fep, fer:ffer, l:fl, h:fh, diam:fdiam }; db.modelesFens.push(existingMod); renderBibliFens(); }
+            if (!editParoiId) { let maxFen = 0; db.fens.forEach(f => { if(f.nom) { let m = f.nom.match(/Fenêtre (\d+)/); if(m && parseInt(m[1]) > maxFen) maxFen = parseInt(m[1]); } }); el.nom = "Fenêtre " + (maxFen + 1); }
+            el.ori = document.getElementById('f-ori').value; el.type = ftype; el.mat = fmat; el.vit = fvit; el.ep = fep; el.fer = ffer; el.l = fl; el.h = fh; el.diam = fdiam; el.surf = fsurf; el.nb = document.getElementById('f-nb').value; el.motifs = document.getElementById('f-motifs').value; 
+        } else if (type === 'portes') { el.type = document.getElementById('po-type').value; el.mat = document.getElementById('po-mat').value; el.donne = document.getElementById('po-donne').value; el.iso = document.getElementById('po-iso').value; el.sas = document.getElementById('po-sas').value; el.l = document.getElementById('po-l').value; el.h = document.getElementById('po-h').value; } else if (type === 'plfs') { el.type = document.getElementById('p-type').value; el.donne = document.getElementById('p-donne').value; el.l = document.getElementById('p-l').value; el.larg = document.getElementById('p-larg').value; el.s = document.getElementById('p-s').value; el.iso = document.getElementById('p-iso').value; el.isoEp = document.getElementById('p-iso-ep').value;} else if (type === 'plas') { el.type = document.getElementById('s-type').value; el.donne = document.getElementById('s-donne').value; el.l = document.getElementById('s-l').value; el.larg = document.getElementById('s-larg').value; el.s = document.getElementById('s-s').value; el.iso = document.getElementById('s-iso').value; el.isoEp = document.getElementById('s-iso-ep').value;}
+        if(!editParoiId) db[type].push(el); editParoiId = null; document.getElementById('btn-save-' + type).textContent = "Enregistrer"; sauvegarderLocal(); renderElementsList(type);
+        if(type === 'murs') { document.getElementById('m-l').value = ''; drawCroquis(); } else if (type === 'fens') { document.getElementById('f-bibli').value = ''; document.getElementById('f-l').value = ''; document.getElementById('f-h').value = ''; document.getElementById('f-diam').value = ''; document.getElementById('f-nb').value = '1'; document.getElementById('f-motifs').value = '1'; } else { document.querySelectorAll(`#vw-${type} input[type="number"]`).forEach(i => i.value = ''); } toast("Élément enregistré ✓");
+    }
+
+    function editerParoi(type, id) {
+        editParoiId = id; const p = db[type].find(x => x.id === id);
+        if(type === 'murs') { document.getElementById('m-ori').value = p.ori; document.getElementById('m-donne').value = p.donne; document.getElementById('m-mat').value = p.mat; document.getElementById('m-l').value = p.l; document.getElementById('m-h').value = p.h; document.getElementById('m-ep').value = p.ep || ''; document.getElementById('m-doub').value = p.doub || 'ABSENT'; document.getElementById('m-iso').value = p.iso || 'Non'; document.getElementById('m-iso-ep').value = p.isoEp || ''; document.getElementById('btn-save-murs').textContent = "Modifier ce mur"; } else if (type === 'fens') { document.getElementById('f-bibli').value = ''; document.getElementById('f-ori').value = p.ori || 'Nord'; document.getElementById('f-type').value = p.type; toggleFenType(); document.getElementById('f-mat').value = p.mat; document.getElementById('f-vit').value = p.vit; document.getElementById('f-ep').value = p.ep || ''; document.getElementById('f-fer').value = p.fer; document.getElementById('f-l').value = p.l || ''; document.getElementById('f-h').value = p.h || ''; if(document.getElementById('f-diam')) document.getElementById('f-diam').value = p.diam || ''; document.getElementById('f-nb').value = p.nb || '1'; document.getElementById('f-motifs').value = p.motifs || '1'; document.getElementById('btn-save-fens').textContent = "Modifier cette fenêtre"; } else if (type === 'portes') { document.getElementById('po-type').value = p.type || 'Porte opaque pleine'; document.getElementById('po-mat').value = p.mat || 'Bois'; document.getElementById('po-donne').value = p.donne || 'Extérieur'; document.getElementById('po-iso').value = p.iso || 'Non isolée / Inconnue'; document.getElementById('po-sas').value = p.sas || 'Non'; document.getElementById('po-l').value = p.l || ''; document.getElementById('po-h').value = p.h || ''; document.getElementById('btn-save-portes').textContent = "Modifier cette porte"; } else if (type === 'plfs') { document.getElementById('p-type').value = p.type; document.getElementById('p-donne').value = p.donne; document.getElementById('p-l').value = p.l || ''; document.getElementById('p-larg').value = p.larg || ''; document.getElementById('p-s').value = p.s || ''; document.getElementById('p-iso').value = p.iso || 'Non'; document.getElementById('p-iso-ep').value = p.isoEp || ''; document.getElementById('btn-save-plfs').textContent = "Modifier ce plafond"; } else if (type === 'plas') { document.getElementById('s-type').value = p.type; document.getElementById('s-donne').value = p.donne; document.getElementById('s-l').value = p.l || ''; document.getElementById('s-larg').value = p.larg || ''; document.getElementById('s-s').value = p.s || ''; document.getElementById('s-iso').value = p.iso || 'Non'; document.getElementById('s-iso-ep').value = p.isoEp || ''; document.getElementById('btn-save-plas').textContent = "Modifier ce plancher"; } window.scrollTo(0,0);
+    }
+
+    function clonerParoi(type, id) { const src = db[type].find(x => x.id === id); if(!src) return; const clone = {...src, id: Date.now() + Math.random(), nivInt: curNivInt}; if (type === 'fens') { let maxFen = 0; db.fens.forEach(f => { if(f.nom) { let m = f.nom.match(/Fenêtre (\d+)/); if(m && parseInt(m[1]) > maxFen) maxFen = parseInt(m[1]); } }); clone.nom = "Fenêtre " + (maxFen + 1); } db[type].push(clone); sauvegarderLocal(); renderElementsList(type); if(type === 'murs') drawCroquis(); toast("Élément cloné ✓"); }
+    function suppElement(type, id) { db[type] = db[type].filter(x => x.id !== id); sauvegarderLocal(); renderElementsList(type); if(type === 'murs') drawCroquis(); }
+    
+    function renderElementsList(tabId) {
+        if(!curAppt) return; let cont, data, type;
+        if(tabId === 'murs') { cont = document.getElementById('list-murs'); data = db.murs; type = 'murs'; } else if(tabId === 'fen' || tabId === 'fens') { cont = document.getElementById('list-fens'); data = db.fens; type = 'fens'; } else if(tabId === 'portes') { cont = document.getElementById('list-portes'); data = db.portes; type = 'portes'; } else if(tabId === 'plafonds' || tabId === 'plfs') { cont = document.getElementById('list-plfs'); data = db.plfs; type = 'plfs'; } else if(tabId === 'planchers' || tabId === 'plas') { cont = document.getElementById('list-plas'); data = db.plas; type = 'plas'; }
+        cont.innerHTML = data.filter(x => x.aid === curAppt && (x.nivInt || 0) === curNivInt).map(x => {
+            let dimText = ""; let titleText = x.mat || x.type;
+            if (type === 'fens') {
+                if (x.type === 'Hublot') { dimText = `Ø: ${x.diam||'?'}cm (Surf: ${x.surf||'?'}m²) | Lame: ${x.ep||'?'}mm | Qté: ${x.nb||1} (Motifs: ${x.motifs||1})`; } else { dimText = `Dim: ${x.l||'?'}x${x.h||'?'}cm | Lame: ${x.ep||'?'}mm | Qté: ${x.nb||1} (Motifs: ${x.motifs||1})`; }
+                let shortFenMat = (x.mat || '').replace("Menuiserie ", ""); if(shortFenMat === "métallique avec rupture de pont thermique") shortFenMat = "Métal (avec RPT)"; if(shortFenMat === "métallique sans rupture de pont thermique") shortFenMat = "Métal (sans RPT)"; shortFenMat = shortFenMat.charAt(0).toUpperCase() + shortFenMat.slice(1); titleText = `${x.nom ? x.nom + ' - ' : ''}${shortFenMat}`;
+            } else if (type === 'plfs' || type === 'plas') { if (x.s) dimText = `Surf: ${x.s}m²`; else dimText = `Dim: ${x.l||'?'} x ${x.larg||'?'}m`; if(x.iso && x.iso !== 'Non') dimText += ` | Iso: ${x.iso}${x.isoEp ? ' '+x.isoEp+'cm' : ''}`;
+            } else if (type === 'murs') { dimText = `Dim: ${x.l||'?'} x ${x.h||'?'}m`; if(x.ep) dimText += ` | Ep: ${x.ep}cm`; if(x.iso && x.iso !== 'Non') dimText += ` | Iso: ${x.iso}${x.isoEp ? ' '+x.isoEp+'cm' : ''}`; if (x.vectX !== undefined) titleText = "Mur (Fermeture auto)";
+            } else if (type === 'portes') { dimText = `Dim: ${x.l||'?'} x ${x.h||'?'}m | Iso: ${x.iso||'Non'} | Sas: ${x.sas||'Non'}`; titleText = `${x.type} (${x.mat || '?'})`; }
+            const badgeText = type === 'fens' ? (x.ori || 'N/A') : (type === 'portes' ? 'Porte' : (x.ori || 'Surf.'));
+            return `
+            <div class="item-row" style="align-items: flex-start;">
+                <div class="item-details" style="flex:1; padding-right:12px; min-width:0;">
+                    <div style="margin-bottom: 6px;"><span class="badge">${badgeText}</span> <b style="font-size:14px; color:var(--tx);">${titleText}</b></div>
+                    <div style="color:var(--tx2); font-size:12px; line-height:1.5; word-wrap: break-word;">${dimText}</div>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; width: 94px; justify-content:flex-start; flex-shrink:0;">
+                    <button class="btn-xs" style="color:var(--ok); background:var(--ok-l); border:1px solid #BBF7D0; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="clonerParoi('${type}', ${x.id})">🔄</button>
+                    <button class="btn-xs" style="color:var(--acc); background:var(--acc-l); border:1px solid #BFDBFE; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="editerParoi('${type}', ${x.id})">✏️</button>
+                    <button class="btn-xs" style="color:var(--dan); background:var(--dan-l); border:1px solid #FECACA; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; font-size:18px; border-radius:10px;" onclick="suppElement('${type}', ${x.id})">❌</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // --- 10. EXPORTS (JSON, EXCEL, ZIP) ---
+    function toggleFenType() {
+        const type = document.getElementById('f-type'); const lh = document.getElementById('f-dim-lh'); const diam = document.getElementById('f-dim-diam');
+        if(type && lh && diam) { if(type.value === 'Hublot') { lh.style.display = 'none'; diam.style.display = 'block'; } else { lh.style.display = 'block'; diam.style.display = 'none'; } }
+    }
+
+    function exportData() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.setAttribute("href", dataStr); a.setAttribute("download", "MyDiag_Backup_" + Date.now() + ".json"); document.body.appendChild(a); a.click(); a.remove(); }
+    
+    function exportExcel() {
+        if (typeof XLSX === 'undefined') return alert("La bibliothèque XLSX n'est pas chargée."); toast("Génération du fichier Excel..."); let wb = XLSX.utils.book_new(); const getAptNum = (id) => { let a = db.appts.find(x=>x.id===id); return a ? a.num : "Inconnu"; };
+        let coproData = [{ "Référence": db.copro.ref || "", "Nom": db.copro.nom || "", "Adresse": db.copro.adresse || "", "Année": db.copro.annee || "", "Bâtiments": db.copro.batiments || "", "Étages": db.copro.etages || "", "VMC Type": db.vmc.type || "", "VMC Période": db.vmc.periode || "", "Chauff Col. Energie": db.chaufCol.energie || "", "Chauff Col. Générateur": db.chaufCol.gen || "", "Chauff Col. Emetteur": db.chaufCol.emetteur || "", "Chauff Col. Année": db.chaufCol.annee || "", "Chauff Col. Puissance": db.chaufCol.puissance || "", "ECS Col. Energie": db.ecsCol.energie || "", "ECS Col. Type": db.ecsCol.type || "", "ECS Col. Année": db.ecsCol.annee || "", "ECS Col. Volume": db.ecsCol.vol || "" }]; XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(coproData), "Copropriété");
+        let apptsData = db.appts.map(a => ({ "Lot": a.num, "Bâtiment": a.bat || "", "Type": a.type === 2 ? "Duplex" : a.type === 3 ? "Triplex" : "Plain-pied", "Étage": a.etage || "", "Niveau ADN": a.niveau || "", "Surface (m²)": a.surf || "", "HSP (m)": a.hsp || "" })); if(apptsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(apptsData), "Appartements");
+        let mursData = db.murs.map(m => ({ "Lot": getAptNum(m.aid), "Niveau (Duplex)": m.nivInt || 0, "Orientation": m.ori || "Auto", "Donne sur": m.donne || "", "Matériau": m.mat || "", "Longueur (m)": m.l || "", "Hauteur (m)": m.h || "", "Épaisseur (cm)": m.ep || "", "Doublage": m.doub || "ABSENT", "Isolant": m.iso || "", "Ép. Isolant (cm)": m.isoEp || "" })); if(mursData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mursData), "Murs");
+        let fensData = db.fens.map(f => ({ "Lot": getAptNum(f.aid), "Niveau": f.nivInt || 0, "Repère": f.nom || "", "Orientation": f.ori || "", "Type": f.type || "", "Matériau": f.mat || "", "Vitrage": f.vit || "", "Ép. Lame (mm)": f.ep || "", "Fermeture": f.fer || "", "Largeur (cm)": f.l || "", "Hauteur (cm)": f.h || "", "Diamètre (cm)": f.diam || "", "Surface Unitaire (m²)": f.surf || "", "Quantité": f.nb || 1, "Motifs": f.motifs || 1 })); if(fensData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fensData), "Fenêtres");
+        let portesData = db.portes.map(p => ({ "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type": p.type || "", "Matériau": p.mat || "", "Donne sur": p.donne || "", "Isolation": p.iso || "", "Sas": p.sas || "", "Largeur (m)": p.l || "", "Hauteur (m)": p.h || "" })); if(portesData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(portesData), "Portes");
+        let plfsData = db.plfs.map(p => ({ "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type ADN": p.type || "", "Donne sur": p.donne || "", "Longueur (m)": p.l || "", "Largeur (m)": p.larg || "", "Surface (m²)": p.s || "", "Isolant": p.iso || "", "Ép. Isolant (cm)": p.isoEp || "" })); if(plfsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plfsData), "Plafonds");
+        let plasData = db.plas.map(p => ({ "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type ADN": p.type || "", "Donne sur": p.donne || "", "Longueur (m)": p.l || "", "Largeur (m)": p.larg || "", "Surface (m²)": p.s || "", "Isolant": p.iso || "", "Ép. Isolant (cm)": p.isoEp || "" })); if(plasData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plasData), "Planchers");
+        let chaufsData = db.chaufs.map(c => ({ "Lot": getAptNum(c.aptId), "Énergie": c.energie || "", "Générateur": c.gen || "", "Émetteur": c.emetteur || "", "Année": c.annee || "", "Puissance (kW)": c.puissance || "" })); if(chaufsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(chaufsData), "Chauffages");
+        let ecsData = db.ecss.map(e => ({ "Lot": getAptNum(e.aptId), "Énergie": e.energie || "", "Type/Générateur": e.type || "", "Année": e.annee || "", "Volume (L)": e.vol || "" })); if(ecsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ecsData), "ECS");
+        let d = new Date(); let fName = `Export_MyDiag_${db.copro.ref||'Projet'}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.xlsx`; XLSX.writeFile(wb, fName);
+    }
+    
+    async function exportZip() {
+        if (typeof JSZip === 'undefined') return alert("La bibliothèque JSZip n'est pas chargée."); toast("Préparation du ZIP en cours..."); let zip = new JSZip(); let hasPhotos = false;
+        if (db.docs && db.docs.length > 0) { let docFolder = zip.folder("Documents_Copro"); db.docs.forEach((d, i) => { if (d.data && d.data.includes('base64,')) { let b64 = d.data.split(',')[1]; let ext = d.type === 'img' ? '.png' : '.pdf'; docFolder.file(d.name || `doc_${i}${ext}`, b64, {base64: true}); hasPhotos = true; } }); }
+        let coproFolder = zip.folder("Systemes_Collectifs");
+        if (db.chaufCol && db.chaufCol.photo && db.chaufCol.photo.includes('base64,')) { coproFolder.file("Plaque_Chauffage_Collectif.png", db.chaufCol.photo.split(',')[1], {base64: true}); hasPhotos = true; }
+        if (db.ecsCol && db.ecsCol.photo && db.ecsCol.photo.includes('base64,')) { coproFolder.file("Plaque_ECS_Collective.png", db.ecsCol.photo.split(',')[1], {base64: true}); hasPhotos = true; }
+        let indFolder = zip.folder("Systemes_Individuels");
+        db.chaufs.forEach((c, i) => { if (c.photo && c.photo.includes('base64,')) { let apt = db.appts.find(a => a.id === c.aptId); let aNum = apt ? apt.num : "Inconnu"; indFolder.file(`Chauffage_${aNum}_${i+1}.png`, c.photo.split(',')[1], {base64: true}); hasPhotos = true; } });
+        db.ecss.forEach((e, i) => { if (e.photo && e.photo.includes('base64,')) { let apt = db.appts.find(a => a.id === e.aptId); let aNum = apt ? apt.num : "Inconnu"; indFolder.file(`ECS_${aNum}_${i+1}.png`, e.photo.split(',')[1], {base64: true}); hasPhotos = true; } });
+        if (!hasPhotos) { toast("Aucune photo à exporter."); return; }
+        let content = await zip.generateAsync({type:"blob"}); let a = document.createElement("a"); a.href = URL.createObjectURL(content); let d = new Date(); a.download = `Photos_MyDiag_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.zip`; document.body.appendChild(a); a.click(); document.body.removeChild(a); toast("ZIP téléchargé !");
+    }
 </script>
 
 </body>
