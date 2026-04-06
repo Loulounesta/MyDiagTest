@@ -574,9 +574,14 @@
 
     function saveCoproData() {
         db.copro = { 
-            ref: document.getElementById('copro-ref').value, nom: document.getElementById('copro-nom').value, 
-            adresse: document.getElementById('copro-adresse').value, annee: document.getElementById('copro-annee').value, 
-            batiments: document.getElementById('copro-batiments').value, etages: document.getElementById('copro-etages').value
+            ref: document.getElementById('copro-ref').value, 
+            nom: document.getElementById('copro-nom').value, 
+            adresse: document.getElementById('copro-adresse').value,
+            cp: document.getElementById('copro-cp').value,
+            ville: document.getElementById('copro-ville').value,
+            annee: document.getElementById('copro-annee').value, 
+            batiments: document.getElementById('copro-batiments').value, 
+            etages: document.getElementById('copro-etages').value
         };
         updateDashboard(); 
         sauvegarderLocal();
@@ -695,7 +700,8 @@
         if(data) db = data;
         renderDocs();
         updateDashboard();
-        ['copro-ref','copro-nom','copro-adresse','copro-annee','copro-batiments','copro-etages'].forEach(id => {
+        // Ajout de copro-cp et copro-ville dans la boucle de chargement
+        ['copro-ref','copro-nom','copro-adresse','copro-cp','copro-ville','copro-annee','copro-batiments','copro-etages'].forEach(id => {
             let k = id.replace('copro-',''); if(db.copro[k]) document.getElementById(id).value = db.copro[k];
         });
         peuplerSelects();
@@ -1480,7 +1486,7 @@
     function exportExcel() {
         if (typeof XLSX === 'undefined') return alert("La bibliothèque XLSX n'est pas chargée."); toast("Génération du fichier Excel..."); let wb = XLSX.utils.book_new(); 
         const getAptNum = (id) => { if(id === 'copro') return 'Communs'; let a = db.appts.find(x=>x.id===id); return a ? a.num : "Inconnu"; };
-        let coproData = [{ "Référence": db.copro.ref || "", "Nom": db.copro.nom || "", "Adresse": db.copro.adresse || "", "Année": db.copro.annee || "", "Bâtiments": db.copro.batiments || "", "Étages": db.copro.etages || "", "VMC Type": db.vmc.type || "", "VMC Période": db.vmc.periode || "", "Chauff Col. Energie": db.chaufCol.energie || "", "Chauff Col. Générateur": db.chaufCol.gen || "", "Chauff Col. Emetteur": db.chaufCol.emetteur || "", "Chauff Col. Année": db.chaufCol.annee || "", "Chauff Col. Puissance": db.chaufCol.puissance || "", "ECS Col. Energie": db.ecsCol.energie || "", "ECS Col. Type": db.ecsCol.type || "", "ECS Col. Année": db.ecsCol.annee || "", "ECS Col. Volume": db.ecsCol.vol || "" }]; XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(coproData), "Copropriété");
+        let coproData = [{ "Référence": db.copro.ref || "", "Nom": db.copro.nom || "", "Adresse": db.copro.adresse || "","Code Postal": db.copro.cp || "",  "Ville": db.copro.ville || "",  "Année": db.copro.annee || "", "Année": db.copro.annee || "", "Bâtiments": db.copro.batiments || "", "Étages": db.copro.etages || "", "VMC Type": db.vmc.type || "", "VMC Période": db.vmc.periode || "", "Chauff Col. Energie": db.chaufCol.energie || "", "Chauff Col. Générateur": db.chaufCol.gen || "", "Chauff Col. Emetteur": db.chaufCol.emetteur || "", "Chauff Col. Année": db.chaufCol.annee || "", "Chauff Col. Puissance": db.chaufCol.puissance || "", "ECS Col. Energie": db.ecsCol.energie || "", "ECS Col. Type": db.ecsCol.type || "", "ECS Col. Année": db.ecsCol.annee || "", "ECS Col. Volume": db.ecsCol.vol || "" }]; XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(coproData), "Copropriété");
         let apptsData = db.appts.map(a => ({ "Lot": a.num, "Bâtiment": a.bat || "", "Type": a.type === 2 ? "Duplex" : a.type === 3 ? "Triplex" : "Plain-pied", "Étage": a.etage || "", "Niveau ADN": a.niveau || "", "Surface (m²)": a.surf || "", "HSP (m)": a.hsp || "" })); if(apptsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(apptsData), "Appartements");
         let mursData = db.murs.map(m => ({ "Lot": getAptNum(m.aid), "Niveau (Duplex)": m.nivInt || 0, "Orientation": m.ori || "Auto", "Donne sur": m.donne || "", "Matériau": m.mat || "", "Longueur (m)": m.l || "", "Hauteur (m)": m.h || "", "Épaisseur (cm)": m.ep || "", "Doublage": m.doub || "ABSENT", "Isolant": m.iso || "", "Ép. Isolant (cm)": m.isoEp || "" })); if(mursData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mursData), "Murs");
         let fensData = db.fens.map(f => ({ "Lot": getAptNum(f.aid), "Niveau": f.nivInt || 0, "Repère": f.nom || "", "Orientation": f.ori || "", "Type": f.type || "", "Matériau": f.mat || "", "Vitrage": f.vit || "", "Ép. Lame (mm)": f.ep || "", "Fermeture": f.fer || "", "Largeur (cm)": f.l || "", "Hauteur (cm)": f.h || "", "Diamètre (cm)": f.diam || "", "Surface Unitaire (m²)": f.surf || "", "Quantité": f.nb || 1, "Motifs": f.motifs || 1 })); if(fensData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fensData), "Fenêtres");
