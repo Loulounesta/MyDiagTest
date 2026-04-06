@@ -507,7 +507,14 @@
         <div style="font-size:14px; color:var(--tx2); margin-bottom:24px; line-height:1.6;">
             Exportez vos relevés au format adapté pour préparer le transfert vers votre logiciel de certification.
         </div>
+        <button class="btn-p" onclick="exportData()" style="background:#475569; margin-top:24px;">📥 BACKUP JSON</button>
         
+        <hr style="border:0; border-top:1px solid var(--bor); margin:32px 0 24px;">
+        <div style="font-size:14px; color:var(--tx2); margin-bottom:16px; font-weight:800; text-transform:uppercase;">✉️ Communications</div>
+        
+        <button class="btn-p" onclick="envoyerMailExport()" style="background:#0284C7;">📧 PRÉPARER L'E-MAIL D'EXPORT</button>
+        <button class="btn-p" onclick="envoyerMailRDV()" style="background:#8B5CF6; margin-top:12px;">📅 DEMANDE DE RDV (ÉCHANTILLONS)</button>
+        <button class="btn" style="background:var(--dan-l); color:var(--dan); margin-top:40px; border:1px solid #FECACA; width:100%; padding:14px; font-weight:bold; border-radius:10px;" onclick="resetProjet()">🗑️ RESET TOTAL DU PROJET</button>
         <button class="btn-p" onclick="exportExcel()" style="background:var(--ok);">📊 EXPORTER EXCEL</button>
         <button class="btn-p" onclick="exportZip()" style="background:var(--warn); margin-top:12px;">📸 EXPORTER PHOTOS (ZIP)</button>
         <button class="btn-p" onclick="exportData()" style="background:#475569; margin-top:24px;">📥 BACKUP JSON</button>
@@ -1495,6 +1502,29 @@
         if (!hasPhotos) { toast("Aucune photo à exporter."); return; }
         let content = await zip.generateAsync({type:"blob"}); let a = document.createElement("a"); a.href = URL.createObjectURL(content); let d = new Date(); a.download = `Photos_MyDiag_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.zip`; document.body.appendChild(a); a.click(); document.body.removeChild(a); toast("ZIP téléchargé !");
     }
+    // --- EMAILS ---
+    window.envoyerMailExport = function() {
+        const ref = db.copro.ref || "Sans_Ref";
+        const nom = db.copro.nom || "Copropriété non renseignée";
+        const subject = encodeURIComponent(`Dossier DPE - Réf: ${ref} - ${nom}`);
+        const body = encodeURIComponent(`Bonjour,\n\nVeuillez trouver ci-joint les exports (Excel, Photos ZIP et Backup JSON) pour le dossier DPE référence ${ref}.\n\n⚠️ PENSEZ À JOINDRE LES 3 FICHIERS TÉLÉCHARGÉS AVANT D'ENVOYER CE MAIL.\n\nCordialement.`);
+        
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        toast("Ouverture de la messagerie...");
+    };
+
+    window.envoyerMailRDV = function() {
+        const ref = db.copro.ref || "Sans_Ref";
+        const nom = db.copro.nom || "";
+        const subject = encodeURIComponent(`Demande de RDV supplémentaires - Réf: ${ref}`);
+        const body = encodeURIComponent(`Bonjour,\n\nLors de ma visite sur le dossier "${nom}" (Réf: ${ref}), je n'ai pas pu accéder à tous les échantillons nécessaires pour la représentativité du DPE.\n\nPourriez-vous s'il vous plaît planifier des rendez-vous supplémentaires avec les occupants manquants ?\n\nMerci d'avance pour votre retour.\n\nCordialement.`);
+        
+        // Remplace "admin@tonentreprise.fr" par la vraie adresse si tu veux que ce soit pré-rempli
+        const adresseAdmin = ""; 
+        
+        window.location.href = `mailto:${adresseAdmin}?subject=${subject}&body=${body}`;
+        toast("Ouverture de la messagerie...");
+    };
 </script>
 
 </body>
