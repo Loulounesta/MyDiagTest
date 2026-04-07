@@ -633,7 +633,8 @@
             addrEl.style.display = 'flex';
             addrEl.querySelector('span').textContent = fullAddr;
             // Utilisation du format d'URL officiel de Google Maps (API universelle)
-            addrEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddr)}`;        } else {
+            addrEl.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddr)}`;
+        } else {  
             addrEl.style.display = 'none';
         }
         
