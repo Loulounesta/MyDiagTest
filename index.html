@@ -1056,21 +1056,7 @@ FEN_FERMETURE: ["Absence", "Jalousie accordéon", "Fermeture sans ajours, volets
         if(db.ecsCol.photo) { ecsImg.src = db.ecsCol.photo; ecsImg.style.display = 'block'; } else { ecsImg.style.display = 'none'; }
     }
 
-    function isSchemaClosed(aptId) {
-        const mursApt = db.murs.filter(m => m.aid === aptId && (m.nivInt||0) === curNivInt);
-        if (mursApt.length < 3) return false;
-        let curX = 0, curY = 0;
-        mursApt.forEach(m => {
-            let l = parseFloat(m.l) || 0;
-            if (m.vectX !== undefined && m.vectY !== undefined) {
-                let origL = Math.sqrt(m.vectX*m.vectX + m.vectY*m.vectY);
-                if (origL > 0) { curX += m.vectX * (l / origL); curY += m.vectY * (l / origL); } else { curX += m.vectX; curY += m.vectY; }
-            } else {
-                if (m.ori === 'Nord') curX += l; else if (m.ori === 'Est') curY += l; else if (m.ori === 'Sud') curX -= l; else if (m.ori === 'Ouest') curY -= l;
-            }
-        });
-        return Math.sqrt(curX*curX + curY*curY) <= 0.15;
-    }
+    
 
     window.fermerPolygone = function(aptId, cX, cY) {
         let dx = -cX; let dy = -cY; let l = Math.sqrt(dx*dx + dy*dy).toFixed(2);
@@ -1099,6 +1085,18 @@ FEN_FERMETURE: ["Absence", "Jalousie accordéon", "Fermeture sans ajours, volets
         toast('Mur de fermeture (' + l + 'm) généré avec succès.');
     };
 
+function getShortMat(mat) {
+        if(!mat) return ""; 
+        if(mat.includes("Pierre")) return "Pierre"; 
+        if(mat.includes("Béton banché")) return "Béton"; 
+        if(mat.includes("Blocs de béton")) return "Parpaing"; 
+        if(mat.includes("Briques pleines")) return "Brique pl."; 
+        if(mat.includes("Briques creuses") || mat.includes("alvéolaire")) return "Brique cr."; 
+        if(mat.includes("Pisé")) return "Pisé"; 
+        if(mat.includes("bois")) return "Bois"; 
+        return "Inc.";
+    }
+    
     function drawCroquis() {
         const canvas = document.getElementById('croquis-canvas'); if (!canvas) return;
         const ctx = canvas.getContext('2d'); const container = document.getElementById('croquis-container'); const msg = document.getElementById('croquis-msg');
