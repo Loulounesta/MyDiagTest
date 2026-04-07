@@ -1198,10 +1198,25 @@
     }
 
     function chargerModeleFen(modId) {
-        if(!modId) { ['f-type','f-mat','f-vit','f-ep','f-fer','f-l','f-h', 'f-diam'].forEach(id => { let el = document.getElementById(id); if(el) el.value = ''; }); toggleFenType(); return; }
+        if(!modId) { 
+            ['f-type','f-mat','f-vit','f-ep','f-fer','f-l','f-h', 'f-diam'].forEach(id => { let el = document.getElementById(id); if(el) el.value = ''; }); 
+            toggleFenType(); 
+            return; 
+        }
         const m = db.modelesFens.find(x => x.id === modId);
         if(m) {
-            document.getElementById('f-type').value = m.type; toggleFenType(); document.getElementById('f-mat').value = m.mat; document.getElementById('f-vit').value = m.vit; document.getElementById('f-ep').value = m.ep || ''; document.getElementById('f-fer').value = m.fer; document.getElementById('f-l').value = m.l; document.getElementById('f-h').value = m.h; if(document.getElementById('f-diam')) document.getElementById('f-diam').value = m.diam || '';
+            document.getElementById('f-type').value = m.type; toggleFenType(); 
+            document.getElementById('f-mat').value = m.mat; 
+            document.getElementById('f-vit').value = m.vit; 
+            document.getElementById('f-ep').value = m.ep || ''; 
+            document.getElementById('f-fer').value = m.fer; 
+            document.getElementById('f-l').value = m.l; 
+            document.getElementById('f-h').value = m.h; 
+            if(document.getElementById('f-diam')) document.getElementById('f-diam').value = m.diam || '';
+            
+            // Nouveautés : chargement de l'orientation et des motifs
+            if(m.ori) document.getElementById('f-ori').value = m.ori;
+            if(m.motifs) document.getElementById('f-motifs').value = m.motifs;
         }
     }
 
