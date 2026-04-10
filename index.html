@@ -416,8 +416,9 @@
     <select id="fen-target" class="appt-target-sel" onchange="changeTargetApt(this.value, 'fen')"></select>
     <div id="fen-niv-container"></div>
     <div class="card">
-        <div class="fr"><select id="f-bibli" onchange="chargerModeleFen(this.value)" style="margin-left:0; background:#EFF6FF; border-color:#BFDBFE; color:#2563EB;"></select></div>
-        <div class="fr"><span class="fl">Orientation</span><select id="f-ori"><option>Nord</option><option>Est</option><option>Sud</option><option>Ouest</option></select></div>
+        <div style="font-size:12px; font-weight:900; color:var(--acc); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">📚 Légende de vos repères plan</div>
+        <div id="f-bibli-container" style="display:flex; overflow-x:auto; gap:10px; padding-bottom:12px; margin-bottom:12px; border-bottom:1px dashed var(--bor);">
+            </div>        <div class="fr"><span class="fl">Orientation</span><select id="f-ori"><option>Nord</option><option>Est</option><option>Sud</option><option>Ouest</option></select></div>
         <div class="fr"><span class="fl">Type</span><select id="f-type" onchange="toggleFenType()"></select></div>
         <div class="fr"><span class="fl">Matériau</span><select id="f-mat"></select></div>
         <div class="fr"><span class="fl">Vitrage</span><select id="f-vit"></select></div>
@@ -1308,27 +1309,38 @@ function getShortMat(mat) {
         sel.innerHTML = html;
     }
 
-    function chargerModeleFen(modId) {
-        if(!modId) { 
-            ['f-type','f-mat','f-vit','f-ep','f-fer','f-l','f-h', 'f-diam'].forEach(id => { let el = document.getElementById(id); if(el) el.value = ''; }); 
-            toggleFenType(); 
-            return; 
+    function renderBibliFens() {
+        const cont = document.getElementById('f-bibli-container'); 
+        if(!cont) return;
+        
+        // Bouton pour créer une nouvelle fenêtre à partir de zéro
+        let html = `
+        <div onclick="chargerModeleFen('')" style="flex: 0 0 auto; background: #F8FAFC; border: 2px dashed #CBD5E1; border-radius: 12px; padding: 12px; cursor: pointer; display:flex; align-items:center; justify-content:center; flex-direction:column; min-width: 100px; transition:0.2s;">
+            <div style="font-size:24px; margin-bottom:4px;">✨</div>
+            <div style="font-size:13px; font-weight:900; color:var(--tx2);">Nouvelle</div>
+        </div>`;
+
+        if(db.modelesFens && db.modelesFens.length > 0) {
+            db.modelesFens.forEach((m, index) => {
+                let repere = "F" + (index + 1); // Génère F1, F2, F3...
+                
+                // Formatage des infos pour que ce soit compact et lisible
+                let dimStr = m.type === 'Hublot' ? `Ø${m.diam}` : `${m.l}x${m.h}`;
+                let shortFer = m.fer && m.fer !== 'Absence' ? m.fer.substring(0, 14) + '...' : 'Sans volet';
+                let ori = m.ori ? m.ori.substring(0,1) : '-'; // N, S, E, O
+                
+                html += `
+                <div onclick="chargerModeleFen('${m.id}')" style="flex: 0 0 auto; background: var(--acc-l); border: 2px solid #BFDBFE; border-radius: 12px; padding: 12px; cursor: pointer; min-width: 140px; transition: 0.2s; box-shadow: 0 4px 10px rgba(37,99,235,0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="background:var(--acc); color:#fff; font-weight:900; font-size:16px; padding:4px 10px; border-radius:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">${repere}</span>
+                        <span style="font-size:14px; font-weight:900; color:var(--acc); background:#fff; padding:2px 8px; border-radius:6px;">${ori}</span>
+                    </div>
+                    <div style="font-size:14px; color:var(--tx); font-weight:900; margin-bottom:4px;">${dimStr} cm</div>
+                    <div style="font-size:11px; font-weight:700; color:var(--tx2);">${shortFer}</div>
+                </div>`;
+            });
         }
-        const m = db.modelesFens.find(x => x.id === modId);
-        if(m) {
-            document.getElementById('f-type').value = m.type; toggleFenType(); 
-            document.getElementById('f-mat').value = m.mat; 
-            document.getElementById('f-vit').value = m.vit; 
-            document.getElementById('f-ep').value = m.ep || ''; 
-            document.getElementById('f-fer').value = m.fer; 
-            document.getElementById('f-l').value = m.l; 
-            document.getElementById('f-h').value = m.h; 
-            if(document.getElementById('f-diam')) document.getElementById('f-diam').value = m.diam || '';
-            
-            // Nouveautés : chargement de l'orientation et des motifs
-            if(m.ori) document.getElementById('f-ori').value = m.ori;
-            if(m.motifs) document.getElementById('f-motifs').value = m.motifs;
-        }
+        cont.innerHTML = html;
     }
 
     function getBatimentOptionsHtml(selected = "") {
@@ -1678,8 +1690,11 @@ function getShortMat(mat) {
                 el.nom = "Fenêtre " + (maxFen + 1); 
             }
             el.ori = fori; el.type = ftype; el.mat = fmat; el.vit = fvit; el.ep = fep; el.fer = ffer; el.l = fl; el.h = fh; el.diam = fdiam; el.surf = fsurf; el.nb = document.getElementById('f-nb').value; el.motifs = fmotifs;        } else if (type === 'portes') { el.type = document.getElementById('po-type').value; el.mat = document.getElementById('po-mat').value; el.donne = document.getElementById('po-donne').value; el.iso = document.getElementById('po-iso').value; el.sas = document.getElementById('po-sas').value; el.l = document.getElementById('po-l').value; el.h = document.getElementById('po-h').value; } else if (type === 'plfs') { el.type = document.getElementById('p-type').value; el.donne = document.getElementById('p-donne').value; el.l = document.getElementById('p-l').value; el.larg = document.getElementById('p-larg').value; el.s = document.getElementById('p-s').value; el.iso = document.getElementById('p-iso').value; el.isoEp = document.getElementById('p-iso-ep').value;} else if (type === 'plas') { el.type = document.getElementById('s-type').value; el.donne = document.getElementById('s-donne').value; el.l = document.getElementById('s-l').value; el.larg = document.getElementById('s-larg').value; el.s = document.getElementById('s-s').value; el.iso = document.getElementById('s-iso').value; el.isoEp = document.getElementById('s-iso-ep').value;}
-        if(!editParoiId) db[type].push(el); editParoiId = null; document.getElementById('btn-save-' + type).textContent = "Enregistrer"; sauvegarderLocal(); renderElementsList(type);
-        
+            // On retrouve l'index du modèle pour le nommer F1, F2...
+            let modIndex = db.modelesFens.findIndex(m => m.type === ftype && m.mat === fmat && m.vit === fvit && m.ep === fep && m.fer === ffer && m.l === fl && m.h === fh && m.diam === fdiam && m.ori === fori && m.motifs === fmotifs);
+            if (!editParoiId) { 
+                el.nom = "F" + (modIndex + 1); 
+            }        
         // --- LOGIQUE DE MÉMOIRE : On ne vide que les dimensions pour l'élément suivant ---
         if(type === 'murs') { 
             document.getElementById('m-l').value = ''; // On garde HSP, Matière, Epaisseur, etc.
@@ -1743,14 +1758,85 @@ function getShortMat(mat) {
     }
 
     function exportData() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.setAttribute("href", dataStr); a.setAttribute("download", "MyDiag_Backup_" + Date.now() + ".json"); document.body.appendChild(a); a.click(); a.remove(); }
+
+    // Traducteur pour générer le code simplifié Annalyssimmo
+    function genererCodeFen(f) {
+        let rep = f.nom || "F?";
+        
+        // Abréviation du type
+        let typeAbr = "";
+        if(f.type) {
+            if(f.type === "Fenêtres battantes") typeAbr = "FB";
+            else if(f.type === "Fenêtres coulissantes") typeAbr = "FC";
+            else if(f.type === "Portes-fenêtres coulissantes") typeAbr = "PFC";
+            else if(f.type.includes("Portes-fenêtres battantes")) typeAbr = "PFB";
+            else if(f.type.includes("sans ouverture")) typeAbr = "Fixe";
+            else if(f.type.includes("toit")) typeAbr = "Velux";
+            else if(f.type === "Hublot") typeAbr = "Hublot";
+        }
+        
+        let ori = f.ori || "";
+        let dim = f.type === 'Hublot' ? `Ø${f.diam}` : `${f.l}x${f.h}`;
+        
+        // Abréviation du matériau
+        let matAbr = "";
+        if(f.mat) {
+            if(f.mat.includes("PVC")) matAbr = "PVC";
+            else if(f.mat.includes("bois/métal")) matAbr = "Bois/Métal";
+            else if(f.mat.includes("bois")) matAbr = "Bois";
+            else if(f.mat.includes("avec rupture")) matAbr = "Métal RPT";
+            else if(f.mat.includes("sans rupture")) matAbr = "Métal";
+        }
+        
+        // Abréviation du vitrage et intégration de la lame (ex: 4/16/4)
+        let vitAbr = "";
+        if(f.vit) {
+            if(f.vit.includes("Simple")) vitAbr = "SV";
+            else if(f.vit.includes("Double")) vitAbr = "DV" + (f.ep ? ` 4/${f.ep}/4` : "");
+            else if(f.vit.includes("Triple")) vitAbr = "TV" + (f.ep ? ` 4/${f.ep}/4/${f.ep}/4` : "");
+            else if(f.vit.includes("Survitrage")) vitAbr = "Surv.";
+            else if(f.vit.includes("Brique")) vitAbr = "Brique";
+            else if(f.vit.includes("Polycarbonate")) vitAbr = "Poly.";
+        }
+        
+        // Abréviation de la fermeture
+        let ferAbr = "";
+        if(f.fer) {
+            if(f.fer === "Absence") ferAbr = "sFerm";
+            else if(f.fer.includes("volets roulants Alu")) ferAbr = "aVR Alu";
+            else if(f.fer.includes("Volet roulant")) ferAbr = "aVR"; // aVR classique
+            else if(f.fer.includes("Persienne")) ferAbr = "aPers.";
+            else if(f.fer.includes("Jalousie")) ferAbr = "aJalousie";
+        }
+        
+        // On assemble le tout proprement !
+        return `${rep} ${typeAbr} ${ori} ${dim} ${matAbr} ${vitAbr} ${ferAbr}`.trim().replace(/\s+/g, ' ');
+    }
     
     function exportExcel() {
         if (typeof XLSX === 'undefined') return alert("La bibliothèque XLSX n'est pas chargée."); toast("Génération du fichier Excel..."); let wb = XLSX.utils.book_new(); 
         const getAptNum = (id) => { if(id === 'copro') return 'Communs'; let a = db.appts.find(x=>x.id===id); return a ? a.num : "Inconnu"; };
         let coproData = [{ "Référence": db.copro.ref || "", "Nom": db.copro.nom || "", "Adresse": db.copro.adresse || "", "Code Postal": db.copro.cp || "", "Ville": db.copro.ville || "", "Année constr.": db.copro.annee || "", "Bâtiments": db.copro.batiments || "", "Étages": db.copro.etages || "", "VMC Type": db.vmc.type || "", "VMC Période": db.vmc.periode || "", "Chauff Col. Energie": db.chaufCol.energie || "", "Chauff Col. Générateur": db.chaufCol.gen || "", "Chauff Col. Emetteur": db.chaufCol.emetteur || "", "Chauff Col. Année": db.chaufCol.annee || "", "Chauff Col. Puissance": db.chaufCol.puissance || "", "ECS Col. Energie": db.ecsCol.energie || "", "ECS Col. Type": db.ecsCol.type || "", "ECS Col. Année": db.ecsCol.annee || "", "ECS Col. Volume": db.ecsCol.vol || "" }];        let apptsData = db.appts.map(a => ({ "Lot": a.num, "Bâtiment": a.bat || "", "Type": a.type === 2 ? "Duplex" : a.type === 3 ? "Triplex" : "Plain-pied", "Étage": a.etage || "", "Niveau ADN": a.niveau || "", "Surface (m²)": a.surf || "", "HSP (m)": a.hsp || "" })); if(apptsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(apptsData), "Appartements");
         let mursData = db.murs.map(m => ({ "Lot": getAptNum(m.aid), "Niveau (Duplex)": m.nivInt || 0, "Orientation": m.ori || "Auto", "Donne sur": m.donne || "", "Matériau": m.mat || "", "Longueur (m)": m.l || "", "Hauteur (m)": m.h || "", "Épaisseur (cm)": m.ep || "", "Doublage": m.doub || "ABSENT", "Isolant": m.iso || "", "Ép. Isolant (cm)": m.isoEp || "" })); if(mursData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mursData), "Murs");
-        let fensData = db.fens.map(f => ({ "Lot": getAptNum(f.aid), "Niveau": f.nivInt || 0, "Repère": f.nom || "", "Orientation": f.ori || "", "Type": f.type || "", "Matériau": f.mat || "", "Vitrage": f.vit || "", "Ép. Lame (mm)": f.ep || "", "Fermeture": f.fer || "", "Largeur (cm)": f.l || "", "Hauteur (cm)": f.h || "", "Diamètre (cm)": f.diam || "", "Surface Unitaire (m²)": f.surf || "", "Quantité": f.nb || 1, "Motifs": f.motifs || 1 })); if(fensData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fensData), "Fenêtres");
-        let portesData = db.portes.map(p => ({ "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type": p.type || "", "Matériau": p.mat || "", "Donne sur": p.donne || "", "Isolation": p.iso || "", "Sas": p.sas || "", "Largeur (m)": p.l || "", "Hauteur (m)": p.h || "" })); if(portesData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(portesData), "Portes");
+let fensData = db.fens.map(f => ({ 
+    "Lot": getAptNum(f.aid), 
+    "Niveau": f.nivInt || 0, 
+    "Code ANALYSIMMO": genererCodeFen(f),
+    "Repère": f.nom || "", 
+    "Orientation": f.ori || "", 
+    "Type": f.type || "", 
+    "Matériau": f.mat || "", 
+    "Vitrage": f.vit || "", 
+    "Ép. Lame (mm)": f.ep || "", 
+    "Fermeture": f.fer || "", 
+    "Largeur (cm)": f.l || "", 
+    "Hauteur (cm)": f.h || "", 
+    "Diamètre (cm)": f.diam || "", 
+    "Surface Unitaire (m²)": f.surf || "", 
+    "Quantité": f.nb || 1, 
+    "Motifs": f.motifs || 1 
+})); 
+if(fensData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(fensData), "Fenêtres");        let portesData = db.portes.map(p => ({ "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type": p.type || "", "Matériau": p.mat || "", "Donne sur": p.donne || "", "Isolation": p.iso || "", "Sas": p.sas || "", "Largeur (m)": p.l || "", "Hauteur (m)": p.h || "" })); if(portesData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(portesData), "Portes");
         let plfsData = db.plfs.map(p => ({ "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type ADN": p.type || "", "Donne sur": p.donne || "", "Longueur (m)": p.l || "", "Largeur (m)": p.larg || "", "Surface (m²)": p.s || "", "Isolant": p.iso || "", "Ép. Isolant (cm)": p.isoEp || "" })); if(plfsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plfsData), "Plafonds");
         let plasData = db.plas.map(p => ({ "Lot": getAptNum(p.aid), "Niveau": p.nivInt || 0, "Type ADN": p.type || "", "Donne sur": p.donne || "", "Longueur (m)": p.l || "", "Largeur (m)": p.larg || "", "Surface (m²)": p.s || "", "Isolant": p.iso || "", "Ép. Isolant (cm)": p.isoEp || "" })); if(plasData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plasData), "Planchers");
         let chaufsData = db.chaufs.map(c => ({ "Lot": getAptNum(c.aptId), "Énergie": c.energie || "", "Générateur": c.gen || "", "Émetteur": c.emetteur || "", "Année": c.annee || "", "Puissance (kW)": c.puissance || "" })); if(chaufsData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(chaufsData), "Chauffages");
